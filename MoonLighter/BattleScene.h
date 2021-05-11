@@ -7,23 +7,10 @@ class ProjectileManager;
 class BattleScene : public GameObject
 {
 private:
-	typedef struct tagTile
-	{
-		RECT rcTile;
-		int frameX;
-		int frameY;
-	}TILE_INFO;
+	Image* backGround;
+	Image* tileImage;
+	TILE_INFO tileMap[TILE_X * TILE_Y];
 
-	TILE_INFO tileInfo[16];
-	Image* testSample;
-
-	//ProjectileManager* projectilemManager;
-	//Player* player;
-	Image* backGroundImage;
-
-	POINTFLOAT player;
-	RECT missile;
-	bool isFired;
 public:
 	HRESULT Init() override;
 	void Release() override;
@@ -31,5 +18,6 @@ public:
 	void Render(HDC hdc) override;
 
 	void CheckCollision();
+	void Load();
 };
 

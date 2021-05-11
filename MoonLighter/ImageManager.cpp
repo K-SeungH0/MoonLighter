@@ -4,6 +4,20 @@
 HRESULT ImageManager::Init()
 {
 	// 이미지 추가
+	AddImage("SaveButton", "Image/Save.bmp", 144, 72, 2, 1);
+	AddImage("LoadButton", "Image/Load.bmp", 144, 72, 2, 1);
+	AddImage("LeftButton", "Image/Left.bmp", 120, 60, 2, 1);
+	AddImage("RightButton", "Image/Right.bmp", 120, 60, 2, 1);
+
+	// TileMap
+	AddImage("Dungeon Background", L"Image/Map/dungeon_background.png",
+		1280, 720, BACKGROUND_TILE_X, BACKGROUND_TILE_Y, true, RGB(128, 128, 128));
+	AddImage("Tile Set", L"Image/Map/TileMap.png",
+		320, 96, TILE_SET_X, TILE_SET_Y, true, RGB(128, 128, 128));
+
+	// Player
+	AddImage("PlayerMove", L"Image/Player/PlayerMove.png", 
+		1200, 1560, 10, 13, true, RGB(128, 128, 128));
 	return S_OK;
 }
 

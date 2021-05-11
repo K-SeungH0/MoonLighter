@@ -4,8 +4,6 @@
 HRESULT Image::Init(int width, int height)
 {
     HDC hdc = GetDC(g_hWnd);
-
-
     
     imageInfo = new IMAGE_INFO();
     imageInfo->resID = 0;
@@ -90,7 +88,10 @@ HRESULT Image::Init(const wchar_t* fileName, int width, int height, int maxFrame
 
     if (bitmap)
     {
-        bitmap->GetHBITMAP(transColor, &imageInfo->hBitmap);
+        int R = GetRValue(transColor);
+        int G = GetGValue(transColor);
+        int B = GetBValue(transColor);
+        bitmap->GetHBITMAP(RGB(B,G,R), &imageInfo->hBitmap);
         delete bitmap;
     }
     
@@ -171,7 +172,7 @@ HRESULT Image::Init(const char* fileName, int width, int height, int maxFrameX, 
     return S_OK;
 }
 
-void Image::Render(HDC hdc, int destX, int destY, int size, bool isCenterRenderring)
+void Image::Render(HDC hdc, int destX, int destY, float size, bool isCenterRenderring)
 {
     int x = destX;
     int y = destY;
@@ -228,7 +229,7 @@ void Image::Render(HDC hdc, int destX, int destY, int size, bool isCenterRenderr
 }
 
 void Image::FrameRender(HDC hdc, int destX, int destY,
-    int currFrameX, int currFrameY, int size, bool isCenterRenderring)
+    int currFrameX, int currFrameY, float size, bool isCenterRenderring)
 {
     imageInfo->currFrameX = currFrameX;
     imageInfo->currFrameY = currFrameY;

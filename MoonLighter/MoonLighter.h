@@ -15,11 +15,11 @@ using namespace std;
 #include "TimerManager.h"
 #include "SceneManager.h"
 
-#define WINSIZE_X	1080
+#define WINSIZE_X	1280
 #define WINSIZE_Y	720
 
-#define TILEMAPTOOLSIZE_X	1620
-#define TILEMAPTOOLSIZE_Y	900
+#define TILEMAPTOOLSIZE_X	1920
+#define TILEMAPTOOLSIZE_Y	1080
 
 #define ASTARSIZE_X	1620
 #define ASTARSIZE_Y	900
@@ -38,20 +38,30 @@ using namespace std;
 #define DELTATIME TIMERMANAGER->GetDeltaTime()
 #define SCENEMANAGER SceneManager::GetInstance()
 
+#define IMAGE_SIZE 2.0f
+
+#define TILE_SET_X	10
+#define TILE_SET_Y	3
+
+#define BACKGROUND_TILE_X 1
+#define BACKGROUND_TILE_Y 1
+
+#define TILESIZE		(32 * IMAGE_SIZE)
+
+#define TILE_X			18 
+#define TILE_Y			9
 
 enum class TILETYPE
 {
+	BREAKABLE,
 	WALL,
-	IRON,
-	FOREST,
-	RIVER,
-	ICE,
-	BOSS,
+	HOLE,
 	NONE
 };
 
 typedef struct tagTile
 {
+	Image* image;
 	RECT rcTile;
 	int frameX;
 	int frameY;

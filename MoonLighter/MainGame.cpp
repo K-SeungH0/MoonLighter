@@ -16,14 +16,12 @@ HRESULT MainGame::Init()
 	backBuffer = new Image();
 	backBuffer->Init(max(WINSIZE_X, TILEMAPTOOLSIZE_X), max(WINSIZE_Y, TILEMAPTOOLSIZE_Y));
 
-	SceneManager::GetInstance()->AddScene("Battle_1", new BattleScene());
+	SceneManager::GetInstance()->AddScene("Battle", new BattleScene());
 	SceneManager::GetInstance()->AddScene("TileMapTool", new TileMapTool());
 	SceneManager::GetInstance()->AddScene("A*", new AstarScene());
 	SceneManager::GetInstance()->AddLodingScene("LodingScene", new LoadingScene());
 
-	SceneManager::GetInstance()->ChageScene("A*");
-
-
+	SceneManager::GetInstance()->ChageScene("Battle");
 	isInited = true;
 
 	return S_OK;

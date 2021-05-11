@@ -4,7 +4,7 @@
 HRESULT Button::Init(const char* fileName, POINT pos)
 {
 	state = BUTTONSTATE::NONE;
-	image = ImageManager::GetInstance()->FindImage(fileName);
+	image = IMAGEMANAGER->FindImage(fileName);
 
 	if (image == nullptr)
 	{

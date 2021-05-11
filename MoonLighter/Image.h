@@ -82,10 +82,10 @@ public:
 		bool isTransparent = FALSE, COLORREF transColor = FALSE);
 
 	// 화면에 출력
-	void Render(HDC hdc, int destX = 0, int destY = 0, int size = 1,
+	void Render(HDC hdc, int destX = 0, int destY = 0, float size = 1.0f,
 		bool isCenterRenderring = false);
 	void FrameRender(HDC hdc, int destX, int destY,
-		int currFrameX, int currFrameY, int size = 1, bool isCenterRenderring = false);
+		int currFrameX, int currFrameY, float size = 1, bool isCenterRenderring = false);
 	void AlphaRender(HDC hdc, int destX, int destY,
 		bool isCenterRenderring = false);
 

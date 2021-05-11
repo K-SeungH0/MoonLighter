@@ -31,6 +31,15 @@
     <Filter Include="MainGame\Scene">
       <UniqueIdentifier>{337c27ff-d3c9-4e0c-a299-58d487af970e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="2D FrameWork\Unit">
+      <UniqueIdentifier>{223a93c5-82e9-41b6-a411-97b9a3549765}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2D FrameWork\Unit\Player">
+      <UniqueIdentifier>{e750f218-fd4c-4889-9dcc-1e273bd45d7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2D FrameWork\Unit\Enemy">
+      <UniqueIdentifier>{100a51e5-648d-479c-a8dc-e31db007cdf5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -74,6 +83,9 @@
     </ClCompile>
     <ClCompile Include="TileMapTool.cpp">
       <Filter>MainGame\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>2D FrameWork\Unit\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="CommonFunction.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>2D FrameWork\Unit\Player</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

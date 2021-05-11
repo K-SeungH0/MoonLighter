@@ -1,20 +1,15 @@
 #pragma once
 #include "GameObject.h"
 
-#define SAMPLE_TILE_X	6
-#define SAMPLE_TILE_Y	1
-#define TILESIZE		24
-
-#define TILE_X			26 
-#define TILE_Y			26
-
 class Image;
 class Button;
 class TileMapTool : public GameObject
 {
 private:
-	Image* sampleTile;
-	TILE_INFO sampleTileInfo[SAMPLE_TILE_X * SAMPLE_TILE_Y];
+	Image* backGroundTile;
+
+	Image* tileSetImage;
+	TILE_INFO tileSetInfo[TILE_SET_X * TILE_SET_Y];
 
 	static TILE_INFO tileInfo[TILE_X * TILE_Y];
 
