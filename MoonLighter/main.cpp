@@ -9,7 +9,7 @@ HWND g_hWnd;				// 윈도우 핸들
 POINT g_ptMouse;
 LPSTR g_lpszClass = (LPSTR)TEXT("윈메인의 시작");
 MainGame g_mainGame;
-TILE_INFO g_testTile[16];
+bool isDebugMode = false;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 int APIENTRY WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance,
@@ -68,7 +68,7 @@ int APIENTRY WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance,
 		else
 		{
 			TimerManager::GetInstance()->Update();
-
+		
 			g_mainGame.Update();
 			g_mainGame.Render();
 		}

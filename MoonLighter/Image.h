@@ -103,6 +103,11 @@ public:
 	BLENDFUNCTION* GetBlendFunc() { return &(this->blendFunc); }
 
 	inline int GetWidth() { return this->imageInfo->width; }
+	inline int GetFrameWidth() { return this->imageInfo->frameWidth; }
 	inline int GetHeight() { return this->imageInfo->height; }
+	inline int GetFrameHeight() { return this->imageInfo->frameHeight; }
+
+	inline void SetFrameWidth(int frameWidth) { this->imageInfo->frameWidth = frameWidth; }
+	inline void SetFrameHeight(int frameHeight) { this->imageInfo->frameHeight = frameHeight; }
 	inline IMAGE_INFO* const GetImageInfo() { return this->imageInfo; }
 };

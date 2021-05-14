@@ -15,10 +15,11 @@ private:
 	Image* backBuffer;
 
 public:
-	HRESULT Init();		// 오버라이딩 : 다형성
-	void Release();
-	void Update();
+	HRESULT Init() override;		// 오버라이딩 : 다형성
+	void Release() override;
+	void Update() override;
 	void Render();
+	void Render(HDC hdc) override {};
 
 	LRESULT MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam);
 

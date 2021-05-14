@@ -31,14 +31,17 @@
     <Filter Include="MainGame\Scene">
       <UniqueIdentifier>{337c27ff-d3c9-4e0c-a299-58d487af970e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="2D FrameWork\Unit">
+    <Filter Include="MainGame\Unit">
       <UniqueIdentifier>{223a93c5-82e9-41b6-a411-97b9a3549765}</UniqueIdentifier>
     </Filter>
-    <Filter Include="2D FrameWork\Unit\Player">
+    <Filter Include="MainGame\Unit\Player">
       <UniqueIdentifier>{e750f218-fd4c-4889-9dcc-1e273bd45d7a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="2D FrameWork\Unit\Enemy">
+    <Filter Include="MainGame\Unit\Enemy">
       <UniqueIdentifier>{100a51e5-648d-479c-a8dc-e31db007cdf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\Item">
+      <UniqueIdentifier>{8640493e-ec9f-4e71-93d6-94bb50a3464c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,9 +66,6 @@
     <ClCompile Include="Button.cpp">
       <Filter>2D FrameWork\UI</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>2D FrameWork</Filter>
-    </ClCompile>
     <ClCompile Include="Image.cpp">
       <Filter>2D FrameWork</Filter>
     </ClCompile>
@@ -85,7 +85,16 @@
       <Filter>MainGame\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>2D FrameWork\Unit\Player</Filter>
+      <Filter>MainGame\Unit\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Unit.cpp">
+      <Filter>MainGame\Unit</Filter>
+    </ClCompile>
+    <ClCompile Include="Equipment.cpp">
+      <Filter>MainGame\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="Item.cpp">
+      <Filter>MainGame\Item</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,7 +147,16 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>2D FrameWork\Unit\Player</Filter>
+      <Filter>MainGame\Unit\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Unit.h">
+      <Filter>MainGame\Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="Equipment.h">
+      <Filter>MainGame\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="Item.h">
+      <Filter>MainGame\Item</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

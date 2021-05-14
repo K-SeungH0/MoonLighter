@@ -89,9 +89,6 @@ HRESULT AstarScene::Init()
 	endTile = &(map[13][3]);
 	endTile->SetColor(RGB(0, 0, 255));
 	endTile->SetType(ASTARTILETYPE::END);
-	IMAGEMANAGER->AddImage("플레이어 정면 이동", L"Image/Player/Dungeon/Move/Player_Move_Front_01.png", 128, 128, 1, 1, true, RGB(128, 128, 128));
-
-	testImage = IMAGEMANAGER->FindImage("플레이어 정면 이동");
 	return S_OK;
 }
 

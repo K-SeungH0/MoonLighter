@@ -1,22 +1,24 @@
 #include "BattleScene.h"
 #include "Image.h"
-
+#include "Player.h"
 HRESULT BattleScene::Init()
 {
     Load();
     tileImage = IMAGEMANAGER->FindImage("Tile Set");
     backGround = IMAGEMANAGER->FindImage("Dungeon Background");
+    lpPlayer = new Player();
+    lpPlayer->Init();
 	return S_OK;
 }
 
 void BattleScene::Release()
 {
-
+    lpPlayer->Release();
 }
 
 void BattleScene::Update()
 {
-
+    lpPlayer->Update();
 }
 
 void BattleScene::Render(HDC hdc)
@@ -31,6 +33,19 @@ void BattleScene::Render(HDC hdc)
             tileMap[i].frameY,
             IMAGE_SIZE);
     }
+    lpPlayer->Render(hdc);
+
+    wsprintf(text, "플레이어 이동 : 방향키");
+    TextOut(hdc, 10, 10, text, strlen(text));
+
+    wsprintf(text, "공격 : A");
+    TextOut(hdc, 10, 10 + 40, text, strlen(text));
+
+    wsprintf(text, "회피 : SpaceBar");
+    TextOut(hdc, 10, 10 + 80, text, strlen(text));
+
+    wsprintf(text, "무기교체 : 1 ~ 5");
+    TextOut(hdc, 10, 10 + 120, text, strlen(text));
 }
 
 void BattleScene::CheckCollision()

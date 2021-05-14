@@ -61,7 +61,7 @@ enum class TILETYPE
 
 typedef struct tagTile
 {
-	Image* image;
+	Image* lpImage;
 	RECT rcTile;
 	int frameX;
 	int frameY;
@@ -71,4 +71,4 @@ typedef struct tagTile
 extern HWND g_hWnd;
 extern HINSTANCE g_hInstance;
 extern POINT g_ptMouse;
-extern TILE_INFO g_testTile[16];
+extern bool isDebugMode;

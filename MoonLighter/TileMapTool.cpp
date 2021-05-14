@@ -10,8 +10,8 @@ HRESULT TileMapTool::Init()
 {
     SetClientRect(g_hWnd, TILEMAPTOOLSIZE_X, TILEMAPTOOLSIZE_Y);
 
-    backGroundTile = IMAGEMANAGER->FindImage("Dungeon Background");
-    tileSetImage = IMAGEMANAGER->FindImage("Tile Set");
+    lpBackGroundTile = IMAGEMANAGER->FindImage("Dungeon Background");
+    lpTileSetImage = IMAGEMANAGER->FindImage("Tile Set");
 
     hSelectedBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
 
@@ -34,6 +34,7 @@ HRESULT TileMapTool::Init()
 
             tileInfo[i * TILE_X + j].frameX = TILE_X - 1;
             tileInfo[i * TILE_X + j].frameY = TILE_Y - 1;
+            tileInfo[i * TILE_X + j].lpImage = nullptr;
             tileInfo[i * TILE_X + j].type = TILETYPE::NONE;
 
             tileInfo[i * TILE_X + j].rcTile.left = TILESIZE * j + offset;
@@ -50,17 +51,17 @@ HRESULT TileMapTool::Init()
             // 샘플 영역
             if (i == 0 && j == 0)
             {
-                rcSample.left = TILEMAPTOOLSIZE_X - (tileSetImage->GetImageInfo()->width * 2) + (TILESIZE * j);
+                rcSample.left = TILEMAPTOOLSIZE_X - (lpTileSetImage->GetImageInfo()->width * 2) + (TILESIZE * j);
                 rcSample.top = (TILESIZE * i);
             }
             if (i == TILE_SET_Y - 1 && j == TILE_SET_X - 1)
             {
-                rcSample.right = TILEMAPTOOLSIZE_X - (tileSetImage->GetImageInfo()->width * 2) + (TILESIZE * j) + TILESIZE;
+                rcSample.right = TILEMAPTOOLSIZE_X - (lpTileSetImage->GetImageInfo()->width * 2) + (TILESIZE * j) + TILESIZE;
                 rcSample.bottom = (TILESIZE * i) + TILESIZE;
             }
-            tileSetInfo[i * TILE_SET_X + j].rcTile.left = TILEMAPTOOLSIZE_X - (tileSetImage->GetImageInfo()->width * 2) + (TILESIZE * j);
+            tileSetInfo[i * TILE_SET_X + j].rcTile.left = TILEMAPTOOLSIZE_X - (lpTileSetImage->GetImageInfo()->width * 2) + (TILESIZE * j);
             tileSetInfo[i * TILE_SET_X + j].rcTile.top = (TILESIZE * i);
-            tileSetInfo[i * TILE_SET_X + j].rcTile.right = TILEMAPTOOLSIZE_X - (tileSetImage->GetImageInfo()->width * 2) + (TILESIZE * j) + TILESIZE;
+            tileSetInfo[i * TILE_SET_X + j].rcTile.right = TILEMAPTOOLSIZE_X - (lpTileSetImage->GetImageInfo()->width * 2) + (TILESIZE * j) + TILESIZE;
             tileSetInfo[i * TILE_SET_X + j].rcTile.bottom = (TILESIZE * i) + TILESIZE;
 
             switch (i)
@@ -151,19 +152,19 @@ HRESULT TileMapTool::Init()
 
     // UI Button
     saveButton = new Button();
-    saveButton->Init("SaveButton", { TILEMAPTOOLSIZE_X - tileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 200 });
+    saveButton->Init("SaveButton", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 200 });
     saveButton->SetClick(Save, 1);
 
     loadButton = new Button();
-    loadButton->Init("LoadButton", { TILEMAPTOOLSIZE_X - tileSetImage->GetImageInfo()->width + 80, TILEMAPTOOLSIZE_Y - 200 });
+    loadButton->Init("LoadButton", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width + 80, TILEMAPTOOLSIZE_Y - 200 });
     loadButton->SetClick(Load, 1);
 
     leftButton = new Button();
-    leftButton->Init("LeftButton", { TILEMAPTOOLSIZE_X - tileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 300 });
+    leftButton->Init("LeftButton", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 300 });
     leftButton->SetClick(StageSelect, -1);
 
     rightButton = new Button();
-    rightButton->Init("RightButton", { TILEMAPTOOLSIZE_X - tileSetImage->GetImageInfo()->width + 80, TILEMAPTOOLSIZE_Y - 300 });
+    rightButton->Init("RightButton", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width + 80, TILEMAPTOOLSIZE_Y - 300 });
     rightButton->SetClick(StageSelect, 1);
 
     //selectStage = 1;
@@ -176,6 +177,7 @@ void TileMapTool::Release()
     SAFE_RELEASE(loadButton);
     SAFE_RELEASE(leftButton);
     SAFE_RELEASE(rightButton);
+    DeleteObject(hSelectedBrush);
 }
 
 void TileMapTool::Update()
@@ -198,18 +200,10 @@ void TileMapTool::Update()
             {
                 if (PtInRect(&(tileInfo[i].rcTile), g_ptMouse))
                 {
-                    for (int j = 0; j <= ptEndSelectedFrame.y - ptStartSelectedFrame.y; j++)
-                    {
-                        for (int k = 0; k <= ptEndSelectedFrame.x - ptStartSelectedFrame.x; k++)
-                        {
-                            if ((i % TILE_X) + k >= TILE_X) continue;
-                            if ((i / TILE_X) + j >= TILE_Y) continue;
-
-                            tileInfo[i + j * TILE_X + k].frameX = ptStartSelectedFrame.x + k;
-                            tileInfo[i + j * TILE_X + k].frameY = ptStartSelectedFrame.y + j;
-                            tileInfo[i + j * TILE_X + k].type = tileSetInfo[(ptStartSelectedFrame.y + j) * TILE_SET_X + (ptStartSelectedFrame.x + k)].type;
-                        }
-                    }
+                    tileInfo[i].frameX = selectedFrame.x;
+                    tileInfo[i].frameY = selectedFrame.y;
+                    tileInfo[i].lpImage = lpTileSetImage;
+                    tileInfo[i].type = tileSetInfo[(selectedFrame.y) * TILE_SET_X + (selectedFrame.x)].type;
                     break;
                 }
             }
@@ -219,37 +213,16 @@ void TileMapTool::Update()
     {
         if (KeyManager::GetInstance()->IsOnceKeyDown(VK_LBUTTON))
         {
-            ptStartSelectedFrame.x = g_ptMouse.x;
-            ptStartSelectedFrame.y = g_ptMouse.y;
-            ptSelected[0] = g_ptMouse;
-    
-        }
-        else if (KeyManager::GetInstance()->IsOnceKeyUp(VK_LBUTTON))
-        {
-            ptEndSelectedFrame.x = g_ptMouse.x;
-            ptEndSelectedFrame.y = g_ptMouse.y;
+            selectedFrame.x = g_ptMouse.x;
+            selectedFrame.y = g_ptMouse.y;
             TileSelect();
-            ptSelected[0].x = -1;
-            ptSelected[0].y = -1;
-            ptSelected[1].x = -1;
-            ptSelected[1].y = -1;
-        }
-        else if (KeyManager::GetInstance()->IsStayKeyDown(VK_LBUTTON))
-        {
-            ptSelected[1] = g_ptMouse;
         }
     }
 
     // Test
     if (KeyManager::GetInstance()->IsOnceKeyDown('Q'))
     {
-        for (int i = 0; i < 16; i++)
-        {
-            g_testTile[i].frameX = tileInfo[i].frameX;
-            g_testTile[i].frameY = tileInfo[i].frameY;
-            g_testTile[i].rcTile = tileInfo[i].rcTile;
-        }
-        SceneManager::GetInstance()->ChageScene("Battle_1");
+        SceneManager::GetInstance()->ChageScene("Battle");
     }
 }
 
@@ -258,10 +231,9 @@ void TileMapTool::Render(HDC hdc)
     PatBlt(hdc, 0, 0, TILEMAPTOOLSIZE_X, TILEMAPTOOLSIZE_Y, WHITENESS);
 
     // 타일 배경
-    backGroundTile->Render(hdc);
+    lpBackGroundTile->Render(hdc);
 
-    HBRUSH brush = (HBRUSH)GetStockObject(NULL_BRUSH);
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, brush);
+    hOldSelectedBrush = (HBRUSH)SelectObject(hdc, hSelectedBrush);
 
     Rectangle(hdc, rcSample.left, rcSample.top, rcSample.right, rcSample.bottom);
 
@@ -270,9 +242,9 @@ void TileMapTool::Render(HDC hdc)
     {
         Rectangle(hdc, tileSetInfo[i].rcTile.left, tileSetInfo[i].rcTile.top, tileSetInfo[i].rcTile.right, tileSetInfo[i].rcTile.bottom);
     }
-    SelectObject(hdc, oldBrush);
+    SelectObject(hdc, hOldSelectedBrush);
 
-    tileSetImage->Render(hdc, TILEMAPTOOLSIZE_X - (tileSetImage->GetImageInfo()->width * 2), 0, IMAGE_SIZE);
+    lpTileSetImage->Render(hdc, TILEMAPTOOLSIZE_X - (lpTileSetImage->GetImageInfo()->width * 2), 0, IMAGE_SIZE);
 
     // UI Button
     if (saveButton)
@@ -285,17 +257,26 @@ void TileMapTool::Render(HDC hdc)
         rightButton->Render(hdc);
 
     wsprintf(szText, "Stage : %d", this->selectStage);
-    TextOut(hdc, TILEMAPTOOLSIZE_X - tileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 350, szText, strlen(szText));
+    TextOut(hdc, TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 350, szText, strlen(szText));
 
     // 메인 영역 전체
-
     for (int i = 0; i < TILE_Y * TILE_X; i++)
     {
-        SelectObject(hdc, brush);
-        Rectangle(hdc, tileInfo[i].rcTile.left, tileInfo[i].rcTile.top, tileInfo[i].rcTile.right, tileInfo[i].rcTile.bottom);
-        
-        SelectObject(hdc, oldBrush);
-        tileSetImage->FrameRender(hdc,
+        if (PtInRect(&(tileInfo[i].rcTile), g_ptMouse))
+        {
+            HBRUSH myBrush = (HBRUSH)CreateSolidBrush(RGB(0, 128, 0));
+            HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, myBrush);
+            Rectangle(hdc, tileInfo[i].rcTile.left, tileInfo[i].rcTile.top, tileInfo[i].rcTile.right, tileInfo[i].rcTile.bottom);
+            SelectObject(hdc, oldBrush);
+            DeleteObject(myBrush);
+        }
+        else
+        {
+            SelectObject(hdc, hSelectedBrush);
+            Rectangle(hdc, tileInfo[i].rcTile.left, tileInfo[i].rcTile.top, tileInfo[i].rcTile.right, tileInfo[i].rcTile.bottom);
+        }
+        SelectObject(hdc, hOldSelectedBrush);
+        lpTileSetImage->FrameRender(hdc,
             tileInfo[i].rcTile.left,
             tileInfo[i].rcTile.top,
             tileInfo[i].frameX,
@@ -304,20 +285,14 @@ void TileMapTool::Render(HDC hdc)
 
     }
 
-    // 선택 영역 표시
-    if (ptStartSelectedFrame.x == ptEndSelectedFrame.x &&
-        ptStartSelectedFrame.y == ptEndSelectedFrame.y)
-    {
-        tileSetImage->FrameRender(hdc,
-            g_ptMouse.x,
-            g_ptMouse.y,
-            ptStartSelectedFrame.x, 
-            ptStartSelectedFrame.y, 
-            IMAGE_SIZE, 
-            true);
-    }
-
-    DeleteObject(brush);
+    // 선택된 타일
+    lpTileSetImage->FrameRender(hdc,
+        g_ptMouse.x,
+        g_ptMouse.y,
+        selectedFrame.x, 
+        selectedFrame.y, 
+        IMAGE_SIZE, 
+        true);
 
 }
 
@@ -362,17 +337,12 @@ void TileMapTool::StageSelect(int num)
 
 void TileMapTool::TileSelect()
 {
-    ptStartSelectedFrame.x -= TILEMAPTOOLSIZE_X - (tileSetImage->GetImageInfo()->width * 2);
-    ptEndSelectedFrame.x -= TILEMAPTOOLSIZE_X - (tileSetImage->GetImageInfo()->width * 2);
+    selectedFrame.x -= TILEMAPTOOLSIZE_X - (lpTileSetImage->GetImageInfo()->width * 2);
 
-    if (ptStartSelectedFrame.x / TILESIZE >= 0 && ptStartSelectedFrame.x / TILESIZE < TILE_SET_X &&
-        ptStartSelectedFrame.y / TILESIZE >= 0 && ptStartSelectedFrame.y / TILESIZE < TILE_SET_Y &&
-        ptEndSelectedFrame.x / TILESIZE >= 0 && ptEndSelectedFrame.x / TILESIZE < TILE_SET_X &&
-        ptEndSelectedFrame.y / TILESIZE >= 0 && ptEndSelectedFrame.y / TILESIZE < TILE_SET_Y)
+    if (selectedFrame.x / TILESIZE >= 0 && selectedFrame.x / TILESIZE < TILE_SET_X &&
+        selectedFrame.y / TILESIZE >= 0 && selectedFrame.y / TILESIZE < TILE_SET_Y)
     {
-        ptStartSelectedFrame.x = ptStartSelectedFrame.x / TILESIZE;
-        ptStartSelectedFrame.y = ptStartSelectedFrame.y / TILESIZE;
-        ptEndSelectedFrame.x = ptEndSelectedFrame.x / TILESIZE;
-        ptEndSelectedFrame.y = ptEndSelectedFrame.y / TILESIZE;
+        selectedFrame.x = selectedFrame.x / TILESIZE;
+        selectedFrame.y = selectedFrame.y / TILESIZE;
     }
 }

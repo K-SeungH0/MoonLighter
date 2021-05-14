@@ -1,23 +1,22 @@
 #pragma once
 #include "GameObject.h"
+// 1200 * 640
 
 class Image;
 class Button;
 class TileMapTool : public GameObject
 {
 private:
-	Image* backGroundTile;
+	Image* lpBackGroundTile;
+	Image* lpTileSetImage;
 
-	Image* tileSetImage;
 	TILE_INFO tileSetInfo[TILE_SET_X * TILE_SET_Y];
-
 	static TILE_INFO tileInfo[TILE_X * TILE_Y];
 
-	POINT ptSelected[2];
 	HBRUSH hSelectedBrush;
 	HBRUSH hOldSelectedBrush;
-	POINT ptStartSelectedFrame;
-	POINT ptEndSelectedFrame;
+
+	POINT selectedFrame;
 
 	int selectedFrameX;
 	int selectedFrameY;

@@ -238,8 +238,8 @@ void Image::FrameRender(HDC hdc, int destX, int destY,
     int y = destY;
     if (isCenterRenderring)
     {
-        x = destX - (imageInfo->frameWidth / 2);
-        y = destY - (imageInfo->frameHeight / 2);
+        x = destX - (imageInfo->frameWidth / 2) * size;
+        y = destY - (imageInfo->frameHeight / 2) * size;
     }
 
     if (isTransparent)

@@ -39,8 +39,10 @@ void MainGame::Release()
 
 void MainGame::Update()
 {
+	if (KEYMANAGER->IsOnceKeyDown('P'))
+		isDebugMode = !isDebugMode;
+
 	SceneManager::GetInstance()->Update();
-	// TileMapTool Scene
 }
 
 void MainGame::Render()

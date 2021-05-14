@@ -10,7 +10,8 @@ private:
 	Image* backGround;
 	Image* tileImage;
 	TILE_INFO tileMap[TILE_X * TILE_Y];
-
+	Player* lpPlayer;
+	char text[128];
 public:
 	HRESULT Init() override;
 	void Release() override;

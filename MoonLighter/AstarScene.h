@@ -105,6 +105,7 @@ public:
 	int CalcCost(int x, int y);
 	int CalcHeuristic(int x, int y);
 	void MarkTileToType();
+
 	~AstarScene() override {};
 };
 
