@@ -38,6 +38,9 @@ public:
 	void Attack();
 	void ChangeType(WEAPONTYPE type);
 	void ResetAttackCollider();
+
+	void ImageLoad();
+
 	inline int GetDamage() { return this->damage; }
 	inline WEAPONTYPE GetType() { return this->weaponType; }
 

@@ -7,7 +7,7 @@
 HINSTANCE g_hInstance;		// 프로그램 인스턴스 핸들
 HWND g_hWnd;				// 윈도우 핸들
 POINT g_ptMouse;
-LPSTR g_lpszClass = (LPSTR)TEXT("윈메인의 시작");
+LPSTR g_lpszClass = (LPSTR)TEXT("문라이터");
 MainGame g_mainGame;
 bool isDebugMode = false;
 

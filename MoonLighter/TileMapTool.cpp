@@ -182,6 +182,11 @@ void TileMapTool::Release()
 
 void TileMapTool::Update()
 {
+    if (KEYMANAGER->IsOnceKeyDown(VK_ESCAPE))
+    {
+        SCENEMANAGER->ChageScene("Title");
+    }
+
     // 세이브, 로드
     if (saveButton)
         saveButton->Update();

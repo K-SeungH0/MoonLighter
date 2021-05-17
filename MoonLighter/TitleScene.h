@@ -1,25 +1,37 @@
 #pragma once
 #include "GameObject.h"
 
-struct Menu
+class Image;
+enum class MENU
 {
-	RECT rc;
-	POINTFLOAT pos;
-	string name;
+	START,
+	MAPTOOL,
+	EXIT,
+	NONE
 };
 
-class Image;
+struct Menu
+{
+	MENU type;
+	POINTFLOAT pos;
+	const char* name;
+};
+
 class TitleScene : public GameObject
 {
 private:
 	Image* lpFrontMenu;
 	Image* lpBackMenu;
 	Image* lpLogo;
+	Image* lpSelect;
 
-	Menu menu[3];
+	Menu menu[(int)MENU::NONE];
 
 	float timer;
 	int frame;
+	int selectIndex;
+	HFONT hFont;
+	HFONT oldFont;
 
 public:
 	HRESULT Init() override;

@@ -9,6 +9,7 @@ HRESULT Equipment::Init()
 
 HRESULT Equipment::Init(Player* player)
 {
+	ImageLoad();
 	this->type = OBJECTTYPE::DYNAMIC;
 	this->weaponType = WEAPONTYPE::SHORTSWORD;
 	ChangeType(weaponType);
@@ -87,6 +88,49 @@ void Equipment::ChangeType(WEAPONTYPE type)
 void Equipment::ResetAttackCollider()
 {
 	collider = { 0,0,0,0 };
+}
+
+void Equipment::ImageLoad()
+{
+	COLORREF color = RGB(128, 128, 128);
+
+	IMAGEMANAGER->AddImage("BigSwordMotion", L"Image/Player/Weapon/BigSwordMotion.png",
+		2560, 256, 40, 4, true, color);
+	IMAGEMANAGER->AddImage("ShortSwordMotion", L"Image/Player/Weapon/ShortSwordMotion.png",
+		1152, 256, 18, 4, true, color);
+	IMAGEMANAGER->AddImage("GlovesMotion", L"Image/Player/Weapon/GlovesMotion.png",
+		1280, 256, 20, 4, true, color);
+	IMAGEMANAGER->AddImage("SpearMotion", L"Image/Player/Weapon/SpearMotion.png",
+		1472, 256, 23, 4, true, color);
+	IMAGEMANAGER->AddImage("BowMotion", L"Image/Player/Weapon/BowMotion.png",
+		448, 256, 7, 4, true, color);
+	IMAGEMANAGER->AddImage("ShortSwordSpecialMotion", L"Image/Player/Weapon/ShortSwordSpecial.png",
+		512, 64, 8, 1, true, color);
+	
+	IMAGEMANAGER->AddImage("BigSword1", L"Image/Player/Weapon/BigSword/1.png",
+		5120, 512, 40, 4, true, color);
+	IMAGEMANAGER->AddImage("BigSword2", L"Image/Player/Weapon/BigSword/2.png",
+		5120, 512, 40, 4, true, color);
+
+	IMAGEMANAGER->AddImage("ShortSword1", L"Image/Player/Weapon/ShortSword/1.png",
+		2304, 512, 18, 4, true, color);
+	IMAGEMANAGER->AddImage("ShortSword2", L"Image/Player/Weapon/ShortSword/2.png",
+		1728, 384, 18, 4, true, color);
+
+	IMAGEMANAGER->AddImage("Bow1", L"Image/Player/Weapon/Bow/1.png",
+		448, 256, 7, 4, true, color);
+	IMAGEMANAGER->AddImage("Bow2", L"Image/Player/Weapon/Bow/2.png",
+		448, 256, 7, 4, true, color);
+
+	IMAGEMANAGER->AddImage("Gloves1", L"Image/Player/Weapon/Gloves/1.png",
+		2560, 512, 20, 4, true, color);
+	IMAGEMANAGER->AddImage("Gloves2", L"Image/Player/Weapon/Gloves/2.png",
+		2560, 512, 20, 4, true, color);
+
+	IMAGEMANAGER->AddImage("Spear1", L"Image/Player/Weapon/Spear/1.png",
+		3680, 640, 23, 4, true, color);
+	IMAGEMANAGER->AddImage("Spear2", L"Image/Player/Weapon/Spear/2.png",
+		3680, 640, 23, 4, true, color);
 }
 
 void Equipment::AttackInfoInit()

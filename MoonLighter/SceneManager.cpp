@@ -20,7 +20,7 @@ DWORD CALLBACK LoadingThread(LPVOID pvParam)
 
 HRESULT SceneManager::Init()
 {
-    return E_NOTIMPL;
+    return S_OK;
 }
 
 void SceneManager::Release()
@@ -86,11 +86,11 @@ HRESULT SceneManager::ChageScene(string sceneName)
     if (iter->second == currentScene)
         return S_OK;
 
+    if (currentScene)
+        currentScene->Release();
+
     if (SUCCEEDED(iter->second->Init()))
     {
-        if (currentScene)
-            currentScene->Release();
-
         currentScene = iter->second;
 
         return S_OK;

@@ -5,6 +5,7 @@ class Player;
 class Image;
 class ProjectileManager;
 class Object;
+class Inventory;
 class BattleScene : public GameObject
 {
 private:
@@ -12,6 +13,7 @@ private:
 	Image* tileImage;
 	TILE_INFO tileMap[TILE_X * TILE_Y];
 	Player* lpPlayer;
+	Inventory* lpInventory;
 
 	vector<Object*> vObjects;
 

@@ -11,7 +11,6 @@ HRESULT MainGame::Init()
 {
 	hdc = GetDC(g_hWnd);
 
-
 	KeyManager::GetInstance()->Init();
 	ImageManager::GetInstance()->Init();
 	SceneManager::GetInstance()->Init();

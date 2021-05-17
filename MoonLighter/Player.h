@@ -37,6 +37,8 @@ public:
 	void AddAttackFrame(vector<int> frame);
 	void EquipmentChagne(Equipment* weapon);
 
+	void ImageLoad();
+
 	// 동작을 시작할때 실행
 	void FrameReset();
 

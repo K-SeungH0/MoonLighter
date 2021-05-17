@@ -5,6 +5,7 @@
 
 HRESULT Player::Init()
 {
+    ImageLoad();
     lpImage = IMAGEMANAGER->FindImage("PlayerState");
     
     moveSpeed = 250;
@@ -41,7 +42,7 @@ void Player::Update()
     if (KEYMANAGER->IsOnceKeyDown('0'))
         Die();
     
-    if (KEYMANAGER->IsOnceKeyDown('A'))
+    if (state != STATE::AVOID && KEYMANAGER->IsOnceKeyDown('A'))
         Attack();
 
     if (!isAction)
@@ -136,7 +137,7 @@ void Player::Render(HDC hdc)
 
     lpImage->FrameRender(hdc, pos.x, pos.y, imageFrame, stateFrame, IMAGE_SIZE, true);
 
-    if (isAction)
+    if (state == STATE::ATTACK)
         weapon->Render(hdc);
 }
 
@@ -308,6 +309,14 @@ void Player::AddAttackFrame(vector<int> frame)
 void Player::EquipmentChagne(Equipment* weapon)
 {
     this->weapon = weapon;
+}
+
+void Player::ImageLoad()
+{
+    COLORREF color = RGB(128, 128, 128);
+
+    IMAGEMANAGER->AddImage("PlayerState", L"Image/Player/PlayerState.png",
+        640, 832, 10, 13, true, color);
 }
 
 void Player::FrameReset()
