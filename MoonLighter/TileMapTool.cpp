@@ -9,7 +9,7 @@ int TileMapTool::selectStage = 1;
 HRESULT TileMapTool::Init()
 {
     SetClientRect(g_hWnd, TILEMAPTOOLSIZE_X, TILEMAPTOOLSIZE_Y);
-
+    ImageLoad();
     lpBackGroundTile = IMAGEMANAGER->FindImage("Dungeon Background");
     lpTileSetImage = IMAGEMANAGER->FindImage("Tile Set");
 
@@ -294,6 +294,9 @@ void TileMapTool::Render(HDC hdc)
         IMAGE_SIZE, 
         true);
 
+
+    wsprintf(szText, "배틀 씬으로 넘어가기 : Q");
+    TextOut(hdc, 100, 10, szText, strlen(szText));
 }
 
 void TileMapTool::Save(int stageNum)
@@ -345,4 +348,20 @@ void TileMapTool::TileSelect()
         selectedFrame.x = selectedFrame.x / TILESIZE;
         selectedFrame.y = selectedFrame.y / TILESIZE;
     }
+}
+
+void TileMapTool::ImageLoad()
+{
+    COLORREF color = RGB(128, 128, 128);
+
+    // 이미지 추가
+    IMAGEMANAGER->AddImage("SaveButton", "Image/Save.bmp", 144, 72, 2, 1);
+    IMAGEMANAGER->AddImage("LoadButton", "Image/Load.bmp", 144, 72, 2, 1);
+    IMAGEMANAGER->AddImage("LeftButton", "Image/Left.bmp", 120, 60, 2, 1);
+    IMAGEMANAGER->AddImage("RightButton", "Image/Right.bmp", 120, 60, 2, 1);
+
+    IMAGEMANAGER->AddImage("Dungeon Background", L"Image/Map/dungeon_background.png",
+        1280, 720, BACKGROUND_TILE_X, BACKGROUND_TILE_Y, true, color);
+    IMAGEMANAGER->AddImage("Tile Set", L"Image/Map/TileMap.png",
+        320, 96, TILE_SET_X, TILE_SET_Y, true, color);
 }

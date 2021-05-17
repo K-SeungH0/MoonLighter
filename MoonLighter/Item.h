@@ -1,12 +1,12 @@
 #pragma once
-#include "GameObject.h"
+#include "Object.h"
 
 class Image;
 
-class Item : public GameObject
+class Item : public Object
 {
 protected:
-	Image* lpItemImage;
+	//Image* lpItemImage;
 
 public:
 	HRESULT Init() override;
@@ -16,7 +16,7 @@ public:
 
 	void Use();
 
-	inline Image* GetImage() { return this->lpItemImage; }
+	//inline Image* GetImage() { return this->lpItemImage; }
 
 	~Item() override {};
 };

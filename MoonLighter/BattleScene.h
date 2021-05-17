@@ -4,6 +4,7 @@
 class Player;
 class Image;
 class ProjectileManager;
+class Object;
 class BattleScene : public GameObject
 {
 private:
@@ -11,6 +12,9 @@ private:
 	Image* tileImage;
 	TILE_INFO tileMap[TILE_X * TILE_Y];
 	Player* lpPlayer;
+
+	vector<Object*> vObjects;
+
 	char text[128];
 public:
 	HRESULT Init() override;
@@ -20,5 +24,6 @@ public:
 
 	void CheckCollision();
 	void Load();
+	void ImageLoad();
 };
 

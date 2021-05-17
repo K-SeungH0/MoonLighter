@@ -31,17 +31,23 @@
     <Filter Include="MainGame\Scene">
       <UniqueIdentifier>{337c27ff-d3c9-4e0c-a299-58d487af970e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame\Unit">
-      <UniqueIdentifier>{223a93c5-82e9-41b6-a411-97b9a3549765}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MainGame\Unit\Player">
-      <UniqueIdentifier>{e750f218-fd4c-4889-9dcc-1e273bd45d7a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MainGame\Unit\Enemy">
-      <UniqueIdentifier>{100a51e5-648d-479c-a8dc-e31db007cdf5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MainGame\Item">
       <UniqueIdentifier>{8640493e-ec9f-4e71-93d6-94bb50a3464c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\Object">
+      <UniqueIdentifier>{4d708b13-454c-4a9f-b1f0-d6cb66838f33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\Object\Unit">
+      <UniqueIdentifier>{223a93c5-82e9-41b6-a411-97b9a3549765}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\Object\Unit\Player">
+      <UniqueIdentifier>{e750f218-fd4c-4889-9dcc-1e273bd45d7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\Object\Unit\Enemy">
+      <UniqueIdentifier>{100a51e5-648d-479c-a8dc-e31db007cdf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\Object\Block">
+      <UniqueIdentifier>{5d4dab45-a383-4c69-ac63-dea1eff7acf2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -85,16 +91,31 @@
       <Filter>MainGame\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>MainGame\Unit\Player</Filter>
+      <Filter>MainGame\Object\Unit\Player</Filter>
     </ClCompile>
     <ClCompile Include="Unit.cpp">
-      <Filter>MainGame\Unit</Filter>
+      <Filter>MainGame\Object\Unit</Filter>
     </ClCompile>
     <ClCompile Include="Equipment.cpp">
       <Filter>MainGame\Item</Filter>
     </ClCompile>
     <ClCompile Include="Item.cpp">
       <Filter>MainGame\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionManager.cpp">
+      <Filter>2D FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Collider.cpp">
+      <Filter>2D FrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="Block.cpp">
+      <Filter>MainGame\Object\Block</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.cpp">
+      <Filter>2D FrameWork\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScene.cpp">
+      <Filter>MainGame\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -147,16 +168,34 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>MainGame\Unit\Player</Filter>
+      <Filter>MainGame\Object\Unit\Player</Filter>
     </ClInclude>
     <ClInclude Include="Unit.h">
-      <Filter>MainGame\Unit</Filter>
+      <Filter>MainGame\Object\Unit</Filter>
     </ClInclude>
     <ClInclude Include="Equipment.h">
       <Filter>MainGame\Item</Filter>
     </ClInclude>
     <ClInclude Include="Item.h">
       <Filter>MainGame\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionManager.h">
+      <Filter>2D FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Collider.h">
+      <Filter>2D FrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>MainGame\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Block.h">
+      <Filter>MainGame\Object\Block</Filter>
+    </ClInclude>
+    <ClInclude Include="UI.h">
+      <Filter>2D FrameWork\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScene.h">
+      <Filter>MainGame\Scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

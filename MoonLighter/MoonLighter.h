@@ -14,6 +14,7 @@ using namespace std;
 #include "ImageManager.h"
 #include "TimerManager.h"
 #include "SceneManager.h"
+#include "CollisionManager.h"
 
 #define WINSIZE_X	1280
 #define WINSIZE_Y	720
@@ -37,7 +38,7 @@ using namespace std;
 #define TIMERMANAGER TimerManager::GetInstance()
 #define DELTATIME TIMERMANAGER->GetDeltaTime()
 #define SCENEMANAGER SceneManager::GetInstance()
-
+#define COLLIDERMANAGER CollisionManager::GetInstance()
 #define IMAGE_SIZE 2.0f
 
 #define TILE_SET_X	10
@@ -57,6 +58,14 @@ enum class TILETYPE
 	WALL,
 	HOLE,
 	NONE
+};
+
+struct RECTFLOAT
+{
+	float left;
+	float top;
+	float right;
+	float bottom;
 };
 
 typedef struct tagTile

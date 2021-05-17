@@ -1,5 +1,5 @@
 #pragma once
-#include "GameObject.h"
+#include "Object.h"
 
 class Image;
 
@@ -24,12 +24,10 @@ enum class DIR
 	DOWN,		
 	NONE
 };
-class Unit : public GameObject
+
+class Unit : public Object
 {
 protected:
-	POINTFLOAT pos;
-	RECT hitBox;
-	Image* lpImage;
 	STATE state;
 	DIR dir;
 
@@ -42,8 +40,11 @@ public:
 	void Release() override;
 	void Update() override;
 	void Render(HDC hdc) override;
-
+	
 	void Hit();
+
+	inline DIR GetDir() { return this->dir; }
+
 	~Unit() override {};
 };
 

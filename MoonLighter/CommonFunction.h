@@ -68,6 +68,8 @@ inline bool RectInRect(RECT rc1, RECT rc2)
 	return true;
 }
 
+
+
 inline float GetHeightFromParabolaMoving(float x/*, POINT currentPos*/)
 {
 	// y = a(x-h)^2 + k

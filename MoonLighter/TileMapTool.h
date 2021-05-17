@@ -30,7 +30,7 @@ private:
 	Button* leftButton;
 	Button* rightButton;
 	static int selectStage;
-	char szText[20];
+	char szText[128];
 
 public:
 	virtual HRESULT Init();
@@ -43,7 +43,7 @@ public:
 	static void Load(int stageNum);
 
 	void TileSelect();
-
+	void ImageLoad();
 	virtual ~TileMapTool() {};
 };
 

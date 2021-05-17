@@ -3,7 +3,6 @@
 
 HRESULT Unit::Init()
 {
-    
     return S_OK;
 }
 
@@ -20,7 +19,7 @@ void Unit::Update()
 void Unit::Render(HDC hdc)
 {
     if (isDebugMode)
-        Rectangle(hdc, hitBox.left, hitBox.top, hitBox.right, hitBox.bottom);
+        Rectangle(hdc, collider.left, collider.top, collider.right, collider.bottom);
 }
 
 void Unit::Hit()

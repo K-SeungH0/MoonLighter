@@ -18,10 +18,9 @@ private:
 	bool isAction;
 	bool isCombo;
 
-	//Image* lpWeaponImage;
 	Equipment* weapon;
 
-	char testText[128];
+	vector<int> attackFrame;
 public:
 	HRESULT Init() override;
 	void Release() override;
@@ -35,11 +34,15 @@ public:
 	void SpecialAttack();
 	void SetHitBox();
 	void NextCombo(int first, int second, int third);
+	void AddAttackFrame(vector<int> frame);
 	void EquipmentChagne(Equipment* weapon);
 
 	// 동작을 시작할때 실행
 	void FrameReset();
 
+	inline POINTFLOAT GetPos() { return this->pos; }
+	inline int GetImageFrame() { return this->imageFrame; }
+	inline int GetStateFrame() { return this->stateFrame; }
 	~Player() override {};
 };
 

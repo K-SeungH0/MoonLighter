@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Image.h"
 #include "Equipment.h"
+#include "CollisionManager.h"
 
 HRESULT Player::Init()
 {
@@ -15,14 +16,17 @@ HRESULT Player::Init()
     frameTimer = 0;
     comboStack = 0;
     
-    pos = { WINSIZE_X / 2 , WINSIZE_Y / 2 };
+    pos = { WINSIZE_X / 2 , WINSIZE_Y - 100 };
     
     isAction = false;
     isCombo = false;
 
     SetHitBox();
     weapon = new Equipment();
-    weapon->Init();
+    weapon->Init(this);
+
+    type = OBJECTTYPE::DYNAMIC;
+    COLLIDERMANAGER->AddCollider(this);
 
     return S_OK;
 }
@@ -69,8 +73,6 @@ void Player::Update()
 
         if (KEYMANAGER->IsOnceKeyDown(VK_DOWN))          FrameReset();
         else if (KEYMANAGER->IsStayKeyDown(VK_DOWN))     Move(DIR::DOWN);
-        
-
 
         if (KEYMANAGER->IsOnceKeyDown(VK_SPACE))
         {
@@ -81,12 +83,35 @@ void Player::Update()
     if(state == STATE::AVOID)
         Move(dir);
 
+    if (state == STATE::ATTACK)
+    {
+        for (int i = 0; i < attackFrame.size(); i++)
+        {
+            if (imageFrame == attackFrame[i])
+            {
+                weapon->Attack();
+                break;
+            }
+            else
+                weapon->ResetAttackCollider();
+        }
+    }
+
     frameTimer += DELTATIME;
     
     if (frameTimer > 0.1f)
     {
         frameTimer -= 0.1f;
-        if (isAction)
+
+        // TODO : 죽었을때 상황 추가해야함
+        if (state == STATE::DIE)
+        {
+            if (++imageFrame >= maxFrame)
+            {
+                imageFrame = maxFrame - 1;
+            }
+        }
+        else if (isAction)
         {
             if (++imageFrame >= maxFrame)
             {
@@ -101,8 +126,8 @@ void Player::Update()
             (++imageFrame) %= maxFrame;
     }
     
-    if (!isAction)
-        SetHitBox();
+    //if (!isAction)
+    //    SetHitBox();
 }
 
 void Player::Render(HDC hdc)
@@ -111,13 +136,8 @@ void Player::Render(HDC hdc)
 
     lpImage->FrameRender(hdc, pos.x, pos.y, imageFrame, stateFrame, IMAGE_SIZE, true);
 
-    if(isAction)
-        weapon->GetImage()->FrameRender(hdc, pos.x, pos.y, imageFrame, stateFrame, IMAGE_SIZE, true);
-
-    wsprintf(testText, "PreFrame : %d", preFrame);
-    TextOut(hdc, 300, 100, testText, strlen(testText));
-    wsprintf(testText, "MaxFrame : %d", maxFrame);
-    TextOut(hdc, 300, 150, testText, strlen(testText));
+    if (isAction)
+        weapon->Render(hdc);
 }
 
 void Player::Avoid()
@@ -129,7 +149,7 @@ void Player::Avoid()
     stateFrame = 4;
     stateFrame += (int)dir;
     maxFrame = 8;
-    hitBox = { 0,0,0,0 };
+    //collider = { 0,0,0,0 };
 }
 
 void Player::Move(DIR dir)
@@ -143,22 +163,38 @@ void Player::Move(DIR dir)
         stateFrame += (int)dir;
         maxFrame = 8;
     }
-
+    
     switch (this->dir)
     {
     case DIR::LEFT:
-        pos.x -= moveSpeed * DELTATIME;
+        collider.left -= moveSpeed * DELTATIME;
+         
+        if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
+        {
+            pos.x -= moveSpeed * DELTATIME;
+        }
         break;
     case DIR::UP:
-        pos.y -= moveSpeed * DELTATIME;
+        collider.top -= moveSpeed * DELTATIME;
+
+        if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
+            pos.y -= moveSpeed * DELTATIME;
         break;
     case DIR::RIGHT:
-        pos.x += moveSpeed * DELTATIME;
+        collider.right += moveSpeed * DELTATIME;
+
+        if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
+            pos.x += moveSpeed * DELTATIME;
         break;
     case DIR::DOWN:
-        pos.y += moveSpeed * DELTATIME;
+        collider.bottom += moveSpeed * DELTATIME;
+
+        if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
+            pos.y += moveSpeed * DELTATIME;
         break;
     }
+
+    SetHitBox();
 }
 
 void Player::Die()
@@ -182,27 +218,26 @@ void Player::Attack()
         FrameReset();
     }
 
-
     switch (weapon->GetType())
     {
         case WEAPONTYPE::BIGSWORD:
-            // 11 -> 22 -> 40
             NextCombo(11, 22, 40);
+            AddAttackFrame({ 6,17,28 });
             lpImage = IMAGEMANAGER->FindImage("BigSwordMotion");
             break;
         case WEAPONTYPE::SHORTSWORD:
-            // 5 -> 9 -> 18
             NextCombo(5, 9, 18);
+            AddAttackFrame({ 2,6,10 });
             lpImage = IMAGEMANAGER->FindImage("ShortSwordMotion");
             break;
         case WEAPONTYPE::GLOVES:
-            // 5 -> 10 -> 20            
             NextCombo(5, 10, 20);
+            AddAttackFrame({ 3,7,12,14 });
             lpImage = IMAGEMANAGER->FindImage("GlovesMotion");
             break;
         case WEAPONTYPE::SPEAR:
-            // 6 -> 14 -> 23
             NextCombo(6, 14, 23);
+            AddAttackFrame({ 2,9,16 });
             lpImage = IMAGEMANAGER->FindImage("SpearMotion");
             break;
         case WEAPONTYPE::BOW:
@@ -235,10 +270,10 @@ void Player::SpecialAttack()
 
 void Player::SetHitBox()
 {
-    hitBox.left = pos.x - lpImage->GetFrameWidth() / 2;
-    hitBox.top = pos.y - lpImage->GetFrameHeight() / 2;
-    hitBox.right = pos.x + lpImage->GetFrameWidth() / 2;
-    hitBox.bottom = pos.y + lpImage->GetFrameHeight() / 2;
+    collider.left = pos.x - lpImage->GetFrameWidth() / 3;
+    collider.top = pos.y - lpImage->GetFrameHeight() / 3;
+    collider.right = pos.x + lpImage->GetFrameWidth() / 3;
+    collider.bottom = pos.y + lpImage->GetFrameHeight() / 3;
 }
 
 void Player::NextCombo(int first, int second, int third)
@@ -261,6 +296,13 @@ void Player::NextCombo(int first, int second, int third)
         }
         comboStack++;
     }
+}
+
+void Player::AddAttackFrame(vector<int> frame)
+{
+    attackFrame.clear();
+
+    attackFrame = frame;
 }
 
 void Player::EquipmentChagne(Equipment* weapon)

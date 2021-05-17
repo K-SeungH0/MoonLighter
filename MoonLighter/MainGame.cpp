@@ -4,13 +4,18 @@
 #include "BattleScene.h"
 #include "AstarScene.h"
 #include "LoadingScene.h"
+#include "TitleScene.h"
+#include "CollisionManager.h"
 
 HRESULT MainGame::Init()
 {
 	hdc = GetDC(g_hWnd);
+
+
 	KeyManager::GetInstance()->Init();
 	ImageManager::GetInstance()->Init();
 	SceneManager::GetInstance()->Init();
+	CollisionManager::GetInstance()->Init();
 
 	// 백버퍼 이미지
 	backBuffer = new Image();
@@ -19,9 +24,10 @@ HRESULT MainGame::Init()
 	SceneManager::GetInstance()->AddScene("Battle", new BattleScene());
 	SceneManager::GetInstance()->AddScene("TileMapTool", new TileMapTool());
 	SceneManager::GetInstance()->AddScene("A*", new AstarScene());
+	SceneManager::GetInstance()->AddScene("Title", new TitleScene());
 	SceneManager::GetInstance()->AddLodingScene("LodingScene", new LoadingScene());
 
-	SceneManager::GetInstance()->ChageScene("Battle");
+	SceneManager::GetInstance()->ChageScene("Title");
 	isInited = true;
 
 	return S_OK;
@@ -32,9 +38,9 @@ void MainGame::Release()
 	SAFE_RELEASE(backBuffer);
 
 	ReleaseDC(g_hWnd, hdc);
-	KeyManager::GetInstance()->Release();
-	ImageManager::GetInstance()->Release();
-	SceneManager::GetInstance()->Release();
+	KEYMANAGER->Release();
+	IMAGEMANAGER->Release();
+	SCENEMANAGER->Release();
 }
 
 void MainGame::Update()
@@ -49,10 +55,11 @@ void MainGame::Render()
 {
 	HDC hBackDC = backBuffer->GetMemDC();
 
-	SceneManager::GetInstance()->Render(hBackDC);
-	TimerManager::GetInstance()->Render(hBackDC);
+	SCENEMANAGER->Render(hBackDC);
+	TIMERMANAGER->Render(hBackDC);
 
 	backBuffer->Render(hdc);
+
 }
 
 LRESULT MainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
