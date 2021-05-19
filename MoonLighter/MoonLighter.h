@@ -15,6 +15,7 @@ using namespace std;
 #include "TimerManager.h"
 #include "SceneManager.h"
 #include "CollisionManager.h"
+#include "GameData.h"
 
 #define WINSIZE_X	1280
 #define WINSIZE_Y	720
@@ -39,6 +40,8 @@ using namespace std;
 #define DELTATIME TIMERMANAGER->GetDeltaTime()
 #define SCENEMANAGER SceneManager::GetInstance()
 #define COLLIDERMANAGER CollisionManager::GetInstance()
+#define GAMEDATA GameData::GetInstance()
+
 #define IMAGE_SIZE 2.0f
 
 #define TILE_SET_X	10

@@ -35,6 +35,7 @@ HRESULT Player::Init()
 void Player::Release()
 {
     weapon->Release();
+    delete this;
 }
 
 void Player::Update()
@@ -272,9 +273,9 @@ void Player::SpecialAttack()
 void Player::SetHitBox()
 {
     collider.left = pos.x - lpImage->GetFrameWidth() / 3;
-    collider.top = pos.y - lpImage->GetFrameHeight() / 3;
+    collider.top = pos.y;
     collider.right = pos.x + lpImage->GetFrameWidth() / 3;
-    collider.bottom = pos.y + lpImage->GetFrameHeight() / 3;
+    collider.bottom = pos.y + lpImage->GetFrameHeight() / 2;
 }
 
 void Player::NextCombo(int first, int second, int third)
@@ -309,6 +310,23 @@ void Player::AddAttackFrame(vector<int> frame)
 void Player::EquipmentChagne(Equipment* weapon)
 {
     this->weapon = weapon;
+}
+
+void Player::CheckItem()
+{
+    auto items = COLLIDERMANAGER->CheckCollider(this);
+
+    for (auto iter = items.begin(); iter != items.end(); iter++) 
+    {
+        try
+        {
+            ((Item*)*iter)->PickUp();
+        }
+        catch(exception e)
+        {
+
+        }
+    }
 }
 
 void Player::ImageLoad()

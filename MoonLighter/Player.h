@@ -36,6 +36,7 @@ public:
 	void NextCombo(int first, int second, int third);
 	void AddAttackFrame(vector<int> frame);
 	void EquipmentChagne(Equipment* weapon);
+	void CheckItem();
 
 	void ImageLoad();
 

@@ -19,6 +19,7 @@ struct AttackInfo
 	int sizeY;
 	POINTFLOAT pos;
 };
+
 class Equipment : public Item
 {
 private:

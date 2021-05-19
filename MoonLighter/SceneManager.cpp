@@ -30,7 +30,7 @@ void SceneManager::Release()
         if (iter->second)
         {
             iter->second->Release();
-            delete iter->second;
+            //delete iter->second;
             iter->second = nullptr;
         }
     }

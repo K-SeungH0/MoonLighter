@@ -144,11 +144,13 @@
   <ItemGroup>
     <ClCompile Include="AstarScene.cpp" />
     <ClCompile Include="BattleScene.cpp" />
+    <ClCompile Include="BattleSceneUI.cpp" />
     <ClCompile Include="Block.cpp" />
     <ClCompile Include="Button.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Equipment.cpp" />
+    <ClCompile Include="GameData.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="ImageManager.cpp" />
     <ClCompile Include="Inventory.cpp" />
@@ -169,12 +171,14 @@
   <ItemGroup>
     <ClInclude Include="AstarScene.h" />
     <ClInclude Include="BattleScene.h" />
+    <ClInclude Include="BattleSceneUI.h" />
     <ClInclude Include="Block.h" />
     <ClInclude Include="Button.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="CommonFunction.h" />
     <ClInclude Include="Equipment.h" />
+    <ClInclude Include="GameData.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="ImageManager.h" />

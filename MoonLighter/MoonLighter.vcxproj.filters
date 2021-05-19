@@ -31,9 +31,6 @@
     <Filter Include="MainGame\Scene">
       <UniqueIdentifier>{337c27ff-d3c9-4e0c-a299-58d487af970e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame\Item">
-      <UniqueIdentifier>{8640493e-ec9f-4e71-93d6-94bb50a3464c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MainGame\Object">
       <UniqueIdentifier>{4d708b13-454c-4a9f-b1f0-d6cb66838f33}</UniqueIdentifier>
     </Filter>
@@ -48,6 +45,15 @@
     </Filter>
     <Filter Include="MainGame\Object\Block">
       <UniqueIdentifier>{5d4dab45-a383-4c69-ac63-dea1eff7acf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2D FrameWork\UI\BattleScene">
+      <UniqueIdentifier>{bbc4de1f-834b-4f06-b557-2ad0a6b083ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2D FrameWork\UI\VillageScene">
+      <UniqueIdentifier>{7d7dc945-a0b0-4180-ba8d-bd27a3607fae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame\Object\Item">
+      <UniqueIdentifier>{8640493e-ec9f-4e71-93d6-94bb50a3464c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -97,10 +103,10 @@
       <Filter>MainGame\Object\Unit</Filter>
     </ClCompile>
     <ClCompile Include="Equipment.cpp">
-      <Filter>MainGame\Item</Filter>
+      <Filter>MainGame\Object\Item</Filter>
     </ClCompile>
     <ClCompile Include="Item.cpp">
-      <Filter>MainGame\Item</Filter>
+      <Filter>MainGame\Object\Item</Filter>
     </ClCompile>
     <ClCompile Include="CollisionManager.cpp">
       <Filter>2D FrameWork\Manager</Filter>
@@ -119,6 +125,12 @@
     </ClCompile>
     <ClCompile Include="Inventory.cpp">
       <Filter>2D FrameWork\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="BattleSceneUI.cpp">
+      <Filter>2D FrameWork\UI\BattleScene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData.cpp">
+      <Filter>2D FrameWork\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -177,10 +189,10 @@
       <Filter>MainGame\Object\Unit</Filter>
     </ClInclude>
     <ClInclude Include="Equipment.h">
-      <Filter>MainGame\Item</Filter>
+      <Filter>MainGame\Object\Item</Filter>
     </ClInclude>
     <ClInclude Include="Item.h">
-      <Filter>MainGame\Item</Filter>
+      <Filter>MainGame\Object\Item</Filter>
     </ClInclude>
     <ClInclude Include="CollisionManager.h">
       <Filter>2D FrameWork\Manager</Filter>
@@ -202,6 +214,12 @@
     </ClInclude>
     <ClInclude Include="Inventory.h">
       <Filter>2D FrameWork\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="BattleSceneUI.h">
+      <Filter>2D FrameWork\UI\BattleScene</Filter>
+    </ClInclude>
+    <ClInclude Include="GameData.h">
+      <Filter>2D FrameWork\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

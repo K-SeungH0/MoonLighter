@@ -4,7 +4,7 @@
 #include "CommonFunction.h"
 #include "Block.h"
 #include "Inventory.h"
-
+#include "BattleSceneUI.h"
 HRESULT BattleScene::Init()
 {
     SetClientRect(g_hWnd, WINSIZE_X, WINSIZE_Y);
@@ -16,8 +16,43 @@ HRESULT BattleScene::Init()
 
     lpPlayer = new Player();
     lpPlayer->Init();
-    lpInventory = new Inventory();
-    lpInventory->Init();
+
+    lpUI = new BattleSceneUI();
+    lpUI->Init();
+    
+    int outsideSize = 50;
+    RECTFLOAT outsideRc;
+    outsideRc.left = 0;
+    outsideRc.right = WINSIZE_X;
+    outsideRc.top = 0;
+    outsideRc.bottom = outsideSize;
+
+    outsideColliderTop = new Block();
+    ((Block*)outsideColliderTop)->Init(outsideRc);
+
+    outsideRc.left = 0;
+    outsideRc.right = outsideSize;
+    outsideRc.top = 0;
+    outsideRc.bottom = WINSIZE_Y;
+    
+    outsideColliderLeft = new Block();
+    ((Block*)outsideColliderLeft)->Init(outsideRc);
+
+    outsideRc.left = WINSIZE_X - outsideSize;
+    outsideRc.right = WINSIZE_X;
+    outsideRc.top = 0;
+    outsideRc.bottom = WINSIZE_Y;
+
+    outsideColliderRight = new Block();
+    ((Block*)outsideColliderRight)->Init(outsideRc);
+
+    outsideRc.left = 0;
+    outsideRc.right = WINSIZE_X;
+    outsideRc.top = WINSIZE_Y - outsideSize;
+    outsideRc.bottom = WINSIZE_Y;
+
+    outsideColliderBottom = new Block();
+    ((Block*)outsideColliderBottom)->Init(outsideRc);
 
     for (int i = 0; i < TILE_X * TILE_Y; i++)
     {
@@ -35,12 +70,13 @@ void BattleScene::Release()
 {
     if(lpPlayer)
         lpPlayer->Release();
-    if (lpInventory)
-        lpInventory->Release();
+    if (lpUI)
+        lpUI->Release();
 
     for (auto iter = vObjects.begin(); iter != vObjects.end();)
     {
-        delete *iter;
+        (*iter)->Release();
+        //delete *iter;
         iter = vObjects.erase(iter);
     }
 
@@ -51,10 +87,10 @@ void BattleScene::Update()
 {
     if (KEYMANAGER->IsOnceKeyDown('I'))
     {
-        lpInventory->ToggleActive();
+        lpUI->ToggleInven();
     }
-    if(lpInventory->GetActive())
-        lpInventory->Update();
+    if(lpUI->GetInvenActive())
+        lpUI->Update();
     else
     {
         lpPlayer->Update();
@@ -72,26 +108,7 @@ void BattleScene::Render(HDC hdc)
     }
 
     lpPlayer->Render(hdc);
-    lpInventory->Render(hdc);
-    //wsprintf(text, "플레이어 이동 : 방향키");
-    //TextOut(hdc, 10, 10, text, strlen(text));
-    //
-    //wsprintf(text, "공격 : A");
-    //TextOut(hdc, 10, 10 + 20, text, strlen(text));
-    //
-    //wsprintf(text, "회피 : SpaceBar");
-    //TextOut(hdc, 10, 10 + 40, text, strlen(text));
-    //
-    //wsprintf(text, "무기교체 : 1 ~ 5");
-    //TextOut(hdc, 10, 10 + 60, text, strlen(text));
-    //
-    //wsprintf(text, "RECT 보기 : P");
-    //TextOut(hdc, 10, 10 + 80, text, strlen(text));
-}
-
-void BattleScene::CheckCollision()
-{
-
+    lpUI->Render(hdc);
 }
 
 void BattleScene::Load()

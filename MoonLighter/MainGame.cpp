@@ -6,6 +6,8 @@
 #include "LoadingScene.h"
 #include "TitleScene.h"
 #include "CollisionManager.h"
+#include "GameData.h"
+#include "Inventory.h"
 
 HRESULT MainGame::Init()
 {
@@ -15,6 +17,7 @@ HRESULT MainGame::Init()
 	ImageManager::GetInstance()->Init();
 	SceneManager::GetInstance()->Init();
 	CollisionManager::GetInstance()->Init();
+	GameData::GetInstance()->Init();
 
 	// 백버퍼 이미지
 	backBuffer = new Image();
@@ -40,6 +43,7 @@ void MainGame::Release()
 	KEYMANAGER->Release();
 	IMAGEMANAGER->Release();
 	SCENEMANAGER->Release();
+	COLLIDERMANAGER->Release();
 }
 
 void MainGame::Update()
@@ -70,7 +74,6 @@ LRESULT MainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lPara
 	case WM_TIMER:
 		break;
 	case WM_LBUTTONDOWN:
-
 		break;
 	case WM_LBUTTONUP:
 		g_ptMouse.x = LOWORD(lParam);

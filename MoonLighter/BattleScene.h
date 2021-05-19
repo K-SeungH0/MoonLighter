@@ -6,14 +6,20 @@ class Image;
 class ProjectileManager;
 class Object;
 class Inventory;
+class BattleSceneUI;
 class BattleScene : public GameObject
 {
 private:
+	Object* outsideColliderTop;
+	Object* outsideColliderLeft;
+	Object* outsideColliderRight;
+	Object* outsideColliderBottom;
+	
 	Image* backGround;
 	Image* tileImage;
 	TILE_INFO tileMap[TILE_X * TILE_Y];
 	Player* lpPlayer;
-	Inventory* lpInventory;
+	BattleSceneUI* lpUI;
 
 	vector<Object*> vObjects;
 
@@ -24,7 +30,6 @@ public:
 	void Update() override;
 	void Render(HDC hdc) override;
 
-	void CheckCollision();
 	void Load();
 	void ImageLoad();
 };

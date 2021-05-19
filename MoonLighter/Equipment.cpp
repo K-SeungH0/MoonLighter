@@ -20,7 +20,7 @@ HRESULT Equipment::Init(Player* player)
 
 void Equipment::Release()
 {
-    delete this;
+	delete this;
 }
 
 void Equipment::Update()

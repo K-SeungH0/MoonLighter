@@ -7,8 +7,8 @@ HRESULT Unit::Init()
 }
 
 void Unit::Release()
-{
-
+ {
+    delete this; 
 }
 
 void Unit::Update()

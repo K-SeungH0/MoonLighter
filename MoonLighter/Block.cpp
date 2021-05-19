@@ -27,8 +27,26 @@ HRESULT Block::Init(TILE_INFO tile)
 	return S_OK;
 }
 
+HRESULT Block::Init(RECTFLOAT rc)
+{
+	// 배틀씬에서 외부 벽 초기화
+	this->tileType = TILETYPE::WALL;
+	this->lpImage = nullptr;
+	this->frameX = 0;
+	this->frameY = 0;
+
+	this->collider.left = rc.left;
+	this->collider.right = rc.right;
+	this->collider.top = rc.top;
+	this->collider.bottom = rc.bottom;
+
+	COLLIDERMANAGER->AddCollider(this);
+	return S_OK;
+}
+
 void Block::Release()
 {
+	delete this;
 }
 
 void Block::Update()
@@ -41,7 +59,8 @@ void Block::Render(HDC hdc)
 	if (isDebugMode)
 		Rectangle(hdc, collider.left, collider.top, collider.right, collider.bottom);
 
-	lpImage->FrameRender(hdc, pos.x, pos.y, frameX, frameY, IMAGE_SIZE);
+	if(lpImage)
+		lpImage->FrameRender(hdc, pos.x, pos.y, frameX, frameY, IMAGE_SIZE);
 }
 
 void Block::Hit()

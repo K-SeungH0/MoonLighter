@@ -12,6 +12,7 @@ private:
 public:
 	HRESULT Init() override;
 	HRESULT Init(TILE_INFO tile);
+	HRESULT Init(RECTFLOAT rc);
 	void Release() override;
 	void Update() override;
 	void Render(HDC hdc) override;
