@@ -22,9 +22,7 @@ public:
 	bool AddImage(string key, string fileName,
 		int width, int height, int maxFrameX, int maxFrameY, bool isTransparent = FALSE,
 		COLORREF transColor = FALSE);	
-	bool AddImage(string key, const wchar_t* fileName,
-			int width, int height, int maxFrameX, int maxFrameY, bool isTransparent = FALSE,
-			COLORREF transColor = FALSE);
+	bool AddImage(string key, const wchar_t* fileName, int maxFrameX = 1, int maxFrameY = 1);
 	bool DeleteImage(string key);
 	void DeleteAll();
 	Image* FindImage(string key);

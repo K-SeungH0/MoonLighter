@@ -3,8 +3,10 @@
 
 enum class OBJECTTYPE
 {
-	STATIC,
-	DYNAMIC,
+	WALL,
+	ITEM,
+	BREAKABLE,
+	UNIT,
 	NONE
 };
 
@@ -23,5 +25,6 @@ public:
 	virtual void Render(HDC hdc) = 0;
 
 	inline RECTFLOAT GetCollider() { return this->collider; }
+	inline OBJECTTYPE GetType() { return this->type; }
 };
 

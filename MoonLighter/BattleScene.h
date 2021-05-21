@@ -7,6 +7,7 @@ class ProjectileManager;
 class Object;
 class Inventory;
 class BattleSceneUI;
+class ItemManager;
 class BattleScene : public GameObject
 {
 private:
@@ -22,6 +23,10 @@ private:
 	BattleSceneUI* lpUI;
 
 	vector<Object*> vObjects;
+	
+	ItemManager* lpItemManager;
+
+	Object* testItem;
 
 	char text[128];
 public:

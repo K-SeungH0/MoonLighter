@@ -5,17 +5,22 @@
 #include "Block.h"
 #include "Inventory.h"
 #include "BattleSceneUI.h"
+#include "Item.h"
+#include "ItemManager.h"
+#include "Equipment.h"
+
 HRESULT BattleScene::Init()
 {
     SetClientRect(g_hWnd, WINSIZE_X, WINSIZE_Y);
+    
+    GAMEDATA->RunTimeDataInit();
     ImageLoad();
- 
     Load();
+
     tileImage = IMAGEMANAGER->FindImage("Tile Set");
     backGround = IMAGEMANAGER->FindImage("Dungeon Background");
 
-    lpPlayer = new Player();
-    lpPlayer->Init();
+    lpPlayer = GAMEDATA->GetRunTimePlayer();
 
     lpUI = new BattleSceneUI();
     lpUI->Init();
@@ -63,6 +68,33 @@ HRESULT BattleScene::Init()
         }
     }
 
+    
+    lpItemManager = new ItemManager();
+    lpItemManager->Init(lpUI->GetInventory());
+
+    GameData::ItemData testdata;
+    testdata.isEquipment = true;
+    testdata.itemCode = 1001;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 100, WINSIZE_Y - 100 });
+
+    testdata.itemCode = 1010;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 200, WINSIZE_Y - 100 });
+    testdata.itemCode = 1020;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 300, WINSIZE_Y - 100 });
+    testdata.itemCode = 1030;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+
+    testdata.isEquipment = false;
+    testdata.itemCode = 2001;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 200, WINSIZE_Y - 150 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 300, WINSIZE_Y - 150 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 150 });
+
+    testdata.itemCode = 2000;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 + 100 , WINSIZE_Y - 150 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 + 200, WINSIZE_Y - 150 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 + 300, WINSIZE_Y - 150 });
+
 	return S_OK;
 }
 
@@ -72,11 +104,12 @@ void BattleScene::Release()
         lpPlayer->Release();
     if (lpUI)
         lpUI->Release();
+    if (lpItemManager)
+        lpItemManager->Release();
 
     for (auto iter = vObjects.begin(); iter != vObjects.end();)
     {
         (*iter)->Release();
-        //delete *iter;
         iter = vObjects.erase(iter);
     }
 
@@ -108,6 +141,8 @@ void BattleScene::Render(HDC hdc)
     }
 
     lpPlayer->Render(hdc);
+    lpItemManager->Render(hdc);
+
     lpUI->Render(hdc);
 }
 
@@ -135,15 +170,10 @@ void BattleScene::ImageLoad()
 {
     COLORREF color = RGB(128, 128, 128);
 
-    IMAGEMANAGER->AddImage("Dungeon Background", L"Image/Map/dungeon_background.png",
-        1280, 720, BACKGROUND_TILE_X, BACKGROUND_TILE_Y, true, color);
-    IMAGEMANAGER->AddImage("Tile Set", L"Image/Map/TileMap.png",
-        320, 96, TILE_SET_X, TILE_SET_Y, true, color);
+    IMAGEMANAGER->AddImage("Dungeon Background", L"Image/Map/dungeon_background.png", BACKGROUND_TILE_X, BACKGROUND_TILE_Y);
+    IMAGEMANAGER->AddImage("Tile Set", L"Image/Map/TileMap.png",TILE_SET_X, TILE_SET_Y);
     
-    IMAGEMANAGER->AddImage("UrnRest", L"Image/Object/BreakAble/UrnRest.png",
-        32, 25, 1, 1, true, color);
-    IMAGEMANAGER->AddImage("SkullRest", L"Image/Object/BreakAble/SkullRest.png",
-        32, 32, 1, 1, true, color);
-    IMAGEMANAGER->AddImage("ChairRest", L"Image/Object/BreakAble/ChairRest.png",
-        23, 19, 1, 1, true, color);
+    IMAGEMANAGER->AddImage("UrnRest", L"Image/Object/BreakAble/UrnRest.png");
+    IMAGEMANAGER->AddImage("SkullRest", L"Image/Object/BreakAble/SkullRest.png");
+    IMAGEMANAGER->AddImage("ChairRest", L"Image/Object/BreakAble/ChairRest.png");
 }

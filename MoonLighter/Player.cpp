@@ -3,6 +3,7 @@
 #include "Equipment.h"
 #include "CollisionManager.h"
 
+
 HRESULT Player::Init()
 {
     ImageLoad();
@@ -23,10 +24,11 @@ HRESULT Player::Init()
     isCombo = false;
 
     SetHitBox();
-    weapon = new Equipment();
-    weapon->Init(this);
 
-    type = OBJECTTYPE::DYNAMIC;
+    weapon = new Equipment();
+    weapon->Init();
+
+    type = OBJECTTYPE::UNIT;
     COLLIDERMANAGER->AddCollider(this);
 
     return S_OK;
@@ -34,7 +36,6 @@ HRESULT Player::Init()
 
 void Player::Release()
 {
-    weapon->Release();
     delete this;
 }
 
@@ -48,16 +49,16 @@ void Player::Update()
 
     if (!isAction)
     {
-        if (KEYMANAGER->IsOnceKeyDown('1'))
-            weapon->ChangeType(WEAPONTYPE::BIGSWORD);
-        else if (KEYMANAGER->IsOnceKeyDown('2'))
-            weapon->ChangeType(WEAPONTYPE::SHORTSWORD);
-        else if (KEYMANAGER->IsOnceKeyDown('3'))
-            weapon->ChangeType(WEAPONTYPE::BOW);
-        else if (KEYMANAGER->IsOnceKeyDown('4'))
-            weapon->ChangeType(WEAPONTYPE::SPEAR);
-        else if (KEYMANAGER->IsOnceKeyDown('5'))
-            weapon->ChangeType(WEAPONTYPE::GLOVES);
+        //if (KEYMANAGER->IsOnceKeyDown('1'))
+        //    weapon->ChangeType(WEAPONTYPE::BIGSWORD);
+        //else if (KEYMANAGER->IsOnceKeyDown('2'))
+        //    weapon->ChangeType(WEAPONTYPE::SHORTSWORD);
+        //else if (KEYMANAGER->IsOnceKeyDown('3'))
+        //    weapon->ChangeType(WEAPONTYPE::BOW);
+        //else if (KEYMANAGER->IsOnceKeyDown('4'))
+        //    weapon->ChangeType(WEAPONTYPE::SPEAR);
+        //else if (KEYMANAGER->IsOnceKeyDown('5'))
+        //    weapon->ChangeType(WEAPONTYPE::GLOVES);
         
         state = STATE::IDLE;
         stateFrame = 8;
@@ -67,13 +68,13 @@ void Player::Update()
         if (KEYMANAGER->IsOnceKeyDown(VK_LEFT))          FrameReset();
         else if (KEYMANAGER->IsStayKeyDown(VK_LEFT))     Move(DIR::LEFT);
 
-        if (KEYMANAGER->IsOnceKeyDown(VK_RIGHT))         FrameReset();
+        else if (KEYMANAGER->IsOnceKeyDown(VK_RIGHT))    FrameReset();
         else if (KEYMANAGER->IsStayKeyDown(VK_RIGHT))    Move(DIR::RIGHT);
 
         if (KEYMANAGER->IsOnceKeyDown(VK_UP))            FrameReset();
         else if (KEYMANAGER->IsStayKeyDown(VK_UP))       Move(DIR::UP);
 
-        if (KEYMANAGER->IsOnceKeyDown(VK_DOWN))          FrameReset();
+        else if (KEYMANAGER->IsOnceKeyDown(VK_DOWN))     FrameReset();
         else if (KEYMANAGER->IsStayKeyDown(VK_DOWN))     Move(DIR::DOWN);
 
         if (KEYMANAGER->IsOnceKeyDown(VK_SPACE))
@@ -130,6 +131,7 @@ void Player::Update()
     
     //if (!isAction)
     //    SetHitBox();
+
 }
 
 void Player::Render(HDC hdc)
@@ -170,7 +172,8 @@ void Player::Move(DIR dir)
     {
     case DIR::LEFT:
         collider.left -= moveSpeed * DELTATIME;
-         
+        CheckItem();
+
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
             pos.x -= moveSpeed * DELTATIME;
@@ -178,18 +181,21 @@ void Player::Move(DIR dir)
         break;
     case DIR::UP:
         collider.top -= moveSpeed * DELTATIME;
+        CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
             pos.y -= moveSpeed * DELTATIME;
         break;
     case DIR::RIGHT:
         collider.right += moveSpeed * DELTATIME;
+        CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
             pos.x += moveSpeed * DELTATIME;
         break;
     case DIR::DOWN:
         collider.bottom += moveSpeed * DELTATIME;
+        CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
             pos.y += moveSpeed * DELTATIME;
@@ -228,6 +234,7 @@ void Player::Attack()
             lpImage = IMAGEMANAGER->FindImage("BigSwordMotion");
             break;
         case WEAPONTYPE::SHORTSWORD:
+        case WEAPONTYPE::NONE:
             NextCombo(5, 9, 18);
             AddAttackFrame({ 2,6,10 });
             lpImage = IMAGEMANAGER->FindImage("ShortSwordMotion");
@@ -307,9 +314,16 @@ void Player::AddAttackFrame(vector<int> frame)
     attackFrame = frame;
 }
 
-void Player::EquipmentChagne(Equipment* weapon)
+void Player::EquipmentChagne(Item* weapon)
 {
-    this->weapon = weapon;
+    if (weapon)
+    {
+        this->weapon->Init(weapon->GetItemData(), weapon->GetItemManager());
+    }
+    else
+    {
+        this->weapon->Init();
+    }
 }
 
 void Player::CheckItem()
@@ -318,23 +332,14 @@ void Player::CheckItem()
 
     for (auto iter = items.begin(); iter != items.end(); iter++) 
     {
-        try
-        {
+        if((*iter)->GetType() == OBJECTTYPE::ITEM)
             ((Item*)*iter)->PickUp();
-        }
-        catch(exception e)
-        {
-
-        }
     }
 }
 
 void Player::ImageLoad()
 {
-    COLORREF color = RGB(128, 128, 128);
-
-    IMAGEMANAGER->AddImage("PlayerState", L"Image/Player/PlayerState.png",
-        640, 832, 10, 13, true, color);
+    IMAGEMANAGER->AddImage("PlayerState", L"Image/Player/PlayerState.png",10, 13);
 }
 
 void Player::FrameReset()

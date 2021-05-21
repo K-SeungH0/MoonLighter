@@ -73,9 +73,13 @@ HRESULT Image::Init(const char* fileName, int width, int height,
     return S_OK;
 }
 
-HRESULT Image::Init(const wchar_t* fileName, int width, int height, int maxFrameX, int maxFrameY, bool isTransparent, COLORREF transColor)
+HRESULT Image::Init(const wchar_t* fileName, int maxFrameX, int maxFrameY)
 {
     HDC hdc = GetDC(g_hWnd);
+    COLORREF color = RGB(128, 128, 128);
+
+    this->isTransparent = true;
+    this->transColor = color;
 
     imageInfo = new IMAGE_INFO();
     imageInfo->resID = 0;
@@ -85,6 +89,9 @@ HRESULT Image::Init(const wchar_t* fileName, int width, int height, int maxFrame
     ULONG_PTR gpToken;
     Gdiplus::GdiplusStartup(&gpToken, &gpStartupInput, NULL);
     Gdiplus::Bitmap* bitmap = Gdiplus::Bitmap::FromFile(fileName, false);
+
+    auto height = bitmap->GetHeight();
+    auto width = bitmap->GetWidth();
 
     if (bitmap)
     {
@@ -118,8 +125,6 @@ HRESULT Image::Init(const wchar_t* fileName, int width, int height, int maxFrame
         return E_FAIL;
     }
 
-    this->isTransparent = isTransparent;
-    this->transColor = transColor;
 
     this->blendFunc.AlphaFormat = 0;
     this->blendFunc.BlendFlags = 0;

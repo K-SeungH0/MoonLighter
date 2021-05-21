@@ -3,6 +3,7 @@
 
 class Image;
 class Equipment;
+class Item;
 
 class Player : public Unit
 {
@@ -35,7 +36,7 @@ public:
 	void SetHitBox();
 	void NextCombo(int first, int second, int third);
 	void AddAttackFrame(vector<int> frame);
-	void EquipmentChagne(Equipment* weapon);
+	void EquipmentChagne(Item* weapon);
 	void CheckItem();
 
 	void ImageLoad();

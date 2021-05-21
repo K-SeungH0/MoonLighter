@@ -54,13 +54,13 @@ bool ImageManager::AddImage(string key, string fileName, int width, int height, 
 	return true;
 }
 
-bool ImageManager::AddImage(string key, const wchar_t* fileName, int width, int height, int maxFrameX, int maxFrameY, bool isTransparent, COLORREF transColor)
+bool ImageManager::AddImage(string key, const wchar_t* fileName,int maxFrameX, int maxFrameY)
 {
 	if (FindImage(key))
 		return false;
 
 	Image* image = new Image();
-	if (FAILED(image->Init(fileName, width, height, maxFrameX, maxFrameY, isTransparent, transColor)))
+	if (FAILED(image->Init(fileName, maxFrameX, maxFrameY)))
 	{
 		image->Release();
 		delete image;

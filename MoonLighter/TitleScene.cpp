@@ -1,4 +1,4 @@
-#include "CommonFunction.h"
+ï»¿#include "CommonFunction.h"
 #include "TitleScene.h"
 #include "Image.h"
 
@@ -6,7 +6,9 @@ HRESULT TitleScene::Init()
 {
 	SetClientRect(g_hWnd, WINSIZE_X, WINSIZE_Y);
 	ImageLoad();
-	AddFontResource("./Font/MoonLighter_Font.ttf");
+	auto i = AddFontResource("./Font/dalmoori.ttf");
+
+
 	SendMessage(g_hWnd, WM_FONTCHANGE, NULL, NULL);
 	lpBackMenu = IMAGEMANAGER->FindImage("BackMenu");
 	lpFrontMenu = IMAGEMANAGER->FindImage("FrontMenu");
@@ -25,13 +27,13 @@ HRESULT TitleScene::Init()
 		switch (i)
 		{
 		case (int)MENU::START:
-			menu[i].name = "½ÃÀÛ";
+			menu[i].name = "ì‹œìž‘";
 			break;
 		case (int)MENU::MAPTOOL:
-			menu[i].name = "¸ÊÅø";
+			menu[i].name = "ë§µíˆ´";
 			break;
 		case (int)MENU::EXIT:
-			menu[i].name = "Á¾·á";
+			menu[i].name = "ì¢…ë£Œ";
 			break;
 		}
 	}
@@ -41,7 +43,6 @@ HRESULT TitleScene::Init()
 void TitleScene::Release()
 {
 	IMAGEMANAGER->DeleteAll();
-	RemoveFontResource("./Font/MoonLighter_Font.ttf");
 }
 
 void TitleScene::Update()
@@ -91,8 +92,8 @@ void TitleScene::Render(HDC hdc)
 	lpBackMenu->FrameRender(hdc, 0, 0, frame, 0, IMAGE_SIZE);
 	lpFrontMenu->FrameRender(hdc, 0, 0, frame, 0, IMAGE_SIZE);
 	lpLogo->Render(hdc, WINSIZE_X / 2 - lpLogo->GetWidth(), WINSIZE_Y / 2 - lpLogo->GetHeight() - 100, IMAGE_SIZE);
-	
-	hFont = CreateFont(32, 0, 0, 0, 0, 0, 0, 0, HANGUL_CHARSET, 0, 0, 0, VARIABLE_PITCH || FF_ROMAN, TEXT("»õ±¼¸²"));
+
+	hFont = CreateFont(32, 0, 0, 0, 0, 0, 0, 0, HANGUL_CHARSET, 0, 0, 0, VARIABLE_PITCH || FF_ROMAN, TEXT("dalmoori"));
 	oldFont = (HFONT)SelectObject(hdc, hFont);
 
 	for (int i = 0; i < (int)MENU::NONE; i++)
@@ -110,12 +111,8 @@ void TitleScene::ImageLoad()
 {
 	COLORREF color = RGB(128, 128, 128);
 
-	IMAGEMANAGER->AddImage("FrontMenu", L"Image/UI/Main_Menu_Front.png",
-		10240, 360, 16, 1, true, color);
-	IMAGEMANAGER->AddImage("BackMenu", L"Image/UI/Main_Menu_Back.png",
-		10240, 360, 16, 1, true, color);
-	IMAGEMANAGER->AddImage("TitleLogo", L"Image/UI/TitleLogo.png",
-		282, 140, 1, 1, true, color);
-	IMAGEMANAGER->AddImage("Select", L"Image/UI/Select.png",
-		32, 32, 1, 1, true, color);
+	IMAGEMANAGER->AddImage("FrontMenu", L"Image/UI/Main_Menu_Front.png",16, 1);
+	IMAGEMANAGER->AddImage("BackMenu", L"Image/UI/Main_Menu_Back.png",16, 1);
+	IMAGEMANAGER->AddImage("TitleLogo", L"Image/UI/TitleLogo.png");
+	IMAGEMANAGER->AddImage("Select", L"Image/UI/Select.png");
 }

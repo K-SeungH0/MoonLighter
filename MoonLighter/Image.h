@@ -73,7 +73,7 @@ public:
 
 	// 파일로부터 이미지를 로드하는 함수
 	HRESULT Init(const char* fileName, int width, int height, bool isTransparent = FALSE, COLORREF transColor = FALSE);
-	HRESULT Init(const wchar_t* fileName, int width, int height, int maxFrameX, int maxFrameY, bool isTransparent = FALSE, COLORREF transColor = FALSE);
+	HRESULT Init(const wchar_t* fileName, int maxFrameX, int maxFrameY);
 
 
 	// 파일로부터 이미지를 로드하는 함수

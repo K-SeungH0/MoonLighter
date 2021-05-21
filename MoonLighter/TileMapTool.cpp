@@ -357,7 +357,6 @@ void TileMapTool::TileSelect()
 
 void TileMapTool::ImageLoad()
 {
-    COLORREF color = RGB(128, 128, 128);
 
     // 이미지 추가
     IMAGEMANAGER->AddImage("SaveButton", "Image/Save.bmp", 144, 72, 2, 1);
@@ -365,8 +364,6 @@ void TileMapTool::ImageLoad()
     IMAGEMANAGER->AddImage("LeftButton", "Image/Left.bmp", 120, 60, 2, 1);
     IMAGEMANAGER->AddImage("RightButton", "Image/Right.bmp", 120, 60, 2, 1);
 
-    IMAGEMANAGER->AddImage("Dungeon Background", L"Image/Map/dungeon_background.png",
-        1280, 720, BACKGROUND_TILE_X, BACKGROUND_TILE_Y, true, color);
-    IMAGEMANAGER->AddImage("Tile Set", L"Image/Map/TileMap.png",
-        320, 96, TILE_SET_X, TILE_SET_Y, true, color);
+    IMAGEMANAGER->AddImage("Dungeon Background", L"Image/Map/dungeon_background.png", BACKGROUND_TILE_X, BACKGROUND_TILE_Y);
+    IMAGEMANAGER->AddImage("Tile Set", L"Image/Map/TileMap.png", TILE_SET_X, TILE_SET_Y);
 }

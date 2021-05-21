@@ -15,7 +15,7 @@ HRESULT Block::Init(TILE_INFO tile)
 	this->collider.right = tile.rcTile.right;
 	this->collider.bottom = tile.rcTile.bottom;
 	
-	this->type = OBJECTTYPE::STATIC;
+	this->type = OBJECTTYPE::BREAKABLE;
 	this->tileType = tile.type;
 	
 	this->frameX = tile.frameX;

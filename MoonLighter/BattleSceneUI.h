@@ -21,6 +21,8 @@ public:
 	void ToggleInven();
 
 	void ImageLoad();
+
+	inline Inventory* GetInventory() { return this->lpUIInventory; }
 	~BattleSceneUI() override {};
 };
 

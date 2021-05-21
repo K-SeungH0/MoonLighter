@@ -28,8 +28,9 @@ private:
 	Player* player;
 	map<pair<WEAPONTYPE, DIR>, AttackInfo> attacks;
 	
+	bool imageLoaded = false;
 public:
-	HRESULT Init(Player* player);
+	HRESULT Init(GameData::ItemData itemData, ItemManager* lpItemManager);
 	HRESULT Init() override;
 	void Release() override;
 	void Update() override;
@@ -37,7 +38,7 @@ public:
 	void AttackInfoInit();
 	
 	void Attack();
-	void ChangeType(WEAPONTYPE type);
+	void ChangeType();
 	void ResetAttackCollider();
 
 	void ImageLoad();

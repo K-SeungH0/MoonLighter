@@ -44,6 +44,7 @@ void MainGame::Release()
 	IMAGEMANAGER->Release();
 	SCENEMANAGER->Release();
 	COLLIDERMANAGER->Release();
+	RemoveFontResource("./Font/dalmoori.ttf");
 }
 
 void MainGame::Update()

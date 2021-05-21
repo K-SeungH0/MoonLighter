@@ -15,9 +15,7 @@ HRESULT BattleSceneUI::Init()
 	lpUIGold = new UI();
 	lpUIGold->Init(IMAGEMANAGER->FindImage("UI_gold"), { 0,0 });
 
-	lpUIInventory = GAMEDATA->GetInventory();
-	//lpUIInventory = new Inventory();
-	//lpUIInventory->Init();
+	lpUIInventory = GAMEDATA->GetRunTimeInventory();
 
 	return S_OK;
 }
@@ -56,10 +54,7 @@ void BattleSceneUI::ToggleInven()
 void BattleSceneUI::ImageLoad()
 {
 	COLORREF color = RGB(128, 128, 128);
-	IMAGEMANAGER->AddImage("UI_Base", L"Image/UI/UI_base.png",
-		1280, 720, 1, 1, true, color);
-	IMAGEMANAGER->AddImage("UI_front", L"Image/UI/UI_front.png",
-		1280, 720, 1, 1, true, color);
-	IMAGEMANAGER->AddImage("UI_gold", L"Image/UI/UI_gold.png",
-		1280, 720, 1, 1, true, color);
+	IMAGEMANAGER->AddImage("UI_Base", L"Image/UI/UI_base.png");
+	IMAGEMANAGER->AddImage("UI_front", L"Image/UI/UI_front.png");
+	IMAGEMANAGER->AddImage("UI_gold", L"Image/UI/UI_gold.png");
 }
