@@ -27,7 +27,6 @@ void CollisionManager::AddCollider(Object* object)
 
 void CollisionManager::RemoveCollider(Object* obejct)
 {
-	//for(auto iter)
 	vColliders.erase(find(vColliders.begin(), vColliders.end(), obejct));
 }
 

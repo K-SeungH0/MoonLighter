@@ -3,13 +3,22 @@
 
 class UI;
 class Inventory;
+class Player;
 class BattleSceneUI : public GameObject
 {
 private:
 	UI* lpUIbase;
 	UI* lpUIFront;
 	UI* lpUIGold;
+	UI* lpUICurrentHpbar;
+	UI* lpUIReduceHpbar;
+
 	Inventory* lpUIInventory;
+
+	Player* player;
+
+	float imageSize;
+	float hpBarReduceTimer;
 
 public:
 	HRESULT Init() override;

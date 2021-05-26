@@ -23,7 +23,7 @@ public:
 	};
 
 private:
-	vector<ItemData> itemDatas;
+	vector<ItemData> vItemDatas;
 	Player* lpPlayerData;
 
 	Player* lpRunTimePlayer;
@@ -38,6 +38,6 @@ public:
 
 	inline Player* GetRunTimePlayer() { return this->lpRunTimePlayer; }
 	inline Inventory* GetRunTimeInventory() { return this->lpRunTimeInventory; }
-	inline vector<ItemData> GetItems() { return this->itemDatas; }
+	inline vector<ItemData> GetItems() { return this->vItemDatas; }
 };
 

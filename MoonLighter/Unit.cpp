@@ -24,5 +24,6 @@ void Unit::Render(HDC hdc)
 
 void Unit::Hit()
 {
-
+    state = STATE::HIT;
+    
 }

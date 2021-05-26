@@ -19,7 +19,7 @@ void GameData::AddItem(ItemData item)
 {
 	// TODO : 수정해야함
 	bool isNewItem = true;
-	for (auto iter = itemDatas.begin(); iter != itemDatas.end(); iter++)
+	for (auto iter = vItemDatas.begin(); iter != vItemDatas.end(); iter++)
 	{
 		if ((*iter).itemCode == item.itemCode)
 		{
@@ -28,7 +28,7 @@ void GameData::AddItem(ItemData item)
 	}
 
 	if(isNewItem)
-		itemDatas.push_back(item);
+		vItemDatas.push_back(item);
 }
 
 void GameData::RunTimeDataInit()

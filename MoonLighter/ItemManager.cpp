@@ -1,7 +1,7 @@
 #include "ItemManager.h"
 #include "Item.h"
 #include "Inventory.h"
-#include "Equipment.h"
+#include "Weapon.h"
 
 HRESULT ItemManager::Init()
 {

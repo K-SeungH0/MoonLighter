@@ -7,7 +7,7 @@
 #include "BattleSceneUI.h"
 #include "Item.h"
 #include "ItemManager.h"
-#include "Equipment.h"
+#include "Weapon.h"
 
 HRESULT BattleScene::Init()
 {
@@ -17,8 +17,7 @@ HRESULT BattleScene::Init()
     ImageLoad();
     Load();
 
-    tileImage = IMAGEMANAGER->FindImage("Tile Set");
-    backGround = IMAGEMANAGER->FindImage("Dungeon Background");
+    lpBackGround = IMAGEMANAGER->FindImage("Dungeon_Background");
 
     lpPlayer = GAMEDATA->GetRunTimePlayer();
 
@@ -67,7 +66,6 @@ HRESULT BattleScene::Init()
             ((Block*)vObjects.back())->Init(tileMap[i]);
         }
     }
-
     
     lpItemManager = new ItemManager();
     lpItemManager->Init(lpUI->GetInventory());
@@ -83,6 +81,33 @@ HRESULT BattleScene::Init()
     lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 300, WINSIZE_Y - 100 });
     testdata.itemCode = 1030;
     lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+
+    testdata.itemCode = 4000;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    testdata.itemCode = 4001;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    testdata.itemCode = 4010;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    testdata.itemCode = 4011;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    testdata.itemCode = 4020;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    testdata.itemCode = 4021;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+
+    testdata.itemCode = 3000;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    testdata.itemCode = 3003;
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+    lpItemManager->AddItem(new Item(), testdata, { WINSIZE_X / 2 - 400, WINSIZE_Y - 100 });
+
 
     testdata.isEquipment = false;
     testdata.itemCode = 2001;
@@ -119,21 +144,22 @@ void BattleScene::Release()
 void BattleScene::Update()
 {
     if (KEYMANAGER->IsOnceKeyDown('I'))
-    {
         lpUI->ToggleInven();
-    }
-    if(lpUI->GetInvenActive())
-        lpUI->Update();
-    else
+
+    if (!lpUI->GetInvenActive())
     {
         lpPlayer->Update();
         // TODO : Enemy UpdateÃß°¡
     }
+
+    lpUI->Update();
+
+    EFFECTMANAGER->Update();
 }
 
 void BattleScene::Render(HDC hdc)
 {
-    backGround->Render(hdc);
+    lpBackGround->Render(hdc);
 
     for (auto iter = vObjects.begin(); iter != vObjects.end(); iter++)
     {
@@ -142,7 +168,7 @@ void BattleScene::Render(HDC hdc)
 
     lpPlayer->Render(hdc);
     lpItemManager->Render(hdc);
-
+    EFFECTMANAGER->Render(hdc);
     lpUI->Render(hdc);
 }
 
@@ -170,8 +196,8 @@ void BattleScene::ImageLoad()
 {
     COLORREF color = RGB(128, 128, 128);
 
-    IMAGEMANAGER->AddImage("Dungeon Background", L"Image/Map/dungeon_background.png", BACKGROUND_TILE_X, BACKGROUND_TILE_Y);
-    IMAGEMANAGER->AddImage("Tile Set", L"Image/Map/TileMap.png",TILE_SET_X, TILE_SET_Y);
+    IMAGEMANAGER->AddImage("Dungeon_Background", L"Image/Map/dungeon_background.png", BACKGROUND_TILE_X, BACKGROUND_TILE_Y);
+    IMAGEMANAGER->AddImage("Tile_Set", L"Image/Map/TileMap.png",TILE_SET_X, TILE_SET_Y);
     
     IMAGEMANAGER->AddImage("UrnRest", L"Image/Object/BreakAble/UrnRest.png");
     IMAGEMANAGER->AddImage("SkullRest", L"Image/Object/BreakAble/SkullRest.png");

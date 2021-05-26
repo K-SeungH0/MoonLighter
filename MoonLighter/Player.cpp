@@ -1,8 +1,8 @@
 #include "Player.h"
 #include "Image.h"
-#include "Equipment.h"
+#include "Weapon.h"
 #include "CollisionManager.h"
-
+#include "Inventory.h"
 
 HRESULT Player::Init()
 {
@@ -10,7 +10,16 @@ HRESULT Player::Init()
     lpImage = IMAGEMANAGER->FindImage("PlayerState");
     
     moveSpeed = 250;
+    armor = 10;
+    maxHp = 100;
+    hp = maxHp;
+
+    additionalHp = 0;
+    additionalMoveSpeed = 0;
+    additionalArmor = 0;
     
+    gold = 123456789;
+
     imageFrame = 0;
     stateFrame = 0;
     maxFrame = 0;
@@ -18,19 +27,21 @@ HRESULT Player::Init()
     frameTimer = 0;
     comboStack = 0;
     
-    pos = { WINSIZE_X / 2 , WINSIZE_Y - 100 };
+    pos = { WINSIZE_X / 2 , WINSIZE_Y / 2 };
     
     isAction = false;
     isCombo = false;
+    isEquipMainWeapon = true;
 
     SetHitBox();
 
-    weapon = new Equipment();
-    weapon->Init();
+    lpCurrentWeapon = new Weapon();
+    ChangeWeapon(nullptr);
 
-    type = OBJECTTYPE::UNIT;
+    lpPotion = nullptr;
+
+    objectType = OBJECTTYPE::UNIT;
     COLLIDERMANAGER->AddCollider(this);
-
     return S_OK;
 }
 
@@ -44,8 +55,24 @@ void Player::Update()
     if (KEYMANAGER->IsOnceKeyDown('0'))
         Die();
     
+    if (KEYMANAGER->IsOnceKeyDown('E'))
+    {
+        if (lpPotion && hp < maxHp + additionalHp)
+        {
+            hp += lpPotion->GetHp();
+            if (hp >= maxHp + additionalHp)
+                hp = maxHp + additionalHp;
+
+            lpPotion->Use();
+        }
+    }
+
+
     if (state != STATE::AVOID && KEYMANAGER->IsOnceKeyDown('A'))
         Attack();
+
+    if (KEYMANAGER->IsOnceKeyDown('D'))
+        this->hp--;
 
     if (!isAction)
     {
@@ -92,11 +119,11 @@ void Player::Update()
         {
             if (imageFrame == attackFrame[i])
             {
-                weapon->Attack();
+                lpCurrentWeapon->Attack();
                 break;
             }
             else
-                weapon->ResetAttackCollider();
+                lpCurrentWeapon->ResetAttackCollider();
         }
     }
 
@@ -141,7 +168,7 @@ void Player::Render(HDC hdc)
     lpImage->FrameRender(hdc, pos.x, pos.y, imageFrame, stateFrame, IMAGE_SIZE, true);
 
     if (state == STATE::ATTACK)
-        weapon->Render(hdc);
+        lpCurrentWeapon->Render(hdc);
 }
 
 void Player::Avoid()
@@ -171,34 +198,34 @@ void Player::Move(DIR dir)
     switch (this->dir)
     {
     case DIR::LEFT:
-        collider.left -= moveSpeed * DELTATIME;
+        collider.left -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
         CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            pos.x -= moveSpeed * DELTATIME;
+            pos.x -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
         }
         break;
     case DIR::UP:
-        collider.top -= moveSpeed * DELTATIME;
+        collider.top -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
         CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
-            pos.y -= moveSpeed * DELTATIME;
+            pos.y -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
         break;
     case DIR::RIGHT:
-        collider.right += moveSpeed * DELTATIME;
+        collider.right += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
-            pos.x += moveSpeed * DELTATIME;
+            pos.x += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         break;
     case DIR::DOWN:
-        collider.bottom += moveSpeed * DELTATIME;
+        collider.bottom += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
-            pos.y += moveSpeed * DELTATIME;
+            pos.y += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         break;
     }
 
@@ -226,7 +253,7 @@ void Player::Attack()
         FrameReset();
     }
 
-    switch (weapon->GetType())
+    switch (lpCurrentWeapon->GetType())
     {
         case WEAPONTYPE::BIGSWORD:
             NextCombo(11, 22, 40);
@@ -260,7 +287,7 @@ void Player::SpecialAttack()
 {
     isAction = true;
 
-    switch (weapon->GetType())
+    switch (lpCurrentWeapon->GetType())
     {
     case WEAPONTYPE::BIGSWORD:
         state = STATE::CHARGING;
@@ -314,15 +341,79 @@ void Player::AddAttackFrame(vector<int> frame)
     attackFrame = frame;
 }
 
-void Player::EquipmentChagne(Item* weapon)
+void Player::ChangeWeapon(Item* weapon)
 {
     if (weapon)
     {
-        this->weapon->Init(weapon->GetItemData(), weapon->GetItemManager());
+        this->lpCurrentWeapon->Init(weapon->GetItemData(), weapon->GetItemManager());
+        additionalMoveSpeed = weapon->GetSpeed();
+        this->damage = this->lpCurrentWeapon->GetDamage();
     }
     else
     {
-        this->weapon->Init();
+        this->lpCurrentWeapon->Init();
+        additionalMoveSpeed = 0;
+        this->damage = this->lpCurrentWeapon->GetDamage();
+    }
+}
+
+void Player::EquipFromInventory(SLOTTYPE slotType, Item* equipment)
+{
+    switch (slotType)
+    {
+    case SLOTTYPE::INVEN:
+        break;
+    case SLOTTYPE::MAINWEAPON:
+        lpMainWeapon = equipment;
+        if(isEquipMainWeapon)
+            ChangeWeapon(lpMainWeapon);
+        break;
+    case SLOTTYPE::SUBWEAPON:
+        lpSubWeapon = equipment;
+        if (!isEquipMainWeapon)
+            ChangeWeapon(lpSubWeapon);
+        break;
+    case SLOTTYPE::HELMET:
+        if (equipment)
+            additionalHp = equipment->GetHp();
+        else
+        {
+            additionalHp = 0;
+            if (hp > maxHp + additionalHp)
+                hp = maxHp + additionalHp;
+        }
+        break;
+    case SLOTTYPE::CHEST:
+        if (equipment)
+            additionalArmor = equipment->GetArmor();
+        else
+            additionalArmor = 0;
+        break;
+    case SLOTTYPE::SHOES:
+        if (equipment)
+            additionalMoveSpeed = equipment->GetSpeed();
+        else
+            additionalMoveSpeed = 0;
+        break;
+    case SLOTTYPE::POTION:
+        lpPotion = equipment;
+        break;
+    case SLOTTYPE::NONE:
+        break;
+    }
+}
+
+void Player::SwapWeapon()
+{
+    if (isEquipMainWeapon)
+    {
+        ChangeWeapon(lpSubWeapon);
+        isEquipMainWeapon = !isEquipMainWeapon;
+    }
+    else
+    {
+        ChangeWeapon(lpMainWeapon);
+        isEquipMainWeapon = !isEquipMainWeapon;
     }
 }
 
@@ -332,18 +423,46 @@ void Player::CheckItem()
 
     for (auto iter = items.begin(); iter != items.end(); iter++) 
     {
-        if((*iter)->GetType() == OBJECTTYPE::ITEM)
+        if((*iter)->GetObjectType() == OBJECTTYPE::ITEM)
             ((Item*)*iter)->PickUp();
     }
 }
 
 void Player::ImageLoad()
 {
+
     IMAGEMANAGER->AddImage("PlayerState", L"Image/Player/PlayerState.png",10, 13);
+
+    IMAGEMANAGER->AddImage("BigSwordMotion", L"Image/Player/Weapon/BigSwordMotion.png", 40, 4);
+    IMAGEMANAGER->AddImage("ShortSwordMotion", L"Image/Player/Weapon/ShortSwordMotion.png", 18, 4);
+    IMAGEMANAGER->AddImage("GlovesMotion", L"Image/Player/Weapon/GlovesMotion.png", 20, 4);
+    IMAGEMANAGER->AddImage("SpearMotion", L"Image/Player/Weapon/SpearMotion.png", 23, 4);
+    IMAGEMANAGER->AddImage("BowMotion", L"Image/Player/Weapon/BowMotion.png", 7, 4);
 }
 
 void Player::FrameReset()
 {
     frameTimer = 0;
     imageFrame = 0;
-}   
+}
+
+Image* Player::GetCurrentWeaponImage()
+{
+    return this->lpCurrentWeapon->GetItemData().lpItemImage;
+}
+
+Image* Player::GetPotionImage()
+{
+    if (lpPotion)
+        return this->lpPotion->GetItemData().lpItemImage;
+    else
+        return nullptr;
+}
+
+int Player::GetPotionCount()
+{
+    if (lpPotion)
+        return this->lpPotion->GetItemData().count;
+    else
+        return 0;
+}

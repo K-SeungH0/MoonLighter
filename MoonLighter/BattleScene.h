@@ -16,8 +16,7 @@ private:
 	Object* outsideColliderRight;
 	Object* outsideColliderBottom;
 	
-	Image* backGround;
-	Image* tileImage;
+	Image* lpBackGround;
 	TILE_INFO tileMap[TILE_X * TILE_Y];
 	Player* lpPlayer;
 	BattleSceneUI* lpUI;

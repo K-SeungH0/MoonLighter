@@ -4,6 +4,13 @@
 
 class Image;
 class Button;
+
+enum class SELECTSCENE
+{
+	TOWN,
+	DUNGEON,
+	NONE
+};
 class TileMapTool : public GameObject
 {
 private:
@@ -29,21 +36,28 @@ private:
 	Button* loadButton;
 	Button* leftButton;
 	Button* rightButton;
-	static int selectStage;
+
+	Button* townSelectButton;
+	Button* dungeonSelectButton;
+
+	int selectStage;
 	char szText[128];
 
-public:
-	virtual HRESULT Init();
-	virtual void Release();
-	virtual void Update();
-	virtual void Render(HDC hdc);
+	POINT cameraPos;
+	SELECTSCENE currentScene;
 
-	static void StageSelect(int num);
-	static void Save(int stageNum);
-	static void Load(int stageNum);
+public:
+	HRESULT Init() override;
+	void Release() override;
+	void Update() override;
+	void Render(HDC hdc) override;
+
+	void StageSelect(int num);
+	void Save(int stageNum);
+	void Load(int stageNum);
+	void SceneSelect(int num);
 
 	void TileSelect();
 	void ImageLoad();
 	virtual ~TileMapTool() {};
 };
-

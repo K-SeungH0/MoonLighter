@@ -7,7 +7,20 @@
 class Image;
 class Item;
 class ItemManager;
-class Equipment;
+class Weapon;
+
+enum class SLOTTYPE
+{
+	INVEN,
+	MAINWEAPON,
+	SUBWEAPON,
+	HELMET,
+	CHEST,
+	SHOES,
+	POTION,
+	NONE
+};
+
 struct Slot
 {
 	Image* lpSlotImage;
@@ -15,15 +28,18 @@ struct Slot
 	Item* lpItem = nullptr;
 	//GameData::ItemData itemData;
 	int count = 0;
+	SLOTTYPE slotType;
 };
+
 class Inventory : public UI
 {
 private:
 	bool isActive;
 
-	Image* jBtn;
-	Image* iBtn;
+	Image* lpJBtnImage;
+	Image* lpIBtnImage;
 	Image* lpDescriptionImage;
+	Image* lpCurrentWeaponImage;
 
 	Slot invenSlots[INVEN_SIZE_Y][INVEN_SIZE_X];
 	Slot equipSlots[INVEN_SIZE_Y][2];
@@ -46,11 +62,12 @@ public:
 	void Render(HDC hdc) override;
 
 	void AddItem(Item* item);
+	void RemoveItem(Item* item);
 	void ToggleActive();
 	void ItemPickUp();
 	void ItemAllPickUp();
 	void ItemPickDown();
-
+	void SwapWeapon();
 	inline bool GetActive() { return this->isActive; }
 
 	void DataLoad(ItemManager* lpItemManager);

@@ -17,7 +17,7 @@ public:
 	void Update() override;
 	void Render(HDC hdc) override;
 
-	void Hit();
+	void Hit(Object* attacker, Image* hitEffect);
 	void Broken();
 };
 

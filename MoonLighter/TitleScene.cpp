@@ -6,7 +6,6 @@ HRESULT TitleScene::Init()
 {
 	SetClientRect(g_hWnd, WINSIZE_X, WINSIZE_Y);
 	ImageLoad();
-	auto i = AddFontResource("./Font/dalmoori.ttf");
 
 
 	SendMessage(g_hWnd, WM_FONTCHANGE, NULL, NULL);
@@ -93,24 +92,16 @@ void TitleScene::Render(HDC hdc)
 	lpFrontMenu->FrameRender(hdc, 0, 0, frame, 0, IMAGE_SIZE);
 	lpLogo->Render(hdc, WINSIZE_X / 2 - lpLogo->GetWidth(), WINSIZE_Y / 2 - lpLogo->GetHeight() - 100, IMAGE_SIZE);
 
-	hFont = CreateFont(32, 0, 0, 0, 0, 0, 0, 0, HANGUL_CHARSET, 0, 0, 0, VARIABLE_PITCH || FF_ROMAN, TEXT("dalmoori"));
-	oldFont = (HFONT)SelectObject(hdc, hFont);
-
 	for (int i = 0; i < (int)MENU::NONE; i++)
 	{
-		TextOut(hdc, menu[i].pos.x, menu[i].pos.y, menu[i].name, strlen(menu[i].name));
+		FLOATINGFONT->Render(hdc, { (LONG)menu[i].pos.x, (LONG)menu[i].pos.y }, 32, menu[i].name, RGB(255, 255, 255));
 	}
-	
-	SelectObject(hdc, oldFont);
-	DeleteObject(hFont);
 
 	lpSelect->Render(hdc, menu[selectIndex].pos.x - lpSelect->GetWidth(), menu[selectIndex].pos.y);
 }
 
 void TitleScene::ImageLoad()
 {
-	COLORREF color = RGB(128, 128, 128);
-
 	IMAGEMANAGER->AddImage("FrontMenu", L"Image/UI/Main_Menu_Front.png",16, 1);
 	IMAGEMANAGER->AddImage("BackMenu", L"Image/UI/Main_Menu_Back.png",16, 1);
 	IMAGEMANAGER->AddImage("TitleLogo", L"Image/UI/TitleLogo.png");

@@ -33,6 +33,9 @@ protected:
 
 	int moveSpeed;
 	int damage;
+
+	int armor;
+	int maxHp;
 	int hp;
 
 public:
@@ -44,7 +47,11 @@ public:
 	void Hit();
 
 	inline DIR GetDir() { return this->dir; }
-
+	inline int GetCurrentHp() { return this->hp; }
+	inline int GetMaxHp() { return this->maxHp; }
+	inline int GetArmor() { return this->armor; }
+	inline int GetMoveSpeed() { return this->moveSpeed; }
+	inline int GetDamage() { return this->damage; }
 	~Unit() override {};
 };
 

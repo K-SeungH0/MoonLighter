@@ -21,12 +21,11 @@ void TimerManager::Update()
 
 void TimerManager::Render(HDC hdc)
 {
-	SetBkMode(hdc, 1);
-	SetTextColor(hdc, RGB(255, 255, 255));
 	if (timer)
 	{
+		SetTextColor(hdc, RGB(255, 255, 255));
 		wsprintf(szText, "FPS : %d", timer->GetFPS());
-		TextOut(hdc, 20, 20, szText, strlen(szText));
+		TextOut(hdc, 5, 5, szText, strlen(szText));
 	}
 }
 

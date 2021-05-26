@@ -4,14 +4,17 @@
 #include "Button.h"
 
 TILE_INFO TileMapTool::tileInfo[TILE_X * TILE_Y];
-int TileMapTool::selectStage = 1;
+//int TileMapTool::selectStage = 1;
 
 HRESULT TileMapTool::Init()
 {
     SetClientRect(g_hWnd, TILEMAPTOOLSIZE_X, TILEMAPTOOLSIZE_Y);
     ImageLoad();
-    lpBackGroundTile = IMAGEMANAGER->FindImage("Dungeon Background");
-    lpTileSetImage = IMAGEMANAGER->FindImage("Tile Set");
+
+    lpBackGroundTile = IMAGEMANAGER->FindImage("Dungeon_Background");
+    currentScene = SELECTSCENE::DUNGEON;
+
+    lpTileSetImage = IMAGEMANAGER->FindImage("Tile_Set");
 
     hSelectedBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
 
@@ -85,89 +88,41 @@ HRESULT TileMapTool::Init()
             }
         }
     }
-    
-    //for (int i = 0; i < SAMPLE_TILE_Y; i++)
-    //{
-    //    for (int j = 0; j < SAMPLE_TILE_X; j++)
-    //    {
-    //        sampleTileInfo[i * SAMPLE_TILE_X + j].rcTile =
-    //        {
-    //            TILEMAPTOOLSIZE_X - sampleTile->GetImageInfo()->width + (TILESIZE * j),
-    //            (TILESIZE * j),
-    //            TILEMAPTOOLSIZE_X - sampleTile->GetImageInfo()->width + (TILESIZE * j) + TILESIZE,
-    //            (TILESIZE * j) + TILESIZE,
-    //        };
-    //        sampleTileInfo[i * SAMPLE_TILE_X + j].frameX = j;
-    //        sampleTileInfo[i * SAMPLE_TILE_X + j].frameY = i;
-
-    //        switch (i)
-    //        {
-    //            // X = 0~1 WALL
-    //        case 0:
-    //        case 1:
-    //            sampleTileInfo[i * SAMPLE_TILE_X + j].type = TILETYPE::WALL;
-    //            break;
-
-    //            // X = 2~3 IRON
-    //        case 2:
-    //        case 3:
-    //            sampleTileInfo[i * SAMPLE_TILE_X + j].type = TILETYPE::IRON;
-    //            break;
-
-    //            // X = 4~9 RIVER
-    //        case 4:
-    //        case 5:
-    //        case 6:
-    //        case 7:
-    //        case 8:
-    //        case 9:
-    //            sampleTileInfo[i * SAMPLE_TILE_X + j].type = TILETYPE::RIVER;
-    //            break;
-
-    //            // X = 10~11 FOREST
-    //        case 10:
-    //        case 11:
-    //            sampleTileInfo[i * SAMPLE_TILE_X + j].type = TILETYPE::FOREST;
-    //            break;
-
-    //            // X = 12~13 ICE
-    //        case 12:
-    //        case 13:
-    //            sampleTileInfo[i * SAMPLE_TILE_X + j].type = TILETYPE::ICE;
-    //            break;
-    //            // X = 14~15 BOSS
-    //        case 14:
-    //        case 15:
-    //            sampleTileInfo[i * SAMPLE_TILE_X + j].type = TILETYPE::BOSS;
-    //            break;
-
-    //            // X = 16~17 BOSSDIE
-    //            // X = 18~19 NONE
-    //        default:
-    //            sampleTileInfo[i * SAMPLE_TILE_X + j].type = TILETYPE::NONE;
-    //            break;
-    //        }
-    //    }
-    //}
 
     // UI Button
     saveButton = new Button();
-    saveButton->Init("SaveButton", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 200 });
-    saveButton->SetClick(Save, 1);
+    saveButton->Init("Save", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width - 120, TILEMAPTOOLSIZE_Y - 200 });
+    saveButton->SetTileMap(this);
+    saveButton->SetClick(&TileMapTool::Save, 1);
 
     loadButton = new Button();
-    loadButton->Init("LoadButton", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width + 80, TILEMAPTOOLSIZE_Y - 200 });
-    loadButton->SetClick(Load, 1);
-
+    loadButton->Init("Load", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width + 20, TILEMAPTOOLSIZE_Y - 200 });
+    loadButton->SetTileMap(this);
+    loadButton->SetClick(&TileMapTool::Load, 1);
+    
     leftButton = new Button();
-    leftButton->Init("LeftButton", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 300 });
-    leftButton->SetClick(StageSelect, -1);
-
+    leftButton->Init("Left", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width - 120, TILEMAPTOOLSIZE_Y - 300 });
+    leftButton->SetTileMap(this);
+    leftButton->SetClick(&TileMapTool::StageSelect, -1);
+    
     rightButton = new Button();
-    rightButton->Init("RightButton", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width + 80, TILEMAPTOOLSIZE_Y - 300 });
-    rightButton->SetClick(StageSelect, 1);
+    rightButton->Init("Right", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width + 20, TILEMAPTOOLSIZE_Y - 300 });
+    rightButton->SetTileMap(this);
+    rightButton->SetClick(&TileMapTool::StageSelect, 1);
+    
+    townSelectButton = new Button();
+    townSelectButton->Init("Town", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width -120, TILEMAPTOOLSIZE_Y - 400 });
+    townSelectButton->SetTileMap(this);
+    townSelectButton->SetClick(&TileMapTool::SceneSelect, 0);
+    
+    dungeonSelectButton = new Button();
+    dungeonSelectButton->Init("Dungeon", { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width + 20, TILEMAPTOOLSIZE_Y - 400 });
+    dungeonSelectButton->SetTileMap(this);
+    dungeonSelectButton->SetClick(&TileMapTool::SceneSelect, 1);
 
     //selectStage = 1;
+
+    cameraPos = { 0,0 };
     return S_OK;
 }
 
@@ -186,17 +141,37 @@ void TileMapTool::Update()
     {
         SCENEMANAGER->ChageScene("Title");
     }
+    if (KEYMANAGER->IsStayKeyDown(VK_DOWN) || KEYMANAGER->IsStayKeyDown('S'))
+    {
+        cameraPos.y += 2;
+        if (cameraPos.y > lpBackGroundTile->GetHeight() - WINSIZE_Y)
+            cameraPos.y = lpBackGroundTile->GetHeight() - WINSIZE_Y;
+    }
+    if (KEYMANAGER->IsStayKeyDown(VK_UP) || KEYMANAGER->IsStayKeyDown('W'))
+    {
+        cameraPos.y -= 2;
+        if (cameraPos.y < 0) cameraPos.y = 0;
+    }
+    if (KEYMANAGER->IsStayKeyDown(VK_RIGHT) || KEYMANAGER->IsStayKeyDown('D'))
+    {
+        cameraPos.x += 2;
+        if (cameraPos.x > lpBackGroundTile->GetWidth() - WINSIZE_X)
+            cameraPos.x = lpBackGroundTile->GetWidth() - WINSIZE_X;
+    }
+    if (KEYMANAGER->IsStayKeyDown(VK_LEFT) || KEYMANAGER->IsStayKeyDown('A'))
+    {
+        cameraPos.x -= 2;
+        if (cameraPos.x < 0) cameraPos.x = 0;
+    }
 
     // 세이브, 로드
-    if (saveButton)
-        saveButton->Update();
-    if (loadButton)
-        loadButton->Update();
-    if (leftButton)
-        leftButton->Update();
-    if (rightButton)
-        rightButton->Update();
-    
+    saveButton->Update();
+    loadButton->Update();
+    leftButton->Update();
+    rightButton->Update();
+    townSelectButton->Update();
+    dungeonSelectButton->Update();
+
     if (PtInRect(&rcMain, g_ptMouse))
     {
         if (KEYMANAGER->IsStayKeyDown(VK_LBUTTON))
@@ -236,7 +211,7 @@ void TileMapTool::Render(HDC hdc)
     PatBlt(hdc, 0, 0, TILEMAPTOOLSIZE_X, TILEMAPTOOLSIZE_Y, WHITENESS);
 
     // 타일 배경
-    lpBackGroundTile->Render(hdc);
+    lpBackGroundTile->CameraRender(hdc, 0, 0, cameraPos.x, cameraPos.y);
 
     hOldSelectedBrush = (HBRUSH)SelectObject(hdc, hSelectedBrush);
 
@@ -252,17 +227,15 @@ void TileMapTool::Render(HDC hdc)
     lpTileSetImage->Render(hdc, TILEMAPTOOLSIZE_X - (lpTileSetImage->GetImageInfo()->width * 2), 0, IMAGE_SIZE);
 
     // UI Button
-    if (saveButton)
-        saveButton->Render(hdc);
-    if (loadButton)
-        loadButton->Render(hdc);
-    if (leftButton)
-        leftButton->Render(hdc);
-    if (rightButton)
-        rightButton->Render(hdc);
+    saveButton->Render(hdc);
+    loadButton->Render(hdc);
+    leftButton->Render(hdc);
+    rightButton->Render(hdc);
+    townSelectButton->Render(hdc);
+    dungeonSelectButton->Render(hdc);
 
-    wsprintf(szText, "Stage : %d", this->selectStage);
-    TextOut(hdc, TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 350, szText, strlen(szText));
+    wsprintf(szText, "DunGeon %d", this->selectStage);
+    FLOATINGFONT->Render(hdc, { TILEMAPTOOLSIZE_X - lpTileSetImage->GetImageInfo()->width, TILEMAPTOOLSIZE_Y - 350 }, 18, szText, RGB(0, 0, 0));
 
     // 메인 영역 전체
     for (int i = 0; i < TILE_Y * TILE_X; i++)
@@ -299,9 +272,8 @@ void TileMapTool::Render(HDC hdc)
         IMAGE_SIZE, 
         true);
 
-
     wsprintf(szText, "배틀 씬으로 넘어가기 : Q");
-    TextOut(hdc, 100, 10, szText, strlen(szText));
+    FLOATINGFONT->Render(hdc, { TILEMAPTOOLSIZE_X - 300,  TILEMAPTOOLSIZE_Y - 100, }, 18, szText, RGB(0, 0, 0));
 }
 
 void TileMapTool::Save(int stageNum)
@@ -336,11 +308,27 @@ void TileMapTool::Load(int stageNum)
     CloseHandle(hFile);
 }
 
+void TileMapTool::SceneSelect(int num)
+{
+    switch (num)
+    {
+    case (int)SELECTSCENE::TOWN:
+        lpBackGroundTile = IMAGEMANAGER->FindImage("Town_BackGround");
+        currentScene = SELECTSCENE::TOWN;
+        break;
+    case (int)SELECTSCENE::DUNGEON:
+        lpBackGroundTile = IMAGEMANAGER->FindImage("Dungeon_Background");
+        currentScene = SELECTSCENE::DUNGEON;
+        break;
+    }
+    cameraPos = { 0,0 };
+}
+
 void TileMapTool::StageSelect(int num)
 {
     selectStage += num;
-    if (selectStage > 3) selectStage = 1;
-    if (selectStage < 1) selectStage = 3;
+    if (selectStage > 10) selectStage = 1;
+    if (selectStage < 1) selectStage = 10;
 }
 
 void TileMapTool::TileSelect()
@@ -357,13 +345,13 @@ void TileMapTool::TileSelect()
 
 void TileMapTool::ImageLoad()
 {
+    //IMAGEMANAGER->AddImage("SaveButton", "Image/Save.bmp", 144, 72, 2, 1);
+    //IMAGEMANAGER->AddImage("LoadButton", "Image/Load.bmp", 144, 72, 2, 1);
+    //IMAGEMANAGER->AddImage("LeftButton", "Image/Left.bmp", 120, 60, 2, 1);
+    //IMAGEMANAGER->AddImage("RightButton", "Image/Right.bmp", 120, 60, 2, 1);
 
     // 이미지 추가
-    IMAGEMANAGER->AddImage("SaveButton", "Image/Save.bmp", 144, 72, 2, 1);
-    IMAGEMANAGER->AddImage("LoadButton", "Image/Load.bmp", 144, 72, 2, 1);
-    IMAGEMANAGER->AddImage("LeftButton", "Image/Left.bmp", 120, 60, 2, 1);
-    IMAGEMANAGER->AddImage("RightButton", "Image/Right.bmp", 120, 60, 2, 1);
-
-    IMAGEMANAGER->AddImage("Dungeon Background", L"Image/Map/dungeon_background.png", BACKGROUND_TILE_X, BACKGROUND_TILE_Y);
-    IMAGEMANAGER->AddImage("Tile Set", L"Image/Map/TileMap.png", TILE_SET_X, TILE_SET_Y);
+    IMAGEMANAGER->AddImage("Dungeon_Background", L"Image/Map/Dungeon_BackGround.png");
+    IMAGEMANAGER->AddImage("Tile_Set", L"Image/Map/TileMap.png", TILE_SET_X, TILE_SET_Y);
+    IMAGEMANAGER->AddImage("Town_BackGround", L"Image/Map/Town_BackGround.png");
 }

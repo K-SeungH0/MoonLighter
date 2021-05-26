@@ -2,8 +2,9 @@
 #include "Unit.h"
 
 class Image;
-class Equipment;
+class Weapon;
 class Item;
+enum class SLOTTYPE;
 
 class Player : public Unit
 {
@@ -18,8 +19,20 @@ private:
 
 	bool isAction;
 	bool isCombo;
+	bool isEquipMainWeapon;
 
-	Equipment* weapon;
+	int additionalHp;
+	int additionalMoveSpeed;
+	int additionalArmor;
+
+	int gold;
+
+	Weapon* lpCurrentWeapon;
+
+	Item* lpMainWeapon;
+	Item* lpSubWeapon;
+
+	Item* lpPotion;
 
 	vector<int> attackFrame;
 public:
@@ -36,17 +49,28 @@ public:
 	void SetHitBox();
 	void NextCombo(int first, int second, int third);
 	void AddAttackFrame(vector<int> frame);
-	void EquipmentChagne(Item* weapon);
+	void ChangeWeapon(Item* weapon);
+	void EquipFromInventory(SLOTTYPE slotType, Item* equipment);
+	void SwapWeapon();
 	void CheckItem();
-
 	void ImageLoad();
-
+	
 	// 동작을 시작할때 실행
 	void FrameReset();
 
 	inline POINTFLOAT GetPos() { return this->pos; }
 	inline int GetImageFrame() { return this->imageFrame; }
 	inline int GetStateFrame() { return this->stateFrame; }
+	inline STATE GetState() { return this->state; }
+	inline bool GetIsAction() { return this->isAction; }
+	inline bool GetIsMainWeapon() { return this->isEquipMainWeapon; }
+	inline int GetAdditionalHp() { return this->additionalHp; }
+	inline int GetAdditionalMoveSpeed() { return this->additionalMoveSpeed; }
+	inline int GetAdditionalArmor() { return this->additionalArmor; }
+	inline int GetGold() { return this->gold; }
+	Image* GetCurrentWeaponImage();
+	Image* GetPotionImage();
+	int GetPotionCount();
 	~Player() override {};
 };
 

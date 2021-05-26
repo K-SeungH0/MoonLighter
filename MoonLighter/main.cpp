@@ -36,7 +36,7 @@ int APIENTRY WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance,
 	// 윈도우 생성
 	g_hWnd = CreateWindow(g_lpszClass, g_lpszClass,
 		WS_OVERLAPPEDWINDOW,
-		50, 50, 1080, 720,
+		0, 0, 1080, 720,
 		NULL, NULL, g_hInstance, NULL);
 
 

@@ -5,7 +5,7 @@
 #include "AstarScene.h"
 #include "LoadingScene.h"
 #include "TitleScene.h"
-#include "CollisionManager.h"
+#include "TownScene.h"
 #include "GameData.h"
 #include "Inventory.h"
 
@@ -17,7 +17,9 @@ HRESULT MainGame::Init()
 	ImageManager::GetInstance()->Init();
 	SceneManager::GetInstance()->Init();
 	CollisionManager::GetInstance()->Init();
+	EffectManager::GetInstance()->Init();
 	GameData::GetInstance()->Init();
+	FloatingFont::GetInstance()->Init();
 
 	// 백버퍼 이미지
 	backBuffer = new Image();
@@ -27,9 +29,11 @@ HRESULT MainGame::Init()
 	SceneManager::GetInstance()->AddScene("TileMapTool", new TileMapTool());
 	SceneManager::GetInstance()->AddScene("A*", new AstarScene());
 	SceneManager::GetInstance()->AddScene("Title", new TitleScene());
+	SceneManager::GetInstance()->AddScene("Town", new TownScene());
+
 	SceneManager::GetInstance()->AddLodingScene("LodingScene", new LoadingScene());
 
-	SceneManager::GetInstance()->ChageScene("Title");
+	SceneManager::GetInstance()->ChageScene("Town");
 	isInited = true;
 
 	return S_OK;
@@ -44,7 +48,8 @@ void MainGame::Release()
 	IMAGEMANAGER->Release();
 	SCENEMANAGER->Release();
 	COLLIDERMANAGER->Release();
-	RemoveFontResource("./Font/dalmoori.ttf");
+	EFFECTMANAGER->Release();
+	FLOATINGFONT->Release();
 }
 
 void MainGame::Update()
@@ -52,18 +57,21 @@ void MainGame::Update()
 	if (KEYMANAGER->IsOnceKeyDown('P'))
 		isDebugMode = !isDebugMode;
 
-	SceneManager::GetInstance()->Update();
+	FLOATINGFONT->Update();
+	SCENEMANAGER->Update();
 }
 
 void MainGame::Render()
 {
 	HDC hBackDC = backBuffer->GetMemDC();
+	SetBkMode(hBackDC, 1);
+	SetTextColor(hBackDC, RGB(255, 255, 255));
 
 	SCENEMANAGER->Render(hBackDC);
 	TIMERMANAGER->Render(hBackDC);
+	FLOATINGFONT->Render(hBackDC);
 
 	backBuffer->Render(hdc);
-
 }
 
 LRESULT MainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)

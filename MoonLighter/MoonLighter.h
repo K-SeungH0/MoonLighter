@@ -15,6 +15,9 @@ using namespace std;
 #include "TimerManager.h"
 #include "SceneManager.h"
 #include "CollisionManager.h"
+#include "EffectManager.h"
+#include "FloatingFont.h"
+
 #include "GameData.h"
 
 #define WINSIZE_X	1280
@@ -37,9 +40,12 @@ using namespace std;
 #define KEYMANAGER KeyManager::GetInstance()
 #define IMAGEMANAGER ImageManager::GetInstance()
 #define TIMERMANAGER TimerManager::GetInstance()
-#define DELTATIME TIMERMANAGER->GetDeltaTime()
 #define SCENEMANAGER SceneManager::GetInstance()
 #define COLLIDERMANAGER CollisionManager::GetInstance()
+#define EFFECTMANAGER EffectManager::GetInstance()
+#define FLOATINGFONT FloatingFont::GetInstance()
+#define DELTATIME TIMERMANAGER->GetDeltaTime()
+
 #define GAMEDATA GameData::GetInstance()
 
 #define IMAGE_SIZE 2.0f

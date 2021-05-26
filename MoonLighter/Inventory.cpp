@@ -7,46 +7,55 @@ HRESULT Inventory::Init()
 {
     ImageLoad();
     lpImage = IMAGEMANAGER->FindImage("Inventory");
-    jBtn = IMAGEMANAGER->FindImage("J_Button");
-    iBtn = IMAGEMANAGER->FindImage("I_Button");
+    lpJBtnImage = IMAGEMANAGER->FindImage("J_Button");
+    lpIBtnImage = IMAGEMANAGER->FindImage("I_Button");
     lpDescriptionImage = IMAGEMANAGER->FindImage("Description");
+    lpCurrentWeaponImage = IMAGEMANAGER->FindImage("MainWeapon");
 
     this->pos.x = WINSIZE_X / 2;
     this->pos.y = WINSIZE_Y / 2;
+
     int offset = 32;
     for (int x = 0; x < INVEN_SIZE_X; x++)
     {
-        //invenSlots[0][x].lpSlotImage = IMAGEMANAGER->FindImage("InvenSlot");
         invenSlots[0][x].slotPos.x = WINSIZE_X / 2 - lpImage->GetWidth() + 46 * 2 + (x * 36 * 2) + offset + 1;
         invenSlots[0][x].slotPos.y = WINSIZE_Y / 2 - lpImage->GetHeight() + 39 * 2 + offset;
+        invenSlots[0][x].slotType = SLOTTYPE::INVEN;
     }
 
     for (int y = 1; y < INVEN_SIZE_Y; y++)
     {
         for (int x = 0; x < INVEN_SIZE_X; x++)
         {
-            //invenSlots[y][x].lpSlotImage = IMAGEMANAGER->FindImage("InvenSlot");
             invenSlots[y][x].slotPos.x = WINSIZE_X / 2 - lpImage->GetWidth() + 46 * 2 + (x * 36 * 2) + offset + 1;
             invenSlots[y][x].slotPos.y = WINSIZE_Y / 2 - lpImage->GetHeight() + 82 * 2 + ((y - 1) * 36 * 2) + offset;
+            invenSlots[y][x].slotType = SLOTTYPE::INVEN;
         }
     }
 
     equipSlots[0][0].slotPos.x = WINSIZE_X / 2 - lpImage->GetWidth() + (310 * 2) + offset + 1;
     equipSlots[0][0].slotPos.y = WINSIZE_Y / 2 - lpImage->GetHeight() + (37 * 2) + offset;
+    equipSlots[0][0].slotType = SLOTTYPE::MAINWEAPON;
+
     equipSlots[0][1].slotPos.x = WINSIZE_X / 2 - lpImage->GetWidth() + (397 * 2) + offset + 1;
     equipSlots[0][1].slotPos.y = WINSIZE_Y / 2 - lpImage->GetHeight() + (37 * 2) + offset;
+    equipSlots[0][1].slotType = SLOTTYPE::SUBWEAPON;
 
     equipSlots[1][0].slotPos.x = WINSIZE_X / 2 - lpImage->GetWidth() + (268 * 2) + offset + 1;
     equipSlots[1][0].slotPos.y = WINSIZE_Y / 2 - lpImage->GetHeight() + (82 * 2) + offset;
+    equipSlots[1][0].slotType = SLOTTYPE::HELMET;
 
     equipSlots[2][0].slotPos.x = WINSIZE_X / 2 - lpImage->GetWidth() + (268 * 2) + offset + 1;
     equipSlots[2][0].slotPos.y = WINSIZE_Y / 2 - lpImage->GetHeight() + (118 * 2) + offset;
+    equipSlots[2][0].slotType = SLOTTYPE::CHEST;
 
     equipSlots[2][1].slotPos.x = WINSIZE_X / 2 - lpImage->GetWidth() + (304 * 2) + offset + 1;
     equipSlots[2][1].slotPos.y = WINSIZE_Y / 2 - lpImage->GetHeight() + (118 * 2) + offset;
+    equipSlots[2][1].slotType = SLOTTYPE::POTION;
 
     equipSlots[3][0].slotPos.x = WINSIZE_X / 2 - lpImage->GetWidth() + (268 * 2) + offset + 1;
     equipSlots[3][0].slotPos.y = WINSIZE_Y / 2 - lpImage->GetHeight() + (154 * 2) + offset;
+    equipSlots[3][0].slotType = SLOTTYPE::SHOES;
 
     selectSlotX = 0;
     selectSlotY = 0;
@@ -59,6 +68,7 @@ HRESULT Inventory::Init()
     isItemPickUp = false;
     selectSlotSize = IMAGE_SIZE;
     selectTimer = 0;
+
     return S_OK;
 }
 
@@ -171,7 +181,6 @@ void Inventory::Update()
         selectTimer = 0;
 
         (++selectSlotY) %= INVEN_SIZE_Y;
-
         if (isEquipSelect && selectSlotX)
         {
             if (selectSlotY == 1)
@@ -211,7 +220,6 @@ void Inventory::Update()
         selectItem.slotPos = invenSlots[selectSlotY][selectSlotX].slotPos;
     }
 
-
     selectSlotSize -= 10 * DELTATIME;
     if (selectSlotSize < IMAGE_SIZE)
         selectSlotSize = IMAGE_SIZE;
@@ -221,39 +229,30 @@ void Inventory::Render(HDC hdc)
 {
     if (isActive)
     {
+        lpImage->Render(hdc, pos.x, pos.y, IMAGE_SIZE, true);
 
-        lpImage->FrameRender(hdc, pos.x, pos.y, 0, 0, IMAGE_SIZE, true);
+        lpJBtnImage->Render(hdc, pos.x - 400, WINSIZE_Y - 50, IMAGE_SIZE, true);
+        FLOATINGFONT->Render(hdc, { pos.x - 400 + 48, WINSIZE_Y - 50 - 15 }, 32, "잡기 / 길게 눌러서 묶음 잡기", RGB(255, 255, 255));
+        
+        lpIBtnImage->Render(hdc, pos.x + 200, WINSIZE_Y - 50, IMAGE_SIZE, true);
+        FLOATINGFONT->Render(hdc, { pos.x + 200 + 48, WINSIZE_Y - 50 - 15 }, 32, "닫기", RGB(255, 255, 255));
 
-        HFONT hFont;
-        HFONT oldFont;
-        hFont = CreateFont(32, 0, 0, 0, 0, 0, 0, 0, HANGUL_CHARSET, 0, 0, 0, VARIABLE_PITCH || FF_ROMAN, TEXT("나눔스퀘어_ac Bold"));
-        oldFont = (HFONT)SelectObject(hdc, hFont);
-        SetBkColor(hdc, RGB(0, 0, 0));
-        jBtn->FrameRender(hdc, pos.x - 400, WINSIZE_Y - 50, 0, 0, IMAGE_SIZE, true);
-        wsprintf(text, "잡기 / 길게 눌러서 묶음 잡기");
-        TextOut(hdc, pos.x - 400 + 48, WINSIZE_Y - 50 - 15, text, strlen(text));
-        iBtn->FrameRender(hdc, pos.x + 200, WINSIZE_Y - 50, 0, 0, IMAGE_SIZE, true);
-        wsprintf(text, "닫기");
-        TextOut(hdc, pos.x + 200 + 48, WINSIZE_Y - 50 - 15, text, strlen(text));
-
-        SelectObject(hdc, oldFont);
-        DeleteObject(hFont);
-
-        SetTextColor(hdc, RGB(0, 0, 0));
+        lpCurrentWeaponImage->Render(hdc, 890, 205, IMAGE_SIZE, true);
 
         for (int y = 0; y < INVEN_SIZE_Y; y++)
         {
             for (int x = 0; x < INVEN_SIZE_X; x++)
             {
-                //invenSlots[y][x].lpSlotImage->FrameRender(hdc, invenSlots[y][x].slotPos.x, invenSlots[y][x].slotPos.y, 0, 0, IMAGE_SIZE, true);
                 if (invenSlots[y][x].lpItem != nullptr)
                 {
                     invenSlots[y][x].lpItem->Render(hdc, { invenSlots[y][x].slotPos.x, invenSlots[y][x].slotPos.y });
 
-                    if (!invenSlots[y][x].lpItem->GetItemData().isEquipment)
+                    invenSlots[y][x].lpItem->SetSaveCount(invenSlots[y][x].count);
+                    invenSlots[y][x].lpItem->SetSaveSlotPos({ x,y });
+                    invenSlots[y][x].lpItem->SetOnwer(&invenSlots[y][x]);
+                    if (!invenSlots[y][x].lpItem->GetItemData().isEquipment || invenSlots[y][x].lpItem->GetSlotType() == SLOTTYPE::POTION)
                     {
-                        wsprintf(text, to_string(invenSlots[y][x].count).c_str());
-                        TextOut(hdc, invenSlots[y][x].slotPos.x + 15, invenSlots[y][x].slotPos.y + 15, text, strlen(text));
+                        FLOATINGFONT->Render(hdc, { invenSlots[y][x].slotPos.x + 15, invenSlots[y][x].slotPos.y + 15 }, 12, to_string(invenSlots[y][x].count).c_str(), RGB(0, 0, 0));
                     }
                 }
             }
@@ -263,7 +262,23 @@ void Inventory::Render(HDC hdc)
             for (int x = 0; x < 2; x++)
             {
                 if (equipSlots[y][x].lpItem != nullptr)
+                {
                     equipSlots[y][x].lpItem->Render(hdc, { equipSlots[y][x].slotPos.x, equipSlots[y][x].slotPos.y });
+
+                    equipSlots[y][x].lpItem->SetSaveCount(equipSlots[y][x].count);
+                    equipSlots[y][x].lpItem->SetSaveSlotPos({ x,y });
+                    equipSlots[y][x].lpItem->SetOnwer(&equipSlots[y][x]);
+
+                    if (equipSlots[y][x].slotType == SLOTTYPE::POTION)
+                    {
+                        if(equipSlots[y][x].count != 0)
+                            FLOATINGFONT->Render(hdc, { equipSlots[y][x].slotPos.x + 15, invenSlots[y][x].slotPos.y + 15 }, 12, to_string(equipSlots[y][x].count).c_str(), RGB(0, 0, 0));
+                        else
+                        {
+
+                        }
+                    }
+                }
             }
         }
 
@@ -274,15 +289,7 @@ void Inventory::Render(HDC hdc)
            {
                lpDescriptionImage->FrameRender(hdc, pos.x - 50, WINSIZE_Y - 100, 0, 0, 1, true);
 
-               hFont = CreateFont(24, 0, 0, 0, 0, 0, 0, 0, HANGUL_CHARSET, 0, 0, 0, VARIABLE_PITCH || FF_ROMAN, TEXT("나눔스퀘어_ac Bold"));
-               oldFont = (HFONT)SelectObject(hdc, hFont);
-
-               string description = equipSlots[selectSlotY][selectSlotX].lpItem->GetDescription();
-               wsprintf(text, description.c_str());               
-               TextOut(hdc, pos.x - 50 - (description.size() * 12 / 2), WINSIZE_Y - 110, text, strlen(text));
-               
-               SelectObject(hdc, oldFont);
-               DeleteObject(hFont);
+               FLOATINGFONT->Render(hdc, { pos.x - 50 - ((LONG)equipSlots[selectSlotY][selectSlotX].lpItem->GetDescription().size() * 12 / 2), WINSIZE_Y - 110 }, 24, equipSlots[selectSlotY][selectSlotX].lpItem->GetDescription().c_str(), RGB(0,0,0));
            }
        }
        else
@@ -290,33 +297,22 @@ void Inventory::Render(HDC hdc)
            if (invenSlots[selectSlotY][selectSlotX].lpItem)
            {
                lpDescriptionImage->FrameRender(hdc, pos.x - 50, WINSIZE_Y - 100, 0, 0, 1, true);
-
-               hFont = CreateFont(24, 0, 0, 0, 0, 0, 0, 0, HANGUL_CHARSET, 0, 0, 0, VARIABLE_PITCH || FF_ROMAN, TEXT("나눔스퀘어_ac Bold"));
-               oldFont = (HFONT)SelectObject(hdc, hFont);
-
-               string description = invenSlots[selectSlotY][selectSlotX].lpItem->GetDescription();
-               wsprintf(text, description.c_str());
-               TextOut(hdc, pos.x - 50 - (description.size() * 12 / 2), WINSIZE_Y - 110, text, strlen(text));
-
-               SelectObject(hdc, oldFont);
-               DeleteObject(hFont);
+               
+               FLOATINGFONT->Render(hdc, { pos.x - 50 - ((LONG)invenSlots[selectSlotY][selectSlotX].lpItem->GetDescription().size() * 12 / 2), WINSIZE_Y - 110 }, 24, invenSlots[selectSlotY][selectSlotX].lpItem->GetDescription().c_str(), RGB(0, 0, 0));
            }
        }
         if (isItemPickUp)
         {
             selectItem.lpSlotImage->FrameRender(hdc, selectItem.slotPos.x - 7, selectItem.slotPos.y - 37 * 2, 0, 0, IMAGE_SIZE, true);
             selectItem.lpItem->Render(hdc, { selectItem.slotPos.x - 7, selectItem.slotPos.y - 37 * 2 });
-            if (!selectItem.lpItem->GetItemData().isEquipment)
-            {
-                wsprintf(text, to_string(selectItem.count).c_str());
-                SetTextColor(hdc, RGB(0, 0, 0));
-                TextOut(hdc, selectItem.slotPos.x - 7 + 15, selectItem.slotPos.y - 37 * 2 + 15, text, strlen(text));
-            }
+            FLOATINGFONT->Render(hdc, { selectItem.slotPos.x - 7 + 15, selectItem.slotPos.y - 37 * 2 + 15 }, 12, to_string(selectItem.count).c_str(), RGB(0, 0, 0));
         }
 
-
+        FLOATINGFONT->Render(hdc, { 1095, 285 }, 24, to_string(GAMEDATA->GetRunTimePlayer()->GetMaxHp() + GAMEDATA->GetRunTimePlayer()->GetAdditionalHp()).c_str(), RGB(0, 0, 0));
+        FLOATINGFONT->Render(hdc, { 1095, 285 + 62 }, 24, to_string(GAMEDATA->GetRunTimePlayer()->GetDamage()).c_str(), RGB(0, 0, 0));
+        FLOATINGFONT->Render(hdc, { 1095, 285 + 123 }, 24, to_string(GAMEDATA->GetRunTimePlayer()->GetArmor() + GAMEDATA->GetRunTimePlayer()->GetAdditionalArmor()).c_str(), RGB(0, 0, 0));
+        FLOATINGFONT->Render(hdc, { 1095, 285 + 183 }, 24, to_string(GAMEDATA->GetRunTimePlayer()->GetMoveSpeed() + GAMEDATA->GetRunTimePlayer()->GetAdditionalMoveSpeed()).c_str(), RGB(0, 0, 0));
     }
-
 }
 
 
@@ -331,11 +327,13 @@ void Inventory::AddItem(Item* item)
             {
                 invenSlots[y][x].lpItem = new Item();
                 invenSlots[y][x].lpItem->Init(item->GetItemData(), item->GetItemManager());
+                invenSlots[y][x].lpItem->SetOnwer(&invenSlots[y][x]);
                 invenSlots[y][x].count++;
                 isAddItem = true;
                 break;
             }
-            else if (invenSlots[y][x].lpItem->GetItemData().itemCode == item->GetItemData().itemCode)
+            else if ((invenSlots[y][x].lpItem->GetItemData().itemCode == item->GetItemData().itemCode) 
+                && (item->GetSlotType() != SLOTTYPE::INVEN || item->GetSlotType() != SLOTTYPE::POTION))
             {
                 invenSlots[y][x].count++;
                 isAddItem = true;
@@ -344,6 +342,22 @@ void Inventory::AddItem(Item* item)
         }
         if (isAddItem)
             break;
+    }
+}
+
+void Inventory::RemoveItem(Item* item)
+{
+    for (int y = 0; y < INVEN_SIZE_Y; y++)
+    {
+        for (int x = 0; x < 2; x++)
+        {
+            if (item == equipSlots[y][x].lpItem)
+            {
+                delete equipSlots[y][x].lpItem;
+                equipSlots[y][x].lpItem = nullptr;
+                GAMEDATA->GetRunTimePlayer()->EquipFromInventory(equipSlots[y][x].slotType, equipSlots[y][x].lpItem);
+            }
+        }
     }
 }
 
@@ -365,10 +379,15 @@ void Inventory::ItemPickUp()
         if (equipSlots[selectSlotY][selectSlotX].lpItem)
         {
             selectItem.lpItem = equipSlots[selectSlotY][selectSlotX].lpItem;
-            equipSlots[selectSlotY][selectSlotX].lpItem = nullptr;
-
-            GAMEDATA->GetRunTimePlayer()->EquipmentChagne(nullptr);
+            //equipSlots[selectSlotY][selectSlotX].lpItem = nullptr;
+            
+            equipSlots[selectSlotY][selectSlotX].count--;
             selectItem.count++;
+
+            if (equipSlots[selectSlotY][selectSlotX].count == 0)
+                equipSlots[selectSlotY][selectSlotX].lpItem = nullptr;
+
+            GAMEDATA->GetRunTimePlayer()->EquipFromInventory(equipSlots[selectSlotY][selectSlotX].slotType, equipSlots[selectSlotY][selectSlotX].lpItem);
             isItemPickUp = true;
         }
     }
@@ -391,17 +410,19 @@ void Inventory::ItemPickUp()
 
 void Inventory::ItemAllPickUp()
 {
-
     if (isEquipSelect)
     {
         selectSlotSize = IMAGE_SIZE * 1.5f;
 
         if (equipSlots[selectSlotY][selectSlotX].lpItem)
         {
-            selectItem.lpItem = equipSlots[selectSlotY][selectSlotX].lpItem;
-            equipSlots[selectSlotY][selectSlotX].lpItem = nullptr;
 
-            selectItem.count++;
+            selectItem.lpItem = equipSlots[selectSlotY][selectSlotX].lpItem;
+            selectItem.count += equipSlots[selectSlotY][selectSlotX].count;
+
+            equipSlots[selectSlotY][selectSlotX].lpItem = nullptr;
+            equipSlots[selectSlotY][selectSlotX].count = 0;
+            GAMEDATA->GetRunTimePlayer()->EquipFromInventory(equipSlots[selectSlotY][selectSlotX].slotType, equipSlots[selectSlotY][selectSlotX].lpItem);
             isItemPickUp = true;
         }
     }
@@ -444,7 +465,6 @@ void Inventory::ItemAllPickUp()
                     invenSlots[selectSlotY][selectSlotX].count = 0;
                 }
             }
-            
             isItemPickUp = true;
         }
     }
@@ -459,22 +479,47 @@ void Inventory::ItemPickDown()
     {
         if (selectItem.lpItem->GetItemData().isEquipment)
         {
+            // 장착된 아이템이 있으면
             if (equipSlots[selectSlotY][selectSlotX].lpItem)
             {
-                Item* tmepItem = equipSlots[selectSlotY][selectSlotX].lpItem;
+                if (selectItem.lpItem->GetSlotType() == equipSlots[selectSlotY][selectSlotX].slotType ||
+                    (selectItem.lpItem->GetSlotType() == SLOTTYPE::MAINWEAPON && equipSlots[selectSlotY][selectSlotX].slotType == SLOTTYPE::SUBWEAPON))
+                {
+                    
+                    if (equipSlots[selectSlotY][selectSlotX].lpItem->GetItemData().itemCode == selectItem.lpItem->GetItemData().itemCode)
+                    {
+                        ItemPickUp();
+                        return;
+                    }
+                    
+                    Item* tempItem = equipSlots[selectSlotY][selectSlotX].lpItem;
+                    int tempCount = equipSlots[selectSlotY][selectSlotX].count;
 
-                equipSlots[selectSlotY][selectSlotX].lpItem = selectItem.lpItem;
-                selectItem.lpItem = tmepItem;
-                GAMEDATA->GetRunTimePlayer()->EquipmentChagne(equipSlots[selectSlotY][selectSlotX].lpItem);
-                isItemPickUp = true;
+                    equipSlots[selectSlotY][selectSlotX].lpItem = selectItem.lpItem;
+                    equipSlots[selectSlotY][selectSlotX].count = selectItem.count;
+                    selectItem.lpItem = tempItem;
+                    selectItem.count = tempCount;
+
+                    GAMEDATA->GetRunTimePlayer()->EquipFromInventory(equipSlots[selectSlotY][selectSlotX].slotType, equipSlots[selectSlotY][selectSlotX].lpItem);
+                    isItemPickUp = true;
+                }
             }
             else
             {
-                equipSlots[selectSlotY][selectSlotX].lpItem = selectItem.lpItem;
-                selectItem.lpItem = nullptr;
-                selectItem.count = 0;
-                GAMEDATA->GetRunTimePlayer()->EquipmentChagne(equipSlots[selectSlotY][selectSlotX].lpItem);
-                isItemPickUp = false;
+                if (selectItem.lpItem->GetSlotType() == equipSlots[selectSlotY][selectSlotX].slotType ||
+                    (selectItem.lpItem->GetSlotType() == SLOTTYPE::MAINWEAPON && equipSlots[selectSlotY][selectSlotX].slotType == SLOTTYPE::SUBWEAPON))
+                {
+                    equipSlots[selectSlotY][selectSlotX].lpItem = selectItem.lpItem;
+                    equipSlots[selectSlotY][selectSlotX].count = selectItem.count;
+
+                    equipSlots[selectSlotY][selectSlotX].lpItem->SetSaveCount(equipSlots[selectSlotY][selectSlotX].count);
+
+                    selectItem.lpItem = nullptr;
+                    selectItem.count = 0;
+                    GAMEDATA->GetRunTimePlayer()->EquipFromInventory(equipSlots[selectSlotY][selectSlotX].slotType, equipSlots[selectSlotY][selectSlotX].lpItem);
+
+                    isItemPickUp = false;
+                }
             }
         }
     }
@@ -511,6 +556,14 @@ void Inventory::ItemPickDown()
             selectItem.count = 0;
         }
     }
+}
+
+void Inventory::SwapWeapon()
+{
+    if (lpCurrentWeaponImage == IMAGEMANAGER->FindImage("MainWeapon"))
+        lpCurrentWeaponImage = IMAGEMANAGER->FindImage("SubWeapon");
+    else
+        lpCurrentWeaponImage = IMAGEMANAGER->FindImage("MainWeapon");
 }
 
 void Inventory::DataLoad(ItemManager* lpItemManager)
@@ -557,9 +610,10 @@ void Inventory::ImageLoad()
     IMAGEMANAGER->AddImage("J_Button", L"Image/UI/J_Button.png");
     IMAGEMANAGER->AddImage("I_Button", L"Image/UI/I_Button.png");
     IMAGEMANAGER->AddImage("Description", L"Image/UI/Inventory_Description.png");
+    IMAGEMANAGER->AddImage("MainWeapon", L"Image/UI/Inventory_MainWeapon.png");
+    IMAGEMANAGER->AddImage("SubWeapon", L"Image/UI/Inventory_SubWeapon.png");
 
-
-    // 장비 아이콘
+    // 무기 아이콘
     IMAGEMANAGER->AddImage("BigSword_0", L"Image/Item/BigSword_0.png");
     IMAGEMANAGER->AddImage("BigSword_1", L"Image/Item/BigSword_1.png");
     IMAGEMANAGER->AddImage("Bow_0", L"Image/Item/Bow_0.png");
@@ -570,6 +624,14 @@ void Inventory::ImageLoad()
     IMAGEMANAGER->AddImage("ShortSword_1", L"Image/Item/ShortSword_1.png");
     IMAGEMANAGER->AddImage("Spear_0", L"Image/Item/Spear_0.png");
     IMAGEMANAGER->AddImage("Spear_1", L"Image/Item/Spear_1.png");
+
+    // 방어구 아이콘
+    IMAGEMANAGER->AddImage("Boot_0", L"Image/Item/Boot_0.png");
+    IMAGEMANAGER->AddImage("Boot_1", L"Image/Item/Boot_1.png");
+    IMAGEMANAGER->AddImage("Helmet_0", L"Image/Item/Helmet_0.png");
+    IMAGEMANAGER->AddImage("Helmet_1", L"Image/Item/Helmet_1.png");
+    IMAGEMANAGER->AddImage("Chest_0", L"Image/Item/Chest_0.png");
+    IMAGEMANAGER->AddImage("Chest_1", L"Image/Item/Chest_1.png");
 
     // 잡템 아이콘
     IMAGEMANAGER->AddImage("Item_0", L"Image/Item/Item_0.png");
@@ -591,5 +653,4 @@ void Inventory::ImageLoad()
     IMAGEMANAGER->AddImage("Potion_1", L"Image/Item/Potion_1.png");
     IMAGEMANAGER->AddImage("Potion_2", L"Image/Item/Potion_2.png");
     IMAGEMANAGER->AddImage("Potion_3", L"Image/Item/Potion_3.png");
-
 }
