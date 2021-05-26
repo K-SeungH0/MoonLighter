@@ -25,7 +25,7 @@ void TownScene::Release()
 
 void TownScene::Update()
 {
-	//lpPlayer->Update();
+	lpPlayer->Update();
 
 	lpCamera->Update();
 }
@@ -33,10 +33,10 @@ void TownScene::Update()
 void TownScene::Render(HDC hdc)
 {
 	//lpBackGround->CameraRender(hdc, 0, 0, lpPlayer->GetPos().x, lpPlayer->GetPos().y);
-	lpCamera->CameraRender(hdc, { 0, 0}, lpBackGround);
-	lpPlayer->Render(hdc);
-	
+	//lpCamera->CameraRender(hdc, { 0, 0}, lpBackGround);
 	//lpPlayer->Render(hdc);
+
+	lpCamera->Render(hdc);
 }
 
 void TownScene::ImageLoad()

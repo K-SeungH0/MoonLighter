@@ -40,6 +40,7 @@ public:
 	void Release() override;
 	void Update() override;
 	void Render(HDC hdc) override;
+	void TestRender(HDC hdc, POINTFLOAT pos);
 
 	void Avoid();
 	void Move(DIR dir);

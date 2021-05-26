@@ -171,6 +171,16 @@ void Player::Render(HDC hdc)
         lpCurrentWeapon->Render(hdc);
 }
 
+void Player::TestRender(HDC hdc, POINTFLOAT pos)
+{
+    Unit::Render(hdc);
+
+    lpImage->FrameRender(hdc, pos.x, pos.y, imageFrame, stateFrame, IMAGE_SIZE, true);
+
+    if (state == STATE::ATTACK)
+        lpCurrentWeapon->Render(hdc);
+}
+
 void Player::Avoid()
 {
     isAction = true;

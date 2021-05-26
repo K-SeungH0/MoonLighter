@@ -20,32 +20,24 @@ void Camera::Release()
 
 void Camera::Update()
 {
-	// playerPos = (WINSIZE_X / 2 , WINSIZE_Y - 100) 
-	POINTFLOAT playerPos = foucs->GetPos();
-	foucs->Update();
-
-	if (foucs->GetPos().x > WINSIZE_X * 3 / 4 &&
+	if (foucs->GetPos().x - cameraPos.x > WINSIZE_X * 3 / 4 &&
 		cameraPos.x < lpBackGround->GetWidth() - WINSIZE_X)
 	{
-		foucs->SetPos({ playerPos.x , foucs->GetPos().y });
 		cameraPos.x += DELTATIME * (foucs->GetMoveSpeed() + foucs->GetAdditionalMoveSpeed());
 	}
-	if (foucs->GetPos().y > WINSIZE_Y * 3 / 4 &&
+	if (foucs->GetPos().y - cameraPos.y > WINSIZE_Y * 3 / 4 &&
 		cameraPos.y < lpBackGround->GetHeight() - WINSIZE_Y)
 	{
-		foucs->SetPos({ foucs->GetPos().x , playerPos.y });
 		cameraPos.y += DELTATIME * (foucs->GetMoveSpeed() + foucs->GetAdditionalMoveSpeed());
 	}
-	if (foucs->GetPos().x < WINSIZE_X / 4 &&
+	if (foucs->GetPos().x - cameraPos.x < WINSIZE_X / 4 &&
 		cameraPos.x > 0)
 	{
-		foucs->SetPos({ playerPos.x , foucs->GetPos().y });
 		cameraPos.x -= DELTATIME * (foucs->GetMoveSpeed() + foucs->GetAdditionalMoveSpeed());
 	}
-	if (foucs->GetPos().y < WINSIZE_Y / 4 &&
+	if (foucs->GetPos().y - cameraPos.y < WINSIZE_Y / 4 &&
 		cameraPos.y > 0)
 	{
-		foucs->SetPos({ foucs->GetPos().x , playerPos.y });
 		cameraPos.y -= DELTATIME * (foucs->GetMoveSpeed() + foucs->GetAdditionalMoveSpeed());
 	}
 
@@ -69,7 +61,12 @@ void Camera::Update()
 
 void Camera::Render(HDC hdc)
 {
-
+	CameraRender(hdc, { 0, 0 }, lpBackGround);
+	POINTFLOAT test;
+	test.x = foucs->GetPos().x - cameraPos.x;
+	test.y = foucs->GetPos().y - cameraPos.y;
+	foucs->TestRender(hdc, test);
+	//CameraRender(hdc, { (LONG)foucs->GetPos().x, (LONG)foucs->GetPos().y }, foucs->GetImage());
 }
 
 void Camera::CameraRender(HDC hdc, POINT worldPos, Image* lpImage)
@@ -79,5 +76,5 @@ void Camera::CameraRender(HDC hdc, POINT worldPos, Image* lpImage)
 	//	cameraPos.y + WINSIZE_Y < worldPos.y - lpImage->GetHeight())
 	//	return;
 	
-	lpImage->CameraRender(hdc, worldPos.x, worldPos.y, cameraPos.x, cameraPos.y);
+	lpImage->CameraRender(hdc, worldPos.x , worldPos.y, cameraPos.x, cameraPos.y);
 }
