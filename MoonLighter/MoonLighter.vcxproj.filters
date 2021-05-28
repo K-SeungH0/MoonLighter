@@ -64,6 +64,9 @@
     <Filter Include="MainGame\Scene\TownScene">
       <UniqueIdentifier>{5cb20e91-8174-4e08-ad66-1b7cf4873d54}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\Scene\ShopScene">
+      <UniqueIdentifier>{289860c8-b1c5-4264-a8fd-fcda71f7b6b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -158,6 +161,9 @@
     </ClCompile>
     <ClCompile Include="TownScene.cpp">
       <Filter>MainGame\Scene\TownScene</Filter>
+    </ClCompile>
+    <ClCompile Include="ShopScene.cpp">
+      <Filter>MainGame\Scene\ShopScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +271,9 @@
     </ClInclude>
     <ClInclude Include="TownScene.h">
       <Filter>MainGame\Scene\TownScene</Filter>
+    </ClInclude>
+    <ClInclude Include="ShopScene.h">
+      <Filter>MainGame\Scene\ShopScene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

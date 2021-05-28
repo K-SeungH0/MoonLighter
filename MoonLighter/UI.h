@@ -22,10 +22,13 @@ public:
 
 	inline int GetCutX() { return this->cutX; }
 	inline int GetCutY() { return this->cutY; }
+	inline int GetFrameX() { return this->frameX; }
+	inline int GetFrameY() { return this->frameY; }
 
 	inline void SetCutX(int cutX) { this->cutX = cutX; }
 	inline void SetCutY(int cutY) { this->cutY = cutY; }
-
+	inline void SetFrameX(int frameX) { this->frameX = frameX; }
+	inline void SetFrameY(int frameY) { this->frameY = frameY; }
 	virtual ~UI() {};
 };
 

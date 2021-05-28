@@ -23,6 +23,9 @@ HRESULT BattleSceneUI::Init()
 	lpUICurrentHpbar = new UI();
 	lpUICurrentHpbar->Init(IMAGEMANAGER->FindImage("UI_HPbar"), { 179, 32 }, 0, 0);
 	
+	lpUICurrentWeapon = new UI();
+	lpUICurrentWeapon->Init(IMAGEMANAGER->FindImage("UI_CurrentWeapon"), { 1090,85 }, 0, 0);
+
 	lpUIInventory = GAMEDATA->GetRunTimeInventory();
 
 	player = GAMEDATA->GetRunTimePlayer();
@@ -38,6 +41,7 @@ void BattleSceneUI::Release()
 	lpUIGold->Release();
 	lpUICurrentHpbar->Release();
 	lpUIReduceHpbar->Release();
+	lpUICurrentWeapon->Release();
 }
 
 void BattleSceneUI::Update()
@@ -50,6 +54,10 @@ void BattleSceneUI::Update()
 		imageSize = 2.0f;
 		player->SwapWeapon();
 		lpUIInventory->SwapWeapon();
+		if (!player->GetIsEquipMainWeapon())
+			lpUICurrentWeapon->SetFrameX(1);
+		else
+			lpUICurrentWeapon->SetFrameX(0);
 	}
 
 	imageSize -= DELTATIME;
@@ -77,8 +85,9 @@ void BattleSceneUI::Render(HDC hdc)
 	lpUIbase->Render(hdc);
 	lpUIFront->Render(hdc);
 	lpUIGold->Render(hdc);
-	lpUIInventory->Render(hdc);
+	lpUICurrentWeapon->Render(hdc);
 
+	lpUIInventory->Render(hdc);
 	lpUIReduceHpbar->Render(hdc);
 	lpUICurrentHpbar->Render(hdc);
 
@@ -114,4 +123,5 @@ void BattleSceneUI::ImageLoad()
 	IMAGEMANAGER->AddImage("UI_front", L"Image/UI/UI_front.png");
 	IMAGEMANAGER->AddImage("UI_gold", L"Image/UI/UI_gold.png");
 	IMAGEMANAGER->AddImage("UI_HPbar", L"Image/UI/UI_HPbar.png", 1 ,5);
+	IMAGEMANAGER->AddImage("UI_CurrentWeapon", L"Image/UI/UI_CurrentWeapon.png", 2 ,1);
 }

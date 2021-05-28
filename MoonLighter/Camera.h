@@ -2,25 +2,29 @@
 #include "GameObject.h"
 
 class Image;
-class Player;
 class Object;
 class Camera : public GameObject
 {
 private:
 	POINTFLOAT cameraPos;
-	Player* foucs;
+	POINTFLOAT* foucsPos;
+
 	Image* lpBackGround;
+	float moveSpeed;
 
 public:
 	HRESULT Init() override;
-	HRESULT Init(Player* foucs , Image* lpBackGround);
+	HRESULT Init(Image* lpBackGround, POINTFLOAT* foucsPos, float moveSpeed);
 	void Release() override;
 	void Update() override;
 	void Render(HDC hdc) override;
 
-	void CameraRender(HDC hdc, POINT wolrdPos, Image* lpImage);
-	
+	void CameraRender(HDC hdc, POINT worldPos, Image* lpImage);
+	void CameraFrameRender(HDC hdc, Image* lpImage, POINT worldPos,
+		int currFrameX, int currFrameY, float size = 1, bool isCenterRenderring = false);
 	
 	inline void SetCameraPos(POINTFLOAT cameraPos) { this->cameraPos = cameraPos; }
+	inline POINTFLOAT GetCameraPos() { return this->cameraPos; }
+	inline POINTFLOAT* GetpCameraPos() { return &this->cameraPos; }
 };
 

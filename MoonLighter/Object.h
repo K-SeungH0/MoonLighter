@@ -1,6 +1,8 @@
 #pragma once
 #include "GameObject.h"
 
+class Camera;
+
 enum class OBJECTTYPE
 {
 	WALL,
@@ -9,14 +11,16 @@ enum class OBJECTTYPE
 	UNIT,
 	NONE
 };
-
 class Object : public GameObject
 {
 protected:
 	POINTFLOAT pos;
+	RECTFLOAT cameraCollider;
 	RECTFLOAT collider;
 	Image* lpImage;
 	OBJECTTYPE objectType;
+	//POINTFLOAT* lpCameraPos;
+	Camera* lpCamera;
 
 public:
 	virtual HRESULT Init() = 0;
@@ -25,6 +29,7 @@ public:
 	virtual void Render(HDC hdc) = 0;
 
 	inline void SetPos(POINTFLOAT pos) { this->pos = pos; }
+	inline void SetCamera(Camera* lpCamera) { this->lpCamera = lpCamera; }
 
 	inline RECTFLOAT GetCollider() { return this->collider; }
 	inline OBJECTTYPE GetObjectType() { return this->objectType; }

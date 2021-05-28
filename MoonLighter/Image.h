@@ -110,8 +110,15 @@ public:
 	inline int GetFrameWidth() { return this->imageInfo->frameWidth; }
 	inline int GetHeight() { return this->imageInfo->height; }
 	inline int GetFrameHeight() { return this->imageInfo->frameHeight; }
+	inline int GetCurrentFrameX() { return this->imageInfo->currFrameX; }
+	inline int GetCurrentFrameY() { return this->imageInfo->currFrameY; }
+	inline int GetMaxFrameX() { return this->imageInfo->maxFrameX; }
+	inline int GetMaxFrameY() { return this->imageInfo->maxFrameY; }
 
 	inline void SetFrameWidth(int frameWidth) { this->imageInfo->frameWidth = frameWidth; }
 	inline void SetFrameHeight(int frameHeight) { this->imageInfo->frameHeight = frameHeight; }
+	inline void SetCurrentFrameX(int x) { this->imageInfo->currFrameX = x; }
+	inline void SetCurrentFrameY(int y) { this->imageInfo->currFrameY = y; }
+
 	inline IMAGE_INFO* const GetImageInfo() { return this->imageInfo; }
 };

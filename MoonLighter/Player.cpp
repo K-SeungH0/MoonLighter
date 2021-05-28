@@ -3,11 +3,13 @@
 #include "Weapon.h"
 #include "CollisionManager.h"
 #include "Inventory.h"
-
+#include "Camera.h"
 HRESULT Player::Init()
 {
     ImageLoad();
     lpImage = IMAGEMANAGER->FindImage("PlayerState");
+    
+    this->dir = DIR::DOWN;
     
     moveSpeed = 250;
     armor = 10;
@@ -27,13 +29,11 @@ HRESULT Player::Init()
     frameTimer = 0;
     comboStack = 0;
     
-    pos = { WINSIZE_X / 2 , WINSIZE_Y / 2 };
-    
+    pos = { WINSIZE_X / 2 , WINSIZE_Y - 100 };
+    winSize = { WINSIZE_X , WINSIZE_Y };
     isAction = false;
     isCombo = false;
     isEquipMainWeapon = true;
-
-    SetHitBox();
 
     lpCurrentWeapon = new Weapon();
     ChangeWeapon(nullptr);
@@ -76,17 +76,6 @@ void Player::Update()
 
     if (!isAction)
     {
-        //if (KEYMANAGER->IsOnceKeyDown('1'))
-        //    weapon->ChangeType(WEAPONTYPE::BIGSWORD);
-        //else if (KEYMANAGER->IsOnceKeyDown('2'))
-        //    weapon->ChangeType(WEAPONTYPE::SHORTSWORD);
-        //else if (KEYMANAGER->IsOnceKeyDown('3'))
-        //    weapon->ChangeType(WEAPONTYPE::BOW);
-        //else if (KEYMANAGER->IsOnceKeyDown('4'))
-        //    weapon->ChangeType(WEAPONTYPE::SPEAR);
-        //else if (KEYMANAGER->IsOnceKeyDown('5'))
-        //    weapon->ChangeType(WEAPONTYPE::GLOVES);
-        
         state = STATE::IDLE;
         stateFrame = 8;
         stateFrame += (int)dir;
@@ -156,16 +145,15 @@ void Player::Update()
             (++imageFrame) %= maxFrame;
     }
     
-    //if (!isAction)
-    //    SetHitBox();
-
 }
 
 void Player::Render(HDC hdc)
 {
     Unit::Render(hdc);
 
-    lpImage->FrameRender(hdc, pos.x, pos.y, imageFrame, stateFrame, IMAGE_SIZE, true);
+    lpCamera->CameraFrameRender(hdc, lpImage, { (LONG)pos.x, (LONG)pos.y }, imageFrame, stateFrame, IMAGE_SIZE, true);
+
+    //lpImage->FrameRender(hdc, pos.x, pos.y, imageFrame, stateFrame, IMAGE_SIZE, true);
 
     if (state == STATE::ATTACK)
         lpCurrentWeapon->Render(hdc);
@@ -195,6 +183,8 @@ void Player::Avoid()
 
 void Player::Move(DIR dir)
 {
+    SetCollider();
+
     this->dir = dir;
 
     if (!isAction)
@@ -213,7 +203,10 @@ void Player::Move(DIR dir)
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            pos.x -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
+            if (collider.left > 0 && !PixelCollision(collider.left, collider.top, false, RGB(255,0,0)))
+            {
+                pos.x -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
+            }
         }
         break;
     case DIR::UP:
@@ -221,25 +214,36 @@ void Player::Move(DIR dir)
         CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
-            pos.y -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
+        {
+            if (collider.top > 0 && !PixelCollision(collider.left, collider.top, true, RGB(255, 0, 0)))
+            {
+                pos.y -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
+            }
+        }
         break;
     case DIR::RIGHT:
         collider.right += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
-            pos.x += (moveSpeed + additionalMoveSpeed) * DELTATIME;
+        {
+            if(collider.right < winSize.x && !PixelCollision(collider.right, collider.top, false, RGB(255, 0, 0)))
+                pos.x += (moveSpeed + additionalMoveSpeed) * DELTATIME;
+        }
         break;
     case DIR::DOWN:
         collider.bottom += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         CheckItem();
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
-            pos.y += (moveSpeed + additionalMoveSpeed) * DELTATIME;
+        {
+            if(collider.bottom < winSize.y && !PixelCollision(collider.left, collider.bottom, true, RGB(255, 0, 0)))
+                pos.y += (moveSpeed + additionalMoveSpeed) * DELTATIME;
+        }
         break;
     }
 
-    SetHitBox();
+    SetCollider();
 }
 
 void Player::Die()
@@ -314,11 +318,15 @@ void Player::SpecialAttack()
     }
 }
 
-void Player::SetHitBox()
+void Player::SetCollider()
 {
+    cameraCollider.left = pos.x - lpImage->GetFrameWidth() / 3 - lpCamera->GetCameraPos().x;
     collider.left = pos.x - lpImage->GetFrameWidth() / 3;
+    cameraCollider.top = pos.y - lpCamera->GetCameraPos().y;
     collider.top = pos.y;
+    cameraCollider.right = pos.x + lpImage->GetFrameWidth() / 3 - lpCamera->GetCameraPos().x;
     collider.right = pos.x + lpImage->GetFrameWidth() / 3;
+    cameraCollider.bottom = pos.y + lpImage->GetFrameHeight() / 2 - lpCamera->GetCameraPos().y;
     collider.bottom = pos.y + lpImage->GetFrameHeight() / 2;
 }
 
@@ -356,13 +364,13 @@ void Player::ChangeWeapon(Item* weapon)
     if (weapon)
     {
         this->lpCurrentWeapon->Init(weapon->GetItemData(), weapon->GetItemManager());
-        additionalMoveSpeed = weapon->GetSpeed();
+        additionalMoveSpeed += weapon->GetSpeed();
         this->damage = this->lpCurrentWeapon->GetDamage();
     }
     else
     {
         this->lpCurrentWeapon->Init();
-        additionalMoveSpeed = 0;
+        additionalMoveSpeed -= 0;
         this->damage = this->lpCurrentWeapon->GetDamage();
     }
 }
@@ -436,6 +444,43 @@ void Player::CheckItem()
         if((*iter)->GetObjectType() == OBJECTTYPE::ITEM)
             ((Item*)*iter)->PickUp();
     }
+}
+
+bool Player::PixelCollision(int x, int y, bool isHorizontal, COLORREF checkColor)
+{
+    if (lpPixelImage)
+    {
+        COLORREF color;
+        int R, G, B;
+
+        if (isHorizontal)
+        {
+            for (; x <= collider.right; x++)
+            {
+                color = GetPixel(lpPixelImage->GetMemDC(), x, y);
+
+                if (checkColor == color)
+                {
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            for (; y <= collider.bottom; y++)
+            {
+                color = GetPixel(lpPixelImage->GetMemDC(), x, y);
+
+               
+
+                if (checkColor == color)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 void Player::ImageLoad()

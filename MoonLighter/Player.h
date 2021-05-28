@@ -35,6 +35,8 @@ private:
 	Item* lpPotion;
 
 	vector<int> attackFrame;
+
+	Image* lpPixelImage;
 public:
 	HRESULT Init() override;
 	void Release() override;
@@ -47,19 +49,23 @@ public:
 	void Die();
 	void Attack();
 	void SpecialAttack();
-	void SetHitBox();
+	void SetCollider();
 	void NextCombo(int first, int second, int third);
 	void AddAttackFrame(vector<int> frame);
 	void ChangeWeapon(Item* weapon);
 	void EquipFromInventory(SLOTTYPE slotType, Item* equipment);
 	void SwapWeapon();
 	void CheckItem();
+	bool PixelCollision(int x, int y, bool isHorizontal, COLORREF checkColor);
 	void ImageLoad();
 	
 	// 동작을 시작할때 실행
 	void FrameReset();
 
+	inline void SetPixelImage(Image* lpPixelImage) { this->lpPixelImage = lpPixelImage; }
+
 	inline POINTFLOAT GetPos() { return this->pos; }
+	inline POINTFLOAT* GetpPos() { return &this->pos; }
 	inline int GetImageFrame() { return this->imageFrame; }
 	inline int GetStateFrame() { return this->stateFrame; }
 	inline STATE GetState() { return this->state; }
@@ -69,6 +75,7 @@ public:
 	inline int GetAdditionalMoveSpeed() { return this->additionalMoveSpeed; }
 	inline int GetAdditionalArmor() { return this->additionalArmor; }
 	inline int GetGold() { return this->gold; }
+	inline bool GetIsEquipMainWeapon() { return this->isEquipMainWeapon; }
 	Image* GetCurrentWeaponImage();
 	Image* GetPotionImage();
 	int GetPotionCount();

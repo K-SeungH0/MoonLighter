@@ -50,16 +50,22 @@ using namespace std;
 
 #define IMAGE_SIZE 2.0f
 
-#define TILE_SET_X	10
-#define TILE_SET_Y	3
+#define DUNGEON_TILE_SET_X	10
+#define DUNGEON_TILE_SET_Y	5
+
+#define TOWN_TILE_SET_X 4
+#define TOWN_TILE_SET_Y 5
 
 #define BACKGROUND_TILE_X 1
 #define BACKGROUND_TILE_Y 1
 
 #define TILESIZE		(32 * IMAGE_SIZE)
 
-#define TILE_X			18 
-#define TILE_Y			9
+#define DUNGEON_TILE_X		18 
+#define DUNGEON_TILE_Y		9
+
+#define TOWN_TILE_X			46
+#define TOWN_TILE_Y			38
 
 enum class TILETYPE
 {
@@ -76,11 +82,17 @@ struct RECTFLOAT
 	float right;
 	float bottom;
 };
-
+enum class TILESCENE
+{
+	TOWN,
+	DUNGEON,
+	NONE
+};
 typedef struct tagTile
 {
 	Image* lpImage;
 	RECT rcTile;
+	RECT collider;
 	int frameX;
 	int frameY;
 	TILETYPE type;

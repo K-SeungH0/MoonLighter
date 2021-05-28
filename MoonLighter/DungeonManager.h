@@ -12,7 +12,7 @@ enum class EXIT
 
 struct Dungeon
 {
-	TILE_INFO tileMap[TILE_X * TILE_Y];
+	TILE_INFO tileMap[DUNGEON_TILE_X * DUNGEON_TILE_Y];
 	EXIT exit;
 };
 

@@ -6,6 +6,7 @@
 #include "LoadingScene.h"
 #include "TitleScene.h"
 #include "TownScene.h"
+#include "ShopScene.h"
 #include "GameData.h"
 #include "Inventory.h"
 
@@ -30,10 +31,11 @@ HRESULT MainGame::Init()
 	SceneManager::GetInstance()->AddScene("A*", new AstarScene());
 	SceneManager::GetInstance()->AddScene("Title", new TitleScene());
 	SceneManager::GetInstance()->AddScene("Town", new TownScene());
+	SceneManager::GetInstance()->AddScene("Shop", new ShopScene());
 
 	SceneManager::GetInstance()->AddLodingScene("LodingScene", new LoadingScene());
 
-	SceneManager::GetInstance()->ChageScene("Town");
+	SceneManager::GetInstance()->ChageScene("Title");
 	isInited = true;
 
 	return S_OK;

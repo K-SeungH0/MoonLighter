@@ -1,44 +1,46 @@
 #include "Camera.h"
 #include "Image.h"
-#include "Player.h"
+
 HRESULT Camera::Init()
 {
 	return S_OK;
 }
 
-HRESULT Camera::Init(Player* foucs, Image* lpBackGround)
+HRESULT Camera::Init(Image* lpBackGround, POINTFLOAT* foucsPos, float moveSpeed)
 {
-	this->foucs = foucs;
+	this->foucsPos = foucsPos;
+	this->moveSpeed = moveSpeed;
 	this->lpBackGround = lpBackGround;
+	FLOATINGFONT->SetCameraPos(&this->cameraPos);
 	return S_OK;
 }
 
 void Camera::Release()
 {
-
+	delete this;
 }
 
 void Camera::Update()
 {
-	if (foucs->GetPos().x - cameraPos.x > WINSIZE_X * 3 / 4 &&
+	while (foucsPos->x - cameraPos.x > WINSIZE_X * 3 / 4 &&
 		cameraPos.x < lpBackGround->GetWidth() - WINSIZE_X)
 	{
-		cameraPos.x += DELTATIME * (foucs->GetMoveSpeed() + foucs->GetAdditionalMoveSpeed());
+		cameraPos.x += DELTATIME * moveSpeed;
 	}
-	if (foucs->GetPos().y - cameraPos.y > WINSIZE_Y * 3 / 4 &&
+	while (foucsPos->y - cameraPos.y > WINSIZE_Y * 3 / 4 &&
 		cameraPos.y < lpBackGround->GetHeight() - WINSIZE_Y)
 	{
-		cameraPos.y += DELTATIME * (foucs->GetMoveSpeed() + foucs->GetAdditionalMoveSpeed());
+		cameraPos.y += DELTATIME * moveSpeed;
 	}
-	if (foucs->GetPos().x - cameraPos.x < WINSIZE_X / 4 &&
+	while (foucsPos->x - cameraPos.x < WINSIZE_X / 4 &&
 		cameraPos.x > 0)
 	{
-		cameraPos.x -= DELTATIME * (foucs->GetMoveSpeed() + foucs->GetAdditionalMoveSpeed());
+		cameraPos.x -= DELTATIME * moveSpeed;
 	}
-	if (foucs->GetPos().y - cameraPos.y < WINSIZE_Y / 4 &&
+	while (foucsPos->y - cameraPos.y < WINSIZE_Y / 4 &&
 		cameraPos.y > 0)
 	{
-		cameraPos.y -= DELTATIME * (foucs->GetMoveSpeed() + foucs->GetAdditionalMoveSpeed());
+		cameraPos.y -= DELTATIME * moveSpeed;
 	}
 
 	if (cameraPos.x <= 0)
@@ -61,11 +63,11 @@ void Camera::Update()
 
 void Camera::Render(HDC hdc)
 {
-	CameraRender(hdc, { 0, 0 }, lpBackGround);
-	POINTFLOAT test;
-	test.x = foucs->GetPos().x - cameraPos.x;
-	test.y = foucs->GetPos().y - cameraPos.y;
-	foucs->TestRender(hdc, test);
+	//CameraRender(hdc, { 0, 0 }, lpBackGround);
+	//POINTFLOAT test;
+	//test.x = foucs->GetPos().x - cameraPos.x;
+	//test.y = foucs->GetPos().y - cameraPos.y;
+	//foucs->TestRender(hdc, test);
 	//CameraRender(hdc, { (LONG)foucs->GetPos().x, (LONG)foucs->GetPos().y }, foucs->GetImage());
 }
 
@@ -76,5 +78,11 @@ void Camera::CameraRender(HDC hdc, POINT worldPos, Image* lpImage)
 	//	cameraPos.y + WINSIZE_Y < worldPos.y - lpImage->GetHeight())
 	//	return;
 	
-	lpImage->CameraRender(hdc, worldPos.x , worldPos.y, cameraPos.x, cameraPos.y);
+	//lpImage->CameraRender(hdc, worldPos.x , worldPos.y, cameraPos.x, cameraPos.y);
+	lpImage->Render(hdc, worldPos.x - cameraPos.x, worldPos.y - cameraPos.y);
+}
+
+void Camera::CameraFrameRender(HDC hdc, Image* lpImage, POINT worldPos, int currFrameX, int currFrameY, float size, bool isCenterRenderring)
+{
+	lpImage->FrameRender(hdc, worldPos.x - cameraPos.x, worldPos.y - cameraPos.y, currFrameX, currFrameY, size, isCenterRenderring);
 }

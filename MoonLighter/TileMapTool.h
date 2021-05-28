@@ -4,21 +4,34 @@
 
 class Image;
 class Button;
+class Camera;
 
-enum class SELECTSCENE
+struct SelectTileInfo
 {
-	TOWN,
-	DUNGEON,
-	NONE
+	Image* lpSelectTile;
+	POINT pos;
+	int frameX;
+	int frameY;
+	RECT rcTile;
+};
+struct ObjectTileInfo
+{
+	Image* lpSelectTile;
+	RECT rcTile;
 };
 class TileMapTool : public GameObject
 {
 private:
 	Image* lpBackGroundTile;
-	Image* lpTileSetImage;
+	Image* lpTownTileSetImage;
+	Image* lpDunGeonTileSetImage;
+	SelectTileInfo selectTileInfo;
+	Image* lpSelectTile;
 
-	TILE_INFO tileSetInfo[TILE_SET_X * TILE_SET_Y];
-	static TILE_INFO tileInfo[TILE_X * TILE_Y];
+	TILE_INFO dunGeonTileSetInfo[DUNGEON_TILE_SET_X * DUNGEON_TILE_SET_Y];
+	TILE_INFO townTileSetInfo[TOWN_TILE_SET_X * TOWN_TILE_SET_Y];
+	static TILE_INFO dungeonTileInfo[DUNGEON_TILE_X * DUNGEON_TILE_Y];
+	static TILE_INFO townTileInfo[TOWN_TILE_X * TOWN_TILE_Y];
 
 	HBRUSH hSelectedBrush;
 	HBRUSH hOldSelectedBrush;
@@ -29,7 +42,8 @@ private:
 	int selectedFrameY;
 
 	RECT rcMain;
-	RECT rcSample;
+	RECT rcDungeonTileSet;
+	RECT rcTownTileSet;
 
 	// UI Button
 	Button* saveButton;
@@ -43,8 +57,13 @@ private:
 	int selectStage;
 	char szText[128];
 
-	POINT cameraPos;
-	SELECTSCENE currentScene;
+	TILESCENE currentScene;
+	Camera* lpCamera;
+
+	float timer;
+
+	int selectPosX;
+	int selectPosY;
 
 public:
 	HRESULT Init() override;
@@ -58,6 +77,7 @@ public:
 	void SceneSelect(int num);
 
 	void TileSelect();
+	ObjectTileInfo GetObjectInfo(int x, int y);
 	void ImageLoad();
 	virtual ~TileMapTool() {};
 };

@@ -19,7 +19,7 @@ void Unit::Update()
 void Unit::Render(HDC hdc)
 {
     if (isDebugMode)
-        Rectangle(hdc, collider.left, collider.top, collider.right, collider.bottom);
+        Rectangle(hdc, cameraCollider.left, cameraCollider.top, cameraCollider.right, cameraCollider.bottom);
 }
 
 void Unit::Hit()

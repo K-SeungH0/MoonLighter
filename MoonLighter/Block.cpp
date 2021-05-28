@@ -22,7 +22,7 @@ HRESULT Block::Init(TILE_INFO tile)
 	this->frameX = tile.frameX;
 	this->frameY = tile.frameY;
 
-	this->lpImage = IMAGEMANAGER->FindImage("Tile_Set");
+	this->lpImage = IMAGEMANAGER->FindImage("DunGeon_TileSet");
 	
 	COLLIDERMANAGER->AddCollider(this);
 	return S_OK;

@@ -8,7 +8,7 @@
 #include "Item.h"
 #include "ItemManager.h"
 #include "Weapon.h"
-
+#include "Camera.h"
 HRESULT BattleScene::Init()
 {
     SetClientRect(g_hWnd, WINSIZE_X, WINSIZE_Y);
@@ -16,11 +16,13 @@ HRESULT BattleScene::Init()
     GAMEDATA->RunTimeDataInit();
     ImageLoad();
     Load();
-
     lpBackGround = IMAGEMANAGER->FindImage("Dungeon_Background");
 
     lpPlayer = GAMEDATA->GetRunTimePlayer();
 
+    lpCamera = new Camera();
+    lpCamera->Init(lpBackGround, lpPlayer->GetpPos(), 350);
+    lpPlayer->SetCamera(lpCamera);
     lpUI = new BattleSceneUI();
     lpUI->Init();
     
@@ -58,7 +60,7 @@ HRESULT BattleScene::Init()
     outsideColliderBottom = new Block();
     ((Block*)outsideColliderBottom)->Init(outsideRc);
 
-    for (int i = 0; i < TILE_X * TILE_Y; i++)
+    for (int i = 0; i < DUNGEON_TILE_X * DUNGEON_TILE_Y; i++)
     {
         if (tileMap[i].type != TILETYPE::NONE) 
         {
@@ -125,19 +127,16 @@ HRESULT BattleScene::Init()
 
 void BattleScene::Release()
 {
-    if(lpPlayer)
-        lpPlayer->Release();
-    if (lpUI)
-        lpUI->Release();
-    if (lpItemManager)
-        lpItemManager->Release();
+    if (lpCamera)      lpCamera->Release();
+    if (lpPlayer)      lpPlayer->Release();
+    if (lpUI)          lpUI->Release();
+    if (lpItemManager) lpItemManager->Release();
 
     for (auto iter = vObjects.begin(); iter != vObjects.end();)
     {
         (*iter)->Release();
         iter = vObjects.erase(iter);
     }
-
     IMAGEMANAGER->DeleteAll();
 }
 
@@ -174,13 +173,13 @@ void BattleScene::Render(HDC hdc)
 
 void BattleScene::Load()
 {
-    string saveName = "Save/SaveMapData";
+    string saveName = "Save/SaveDunGeonMapData";
     saveName += to_string(1) + ".map";
 
     DWORD readBytes;
 
     HANDLE hFile = CreateFile(saveName.c_str(), GENERIC_READ, NULL, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (ReadFile(hFile, tileMap, sizeof(TILE_INFO) * TILE_X * TILE_Y, &readBytes, NULL))
+    if (ReadFile(hFile, tileMap, sizeof(TILE_INFO) * DUNGEON_TILE_X * DUNGEON_TILE_Y, &readBytes, NULL))
     {
 
     }
@@ -197,7 +196,7 @@ void BattleScene::ImageLoad()
     COLORREF color = RGB(128, 128, 128);
 
     IMAGEMANAGER->AddImage("Dungeon_Background", L"Image/Map/dungeon_background.png", BACKGROUND_TILE_X, BACKGROUND_TILE_Y);
-    IMAGEMANAGER->AddImage("Tile_Set", L"Image/Map/TileMap.png",TILE_SET_X, TILE_SET_Y);
+    IMAGEMANAGER->AddImage("DunGeon_TileSet", L"Image/Map/DunGeon_TileSet.png",DUNGEON_TILE_SET_X, DUNGEON_TILE_SET_Y);
     
     IMAGEMANAGER->AddImage("UrnRest", L"Image/Object/BreakAble/UrnRest.png");
     IMAGEMANAGER->AddImage("SkullRest", L"Image/Object/BreakAble/SkullRest.png");

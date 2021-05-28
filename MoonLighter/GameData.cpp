@@ -33,9 +33,29 @@ void GameData::AddItem(ItemData item)
 
 void GameData::RunTimeDataInit()
 {
-	lpRunTimePlayer = new Player();
-	lpRunTimePlayer->Init();
+	if (!lpRunTimePlayer)
+	{
+		lpRunTimePlayer = new Player();
+		lpRunTimePlayer->Init();
+	}
+	else
+	{
+		delete lpRunTimePlayer;
+		lpRunTimePlayer = nullptr;
+		lpRunTimePlayer = new Player();
+		lpRunTimePlayer->Init();
+	}
 
-	lpRunTimeInventory = new Inventory();
-	lpRunTimeInventory->Init();
+	if (!lpRunTimeInventory)
+	{
+		lpRunTimeInventory = new Inventory();
+		lpRunTimeInventory->Init();
+	}
+	else
+	{
+		delete lpRunTimeInventory;
+		lpRunTimeInventory = nullptr;
+		lpRunTimeInventory = new Inventory();
+		lpRunTimeInventory->Init();
+	}
 }

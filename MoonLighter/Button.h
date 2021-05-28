@@ -22,6 +22,9 @@ private:
 
 	int index;
 	string name;
+	
+	bool isSelect;
+	bool isClick;
 	//string _name;
 public:
 	HRESULT Init(string name, POINT pos);

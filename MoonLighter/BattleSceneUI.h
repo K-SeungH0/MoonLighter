@@ -12,6 +12,7 @@ private:
 	UI* lpUIGold;
 	UI* lpUICurrentHpbar;
 	UI* lpUIReduceHpbar;
+	UI* lpUICurrentWeapon;
 
 	Inventory* lpUIInventory;
 

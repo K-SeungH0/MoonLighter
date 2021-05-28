@@ -3,16 +3,23 @@
 
 class Image;
 class Camera;
-class Player;
-class TownScene : public GameObject
+class player;
+class ShopScene : public GameObject
 {
 private:
 	Image* lpBackGround;
-	Camera* lpCamera;
-	Player* lpPlayer;
+	Image* lpMidImage;
+	Image* lpBackGroundPixel;
+	Image* lpDoor;
 	Image* lpInteract;
 
-	bool isEnterDunGeon;
+	Camera* lpCamera;
+	Player* lpPlayer;
+
+	int doorFrameX;
+	int doorFrameY;
+
+	bool exitAble;
 public:
 	HRESULT Init() override;
 	void Release() override;
@@ -20,6 +27,5 @@ public:
 	void Render(HDC hdc) override;
 
 	void ImageLoad();
-
 };
 

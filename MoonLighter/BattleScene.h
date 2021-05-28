@@ -8,16 +8,19 @@ class Object;
 class Inventory;
 class BattleSceneUI;
 class ItemManager;
+class Camera;
 class BattleScene : public GameObject
 {
 private:
+	Camera* lpCamera;
+
 	Object* outsideColliderTop;
 	Object* outsideColliderLeft;
 	Object* outsideColliderRight;
 	Object* outsideColliderBottom;
 	
 	Image* lpBackGround;
-	TILE_INFO tileMap[TILE_X * TILE_Y];
+	TILE_INFO tileMap[DUNGEON_TILE_X * DUNGEON_TILE_Y];
 	Player* lpPlayer;
 	BattleSceneUI* lpUI;
 
