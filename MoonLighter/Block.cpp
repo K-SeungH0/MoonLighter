@@ -47,7 +47,7 @@ HRESULT Block::Init(RECTFLOAT rc)
 
 void Block::Release()
 {
-	delete this;
+
 }
 
 void Block::Update()

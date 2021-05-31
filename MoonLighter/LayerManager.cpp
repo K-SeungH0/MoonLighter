@@ -1,7 +1,6 @@
 #include "LayerManager.h"
 #include "Image.h"
 #include "Camera.h"
-#include <algorithm>
 
 HRESULT LayerManager::Init()
 {

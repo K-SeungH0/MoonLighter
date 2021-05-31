@@ -13,6 +13,7 @@ enum class STATE
 	DEFENDING,
 	AVOID,
 	DIE,
+	TELEPORT,
 	NONE
 };
 

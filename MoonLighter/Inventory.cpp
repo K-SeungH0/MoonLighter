@@ -2,6 +2,7 @@
 #include "Image.h"
 #include "Item.h"
 #include "Player.h"
+#include "Camera.h"
 
 HRESULT Inventory::Init()
 {
@@ -69,6 +70,7 @@ HRESULT Inventory::Init()
     selectSlotSize = IMAGE_SIZE;
     selectTimer = 0;
 
+    lpCamera = nullptr;
     return S_OK;
 }
 
@@ -97,8 +99,6 @@ void Inventory::Release()
             }
         }
     }
-
-    delete this;
 }
 
 void Inventory::Update()
@@ -232,10 +232,10 @@ void Inventory::Render(HDC hdc)
         lpImage->Render(hdc, pos.x, pos.y, IMAGE_SIZE, true);
 
         lpJBtnImage->Render(hdc, pos.x - 400, WINSIZE_Y - 50, IMAGE_SIZE, true);
-        FLOATINGFONT->Render(hdc, { pos.x - 400 + 48, WINSIZE_Y - 50 - 15 }, 32, "잡기 / 길게 눌러서 묶음 잡기", RGB(255, 255, 255));
+        FLOATINGFONT->Render(hdc, { pos.x - 400 + 48 , WINSIZE_Y - 50 - 15 }, 32, "잡기 / 길게 눌러서 묶음 잡기", RGB(255, 255, 255));
         
         lpIBtnImage->Render(hdc, pos.x + 200, WINSIZE_Y - 50, IMAGE_SIZE, true);
-        FLOATINGFONT->Render(hdc, { pos.x + 200 + 48, WINSIZE_Y - 50 - 15 }, 32, "닫기", RGB(255, 255, 255));
+        FLOATINGFONT->Render(hdc, { pos.x + 200 + 48 , WINSIZE_Y - 50 - 15 }, 32, "닫기", RGB(255, 255, 255));
 
         lpCurrentWeaponImage->Render(hdc, 890, 205, IMAGE_SIZE, true);
 

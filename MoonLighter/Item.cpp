@@ -209,7 +209,7 @@ HRESULT Item::Init(GameData::ItemData itemData, ItemManager* lpItemManager)
 
 void Item::Release()
 {
-	delete this;
+
 }
 
 void Item::Update()

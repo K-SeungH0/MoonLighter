@@ -8,7 +8,7 @@ class Image;
 class Item;
 class ItemManager;
 class Weapon;
-
+class Camera;
 enum class SLOTTYPE
 {
 	INVEN,
@@ -55,6 +55,8 @@ private:
 
 	float selectSlotSize;
 	float selectTimer;
+
+	Camera* lpCamera;
 public:
 	HRESULT Init() override;
 	void Release() override;
@@ -68,6 +70,8 @@ public:
 	void ItemAllPickUp();
 	void ItemPickDown();
 	void SwapWeapon();
+
+	inline void SetCamera(Camera* lpCamera) { this->lpCamera = lpCamera; }
 	inline bool GetActive() { return this->isActive; }
 
 	void DataLoad(ItemManager* lpItemManager);

@@ -21,7 +21,6 @@ private:
 	HFONT hFont;
 	HFONT oldFont;
 	vector<FontInfo> vFonts;
-	POINTFLOAT* lpCameraPos;
 
 public:
 	HRESULT Init();
@@ -31,6 +30,5 @@ public:
 	void Render(HDC hdc, POINT pos, int size, const char* text, COLORREF textColor);
 	void DamageRender(POINT pos, int damage, float duration);
 
-	void SetCameraPos(POINTFLOAT* pos) { this->lpCameraPos = pos; }
 };
 

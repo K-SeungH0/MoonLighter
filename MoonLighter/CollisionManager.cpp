@@ -31,6 +31,11 @@ void CollisionManager::AddPixelCollider(Image* lpImage, POINTFLOAT pos)
 	vPixelColliders.push_back(make_pair(lpImage, pos));
 }
 
+void CollisionManager::RemoveAllCollider()
+{
+    vColliders.clear();
+}
+
 void CollisionManager::RemoveCollider(Object* obejct)
 {
 	vColliders.erase(find(vColliders.begin(), vColliders.end(), obejct));

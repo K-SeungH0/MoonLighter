@@ -3,7 +3,7 @@
 #include "Inventory.h"
 #include "Player.h"
 #include "Image.h"
-
+#include "Camera.h"
 HRESULT BattleSceneUI::Init()
 {
 	ImageLoad();
@@ -25,36 +25,56 @@ HRESULT BattleSceneUI::Init()
 	
 	lpUICurrentWeapon = new UI();
 	lpUICurrentWeapon->Init(IMAGEMANAGER->FindImage("UI_CurrentWeapon"), { 1090,85 }, 0, 0);
+	
+	lpUIPendantInteract = new UI();
+	lpUIPendantInteract->Init(IMAGEMANAGER->FindImage("UI_PendantInteract"), { 1177, 635 }, 0, 0);
+	lpUIPendantInteract->SetCutX(60);
 
 	lpUIInventory = GAMEDATA->GetRunTimeInventory();
+	lpPlayer = GAMEDATA->GetRunTimePlayer();
 
-	player = GAMEDATA->GetRunTimePlayer();
+	lpCamera = nullptr;
+	isBattle = false;
 
 	hpBarReduceTimer = 0;
+	escapeTimer = 0;
 	return S_OK;
 }
 
 void BattleSceneUI::Release()
 {
-	lpUIbase->Release();
-	lpUIFront->Release();
-	lpUIGold->Release();
-	lpUICurrentHpbar->Release();
-	lpUIReduceHpbar->Release();
-	lpUICurrentWeapon->Release();
+	SAFE_RELEASE(lpUIbase);		//lpUIbase->Release();
+	SAFE_RELEASE(lpUIFront);		//lpUIFront->Release();
+	SAFE_RELEASE(lpUIGold);		//lpUIGold->Release();
+	SAFE_RELEASE(lpUICurrentHpbar);//lpUICurrentHpbar->Release();
+	SAFE_RELEASE(lpUIReduceHpbar);//lpUIReduceHpbar->Release();
+	SAFE_RELEASE(lpUICurrentWeapon);//lpUICurrentWeapon->Release();
 }
 
 void BattleSceneUI::Update()
 {
+	if (isBattle && KEYMANAGER->IsStayKeyDown('L'))
+	{
+		escapeTimer += DELTATIME;
+		lpUIPendantInteract->SetCutX(60 * (1.0f - escapeTimer));
+		
+	}
+	if (KEYMANAGER->IsOnceKeyUp('L'))
+	{
+		escapeTimer = 0;
+		lpUIPendantInteract->SetCutX(60);
+	}
+
+
 	if(lpUIInventory->GetActive())
 		lpUIInventory->Update();
 
-	if (KEYMANAGER->IsOnceKeyDown('Z') && !player->GetIsAction())
+	if (KEYMANAGER->IsOnceKeyDown('Z') && !lpPlayer->GetIsAction())
 	{
 		imageSize = 2.0f;
-		player->SwapWeapon();
+		lpPlayer->SwapWeapon();
 		lpUIInventory->SwapWeapon();
-		if (!player->GetIsEquipMainWeapon())
+		if (!lpPlayer->GetIsEquipMainWeapon())
 			lpUICurrentWeapon->SetFrameX(1);
 		else
 			lpUICurrentWeapon->SetFrameX(0);
@@ -65,7 +85,7 @@ void BattleSceneUI::Update()
 	if (imageSize <= 1)
 		imageSize = 1;
 
-	lpUICurrentHpbar->SetCutX(153 * (1 - (float)player->GetCurrentHp() / (player->GetMaxHp() + player->GetAdditionalHp())));
+	lpUICurrentHpbar->SetCutX(153 * (1 - (float)lpPlayer->GetCurrentHp() / (lpPlayer->GetMaxHp() + lpPlayer->GetAdditionalHp())));
 
 	if (lpUIReduceHpbar->GetCutX() < lpUICurrentHpbar->GetCutX())
 	{
@@ -78,6 +98,12 @@ void BattleSceneUI::Update()
 	}
 	else
 		lpUIReduceHpbar->SetCutX(lpUICurrentHpbar->GetCutX());
+
+
+	if (escapeTimer >= 1.0f)
+	{
+		SCENEMANAGER->ChageScene("Town");
+	}
 }
 
 void BattleSceneUI::Render(HDC hdc)
@@ -90,20 +116,21 @@ void BattleSceneUI::Render(HDC hdc)
 	lpUIInventory->Render(hdc);
 	lpUIReduceHpbar->Render(hdc);
 	lpUICurrentHpbar->Render(hdc);
+	lpUIPendantInteract->Render(hdc);
 
-	if(player->GetCurrentWeaponImage())
-		player->GetCurrentWeaponImage()->Render(hdc, 1205, 135, IMAGE_SIZE * imageSize, true);
+	if(lpPlayer->GetCurrentWeaponImage())
+		lpPlayer->GetCurrentWeaponImage()->Render(hdc, 1205, 135, IMAGE_SIZE * imageSize, true);
 
-	if (player->GetPotionImage())
+	if (lpPlayer->GetPotionImage())
 	{
-		player->GetPotionImage()->Render(hdc, WINSIZE_X - 35, 20, 1, true);
-		FLOATINGFONT->Render(hdc, { WINSIZE_X - 35 + 10, 20 + 10 }, 18, to_string(player->GetPotionCount()).c_str(), RGB(255, 255, 255));
+		lpPlayer->GetPotionImage()->Render(hdc, WINSIZE_X - 35, 20, 1, true);
+		FLOATINGFONT->Render(hdc, { WINSIZE_X - 35 + 10 , 20 + 10  }, 18, to_string(lpPlayer->GetPotionCount()).c_str(), RGB(255, 255, 255));
 	}
 
 	string hpText= "";
-	hpText = to_string(player->GetCurrentHp()) + "/" + to_string(player->GetMaxHp() + player->GetAdditionalHp());
-	FLOATINGFONT->Render(hdc, { 345,35 }, 24, hpText.c_str(), RGB(255, 255, 255));
-	FLOATINGFONT->Render(hdc, { 50, 115 }, 24, to_string(player->GetGold()).c_str(), RGB(255, 255, 255));
+	hpText = to_string(lpPlayer->GetCurrentHp()) + "/" + to_string(lpPlayer->GetMaxHp() + lpPlayer->GetAdditionalHp());
+	FLOATINGFONT->Render(hdc, { 345 ,35  }, 24, hpText.c_str(), RGB(255, 255, 255));
+	FLOATINGFONT->Render(hdc, { 50 , 115  }, 24, to_string(lpPlayer->GetGold()).c_str(), RGB(255, 255, 255));
 }
 
 bool BattleSceneUI::GetInvenActive()
@@ -122,6 +149,8 @@ void BattleSceneUI::ImageLoad()
 	IMAGEMANAGER->AddImage("UI_Base", L"Image/UI/UI_base.png");
 	IMAGEMANAGER->AddImage("UI_front", L"Image/UI/UI_front.png");
 	IMAGEMANAGER->AddImage("UI_gold", L"Image/UI/UI_gold.png");
+	IMAGEMANAGER->AddImage("UI_PendantInteract", L"Image/UI/UI_PendantInteract.png");
 	IMAGEMANAGER->AddImage("UI_HPbar", L"Image/UI/UI_HPbar.png", 1 ,5);
 	IMAGEMANAGER->AddImage("UI_CurrentWeapon", L"Image/UI/UI_CurrentWeapon.png", 2 ,1);
+
 }

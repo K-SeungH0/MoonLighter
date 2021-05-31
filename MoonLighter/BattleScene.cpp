@@ -24,11 +24,15 @@ HRESULT BattleScene::Init()
 
     lpCamera = new Camera();
     lpCamera->Init(lpBackGround, lpPlayer->GetpPos(), 350);
+
     lpPlayer->SetCamera(lpCamera);
     lpPlayer->SetProjectileCamera();
+
     lpUI = new BattleSceneUI();
     lpUI->Init();
-    
+    lpUI->SetCamera(lpCamera);
+    lpUI->SetIsBattle(true);
+
     lpDungeonManager = new DungeonManager();
     lpDungeonManager->Init();
 
@@ -133,16 +137,16 @@ HRESULT BattleScene::Init()
 
 void BattleScene::Release()
 {
-    if (lpCamera)      lpCamera->Release();
-    if (lpPlayer)      lpPlayer->Release();
-    if (lpUI)          lpUI->Release();
-    if (lpItemManager) lpItemManager->Release();
+    SAFE_RELEASE(lpCamera)      ;//lpCamera->Release();
+    SAFE_RELEASE(lpUI)          ;//lpUI->Release();
+    SAFE_RELEASE(lpItemManager) ;//lpItemManager->Release();
 
     for (auto iter = vObjects.begin(); iter != vObjects.end();)
     {
         (*iter)->Release();
         iter = vObjects.erase(iter);
     }
+    COLLIDERMANAGER->RemoveAllCollider();
     IMAGEMANAGER->DeleteAll();
 }
 

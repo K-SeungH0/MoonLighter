@@ -4,6 +4,7 @@
 class UI;
 class Inventory;
 class Player;
+class Camera;
 class BattleSceneUI : public GameObject
 {
 private:
@@ -13,14 +14,18 @@ private:
 	UI* lpUICurrentHpbar;
 	UI* lpUIReduceHpbar;
 	UI* lpUICurrentWeapon;
+	UI* lpUIPendantInteract;
 
 	Inventory* lpUIInventory;
 
-	Player* player;
+	Player* lpPlayer;
+	Camera* lpCamera;
 
 	float imageSize;
 	float hpBarReduceTimer;
 
+	bool isBattle;
+	float escapeTimer;
 public:
 	HRESULT Init() override;
 	void Release() override;
@@ -32,6 +37,8 @@ public:
 
 	void ImageLoad();
 
+	inline void SetIsBattle(bool isBattle) { this->isBattle = isBattle; }
+	inline void SetCamera(Camera* lpCamera) { this->lpCamera = lpCamera; }
 	inline Inventory* GetInventory() { return this->lpUIInventory; }
 	~BattleSceneUI() override {};
 };

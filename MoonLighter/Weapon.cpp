@@ -44,7 +44,7 @@ HRESULT Weapon::Init(GameData::ItemData itemData, ItemManager* lpItemManager)
 
 void Weapon::Release()
 {
-	delete this;
+
 }
 
 void Weapon::Update()

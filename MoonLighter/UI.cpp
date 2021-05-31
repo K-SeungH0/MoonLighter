@@ -18,7 +18,6 @@ HRESULT UI::Init(Image* lpImage, POINT pos, int frameX, int frameY, int cutX, in
 
 void UI::Release()
 {
-	delete this;
 }
 
 void UI::Update()

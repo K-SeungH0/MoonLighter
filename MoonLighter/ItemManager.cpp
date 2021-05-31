@@ -18,7 +18,7 @@ HRESULT ItemManager::Init(Inventory* lpInventory)
 
 void ItemManager::Release()
 {
-	delete this;
+
 }
 
 void ItemManager::Update()

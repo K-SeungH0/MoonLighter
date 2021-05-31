@@ -35,7 +35,7 @@ HRESULT MainGame::Init()
 
 	SceneManager::GetInstance()->AddLodingScene("LodingScene", new LoadingScene());
 
-	SceneManager::GetInstance()->ChageScene("Town");
+	SceneManager::GetInstance()->ChageScene("Title");
 	isInited = true;
 
 	return S_OK;

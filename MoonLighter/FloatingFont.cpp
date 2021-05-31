@@ -48,12 +48,8 @@ void FloatingFont::Render(HDC hdc, POINT pos, int size, const char* text, COLORR
 	oldFont = (HFONT)SelectObject(hdc, hFont);
 	SetTextColor(hdc, textColor);
 
-	if(lpCameraPos)
-		TextOut(hdc, pos.x - lpCameraPos->x, pos.y - lpCameraPos->y, text, strlen(text));
-
-	else
-		TextOut(hdc, pos.x, pos.y, text, strlen(text));
-
+	TextOut(hdc, pos.x , pos.y , text, strlen(text));
+	
 	SelectObject(hdc, oldFont);
 	DeleteObject(hFont);
 }

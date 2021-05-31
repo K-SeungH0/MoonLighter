@@ -4,6 +4,7 @@
 class Image;
 class Camera;
 class player;
+class BattleSceneUI;
 class ShopScene : public GameObject
 {
 private:
@@ -16,11 +17,12 @@ private:
 
 	Camera* lpCamera;
 	Player* lpPlayer;
+	BattleSceneUI* lpUI;
 
 	int doorFrameX;
 	int doorFrameY;
 
-	bool exitAble;
+	bool isExit;
 public:
 	HRESULT Init() override;
 	void Release() override;

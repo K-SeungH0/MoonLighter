@@ -56,7 +56,6 @@ public:
 	void SwapWeapon();
 	void CheckItem();
 	bool PixelCollision(int x, int y, bool isHorizontal, COLORREF checkColor);
-	void ImageLoad();
 	
 	// 동작을 시작할때 실행
 	void FrameReset();
@@ -79,6 +78,8 @@ public:
 	Image* GetCurrentWeaponImage();
 	Image* GetPotionImage();
 	int GetPotionCount();
+	
+	void ImageLoad();
 	~Player() override {};
 };
 

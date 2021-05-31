@@ -2,7 +2,7 @@
 #include "Player.h"
 #include "Image.h"
 #include "Camera.h"
-
+#include "BattleSceneUI.h"
 HRESULT ShopScene::Init()
 {
 	ImageLoad();
@@ -24,10 +24,13 @@ HRESULT ShopScene::Init()
 	lpPlayer->SetCamera(lpCamera);
 	lpPlayer->SetPixelHDC(&pixelDC);
 
-	//FLOATINGFONT->SetCameraPos(lpCamera->GetpCameraPos());
+	lpUI = new BattleSceneUI();
+	lpUI->Init();
+	lpUI->SetCamera(lpCamera);
+
 	doorFrameX = 0;
 	doorFrameY = 0;
-	exitAble = false;
+	isExit = false;
 	
 	return S_OK;
 }
@@ -48,17 +51,19 @@ void ShopScene::Update()
 	lpPlayer->Update();
 	lpCamera->Update();
 
-	if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().top, false, RGB(0, 255, 255))) exitAble = true;
-	else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().top, true, RGB(0, 255, 255))) exitAble = true;
-	else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().right, lpPlayer->GetCollider().top, false, RGB(0, 255, 255))) exitAble = true;
-	else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().bottom, true, RGB(0, 255, 255))) exitAble = true;
-	else exitAble = false;
+	if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().top, false, RGB(0, 255, 255))) isExit = true;
+	else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().top, true, RGB(0, 255, 255))) isExit = true;
+	else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().right, lpPlayer->GetCollider().top, false, RGB(0, 255, 255))) isExit = true;
+	else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().bottom, true, RGB(0, 255, 255))) isExit = true;
+	else isExit = false;
 
-	if (exitAble)
+	lpUI->Update();
+	if (isExit)
 	{
 		if (KEYMANAGER->IsOnceKeyDown('J'))
 			SCENEMANAGER->ChageScene("Town");
 	}
+
 }
 
 void ShopScene::Render(HDC hdc)
@@ -67,11 +72,11 @@ void ShopScene::Render(HDC hdc)
 	lpPlayer->Render(hdc);
 	lpCamera->CameraRender(hdc, { 825, 607 }, lpMidImage);
 	lpCamera->CameraFrameRender(hdc, lpDoor, {826,1040 }, doorFrameX, doorFrameY);
-
-	if (exitAble)
+	lpUI->Render(hdc);
+	if (isExit)
 	{
 		lpCamera->CameraRender(hdc, { (LONG)lpPlayer->GetPos().x - lpInteract->GetWidth() / 2, (LONG)lpPlayer->GetPos().y - 100 }, lpInteract);
-		FLOATINGFONT->Render(hdc, { (LONG)lpPlayer->GetPos().x - lpInteract->GetWidth() / 2 + 60, (LONG)lpPlayer->GetPos().y - 75 - 9}, 18, "키 눌러서 나가기", RGB(0, 0, 0));
+		FLOATINGFONT->Render(hdc, { (LONG)lpPlayer->GetPos().x - lpInteract->GetWidth() / 2 + 60 - (LONG)lpCamera->GetCameraPos().x, (LONG)lpPlayer->GetPos().y - 75 - 9 - (LONG)lpCamera->GetCameraPos().y }, 18, "키 눌러서 나가기", RGB(0, 0, 0));
 	}
 
 	if(isDebugMode)

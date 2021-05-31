@@ -19,6 +19,8 @@ public:
 
 	void AddCollider(Object* object);
 	void AddPixelCollider(Image* lpImage, POINTFLOAT pos);
+
+	void RemoveAllCollider();
 	void RemoveCollider(Object* obejct);
 	void RemovePixelCollider();
 

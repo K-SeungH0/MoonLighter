@@ -28,6 +28,7 @@ private:
 	TILE_INFO tileMap[TOWN_TILE_X * TOWN_TILE_Y];
 
 	bool isEnterDunGeon;
+	bool isEnterShop;
 	float timer;
 public:
 	HRESULT Init() override;

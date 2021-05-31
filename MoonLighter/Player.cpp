@@ -51,7 +51,7 @@ HRESULT Player::Init()
 
 void Player::Release()
 {
-    delete this;
+    SAFE_RELEASE(lpCurrentWeapon);
 }
 
 void Player::Update()

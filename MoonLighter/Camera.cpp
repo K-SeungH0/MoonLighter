@@ -11,13 +11,12 @@ HRESULT Camera::Init(Image* lpBackGround, POINTFLOAT* foucsPos, float moveSpeed)
 	this->foucsPos = foucsPos;
 	this->moveSpeed = moveSpeed;
 	this->lpBackGround = lpBackGround;
-	FLOATINGFONT->SetCameraPos(&this->cameraPos);
 	return S_OK;
 }
 
 void Camera::Release()
 {
-	delete this;
+	
 }
 
 void Camera::Update()

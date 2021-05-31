@@ -24,7 +24,6 @@ HRESULT TileMapTool::Init()
     
     lpCamera = new Camera();
     lpCamera->Init(lpBackGroundTile, nullptr, 1000);
-    FLOATINGFONT->SetCameraPos(nullptr);
 
     int offset = 60;
     for (int i = 0; i < DUNGEON_TILE_Y; i++)
@@ -592,7 +591,7 @@ void TileMapTool::Render(HDC hdc)
         leftButton->Render(hdc);
         rightButton->Render(hdc);
         wsprintf(szText, "DunGeon %d", this->selectStage);
-        FLOATINGFONT->Render(hdc, { TILEMAPTOOLSIZE_X - lpTownTileSetImage->GetImageInfo()->width - 11 * 9 / 2, TILEMAPTOOLSIZE_Y - 300 }, 18, szText, RGB(0, 0, 0));
+        FLOATINGFONT->Render(hdc, { TILEMAPTOOLSIZE_X - lpTownTileSetImage->GetImageInfo()->width - 11 * 9 / 2 + (LONG)lpCamera->GetCameraPos().x, TILEMAPTOOLSIZE_Y - 300 + (LONG)lpCamera->GetCameraPos().y }, 18, szText, RGB(0, 0, 0));
     }
 
     //POINT ptMouse = g_ptMouse;
@@ -726,7 +725,6 @@ void TileMapTool::SceneSelect(int num)
     }
     lpCamera->Init(lpBackGroundTile, nullptr, 1000);
     lpCamera->SetCameraPos({ 0,0 });
-    FLOATINGFONT->SetCameraPos(nullptr);
 }
 
 void TileMapTool::StageSelect(int num)

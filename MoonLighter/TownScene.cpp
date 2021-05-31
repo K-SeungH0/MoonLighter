@@ -14,9 +14,6 @@ HRESULT TownScene::Init()
 	lpBackGround = IMAGEMANAGER->FindImage("Town_BackGround");
 	lpInteract = IMAGEMANAGER->FindImage("UI_Interact");
 	
-	lpUI = new BattleSceneUI();
-	lpUI->Init();
-	
 	lpPixelImage = new Image();
 	lpPixelImage->Init(lpBackGround->GetWidth(), lpBackGround->GetHeight());
 
@@ -32,7 +29,12 @@ HRESULT TownScene::Init()
 	lpLayerManager->Init();
 	lpLayerManager->SetCamera(lpCamera);
 
+	lpUI = new BattleSceneUI();
+	lpUI->Init();
+	lpUI->SetCamera(lpCamera);
+
 	isEnterDunGeon = false;
+	isEnterShop = false;
 	timer = 0;
 	MapLoad();
 	return S_OK;
@@ -82,14 +84,23 @@ void TownScene::Update()
 		else
 			isEnterDunGeon = false;
 
-		if (isEnterDunGeon)
-		{
-			if (KEYMANAGER->IsOnceKeyDown('J'))
-				SCENEMANAGER->ChageScene("Battle");
-		}
+		if (lpPlayer->GetPos().x > 1900 && lpPlayer->GetPos().x < 2000 && lpPlayer->GetPos().y > 450 && lpPlayer->GetpPos()->y < 500)
+			isEnterShop = true;
+		else
+			isEnterShop = false;
 	}
 	lpUI->Update();
+	if (isEnterDunGeon)
+	{
+		if (KEYMANAGER->IsOnceKeyDown('J'))
+			SCENEMANAGER->ChageScene("Battle");
+	}
 
+	if (isEnterShop)
+	{
+		if (KEYMANAGER->IsOnceKeyDown('J'))
+			SCENEMANAGER->ChageScene("Shop");
+	}
 }
 
 void TownScene::Render(HDC hdc)
@@ -119,7 +130,12 @@ void TownScene::Render(HDC hdc)
 	if (isEnterDunGeon)
 	{
 		lpCamera->CameraRender(hdc, { (LONG)lpPlayer->GetPos().x - lpInteract->GetWidth() / 2, (LONG)lpPlayer->GetPos().y - 100 }, lpInteract);
-		FLOATINGFONT->Render(hdc, { (LONG)lpPlayer->GetPos().x - (lpInteract->GetWidth() / 2) + 60, (LONG)lpPlayer->GetPos().y - 75 - 9}, 18, "키 눌러서 던전가기", RGB(0, 0, 0));
+		FLOATINGFONT->Render(hdc, { (LONG)lpPlayer->GetPos().x - (lpInteract->GetWidth() / 2) + 60 - (LONG)lpCamera->GetCameraPos().x, (LONG)lpPlayer->GetPos().y - 75 - 9 - (LONG)lpCamera->GetCameraPos().y}, 18, "키 눌러서 던전가기", RGB(0, 0, 0));
+	}
+	if (isEnterShop)
+	{
+		lpCamera->CameraRender(hdc, { (LONG)lpPlayer->GetPos().x - lpInteract->GetWidth() / 2, (LONG)lpPlayer->GetPos().y - 100 }, lpInteract);
+		FLOATINGFONT->Render(hdc, { (LONG)lpPlayer->GetPos().x - (lpInteract->GetWidth() / 2) + 60 - (LONG)lpCamera->GetCameraPos().x, (LONG)lpPlayer->GetPos().y - 75 - 9 - (LONG)lpCamera->GetCameraPos().y }, 18, "키 눌러서 상점가기", RGB(0, 0, 0));
 	}
 
 	lpUI->Render(hdc);
