@@ -17,7 +17,6 @@ using namespace std;
 #include "CollisionManager.h"
 #include "EffectManager.h"
 #include "FloatingFont.h"
-
 #include "GameData.h"
 
 #define WINSIZE_X	1280
@@ -54,7 +53,7 @@ using namespace std;
 #define DUNGEON_TILE_SET_Y	5
 
 #define TOWN_TILE_SET_X 4
-#define TOWN_TILE_SET_Y 5
+#define TOWN_TILE_SET_Y 6
 
 #define BACKGROUND_TILE_X 1
 #define BACKGROUND_TILE_Y 1
@@ -81,12 +80,6 @@ struct RECTFLOAT
 	float top;
 	float right;
 	float bottom;
-};
-enum class TILESCENE
-{
-	TOWN,
-	DUNGEON,
-	NONE
 };
 typedef struct tagTile
 {

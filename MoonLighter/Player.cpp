@@ -1,9 +1,10 @@
 #include "Player.h"
 #include "Image.h"
 #include "Weapon.h"
-#include "CollisionManager.h"
 #include "Inventory.h"
 #include "Camera.h"
+#include "Projectile.h"
+
 HRESULT Player::Init()
 {
     ImageLoad();
@@ -28,9 +29,11 @@ HRESULT Player::Init()
 
     frameTimer = 0;
     comboStack = 0;
-    
+    pixelDC = nullptr;
+
     pos = { WINSIZE_X / 2 , WINSIZE_Y - 100 };
-    winSize = { WINSIZE_X , WINSIZE_Y };
+    moveArea = { WINSIZE_X , WINSIZE_Y };
+
     isAction = false;
     isCombo = false;
     isEquipMainWeapon = true;
@@ -39,6 +42,7 @@ HRESULT Player::Init()
     ChangeWeapon(nullptr);
 
     lpPotion = nullptr;
+
 
     objectType = OBJECTTYPE::UNIT;
     COLLIDERMANAGER->AddCollider(this);
@@ -52,6 +56,8 @@ void Player::Release()
 
 void Player::Update()
 {
+    lpCurrentWeapon->Update();
+
     if (KEYMANAGER->IsOnceKeyDown('0'))
         Die();
     
@@ -145,6 +151,8 @@ void Player::Update()
             (++imageFrame) %= maxFrame;
     }
     
+    lpImage->SetCurrentFrameX(imageFrame);
+    lpImage->SetCurrentFrameY(stateFrame);
 }
 
 void Player::Render(HDC hdc)
@@ -152,19 +160,7 @@ void Player::Render(HDC hdc)
     Unit::Render(hdc);
 
     lpCamera->CameraFrameRender(hdc, lpImage, { (LONG)pos.x, (LONG)pos.y }, imageFrame, stateFrame, IMAGE_SIZE, true);
-
-    //lpImage->FrameRender(hdc, pos.x, pos.y, imageFrame, stateFrame, IMAGE_SIZE, true);
-
-    if (state == STATE::ATTACK)
-        lpCurrentWeapon->Render(hdc);
-}
-
-void Player::TestRender(HDC hdc, POINTFLOAT pos)
-{
-    Unit::Render(hdc);
-
-    lpImage->FrameRender(hdc, pos.x, pos.y, imageFrame, stateFrame, IMAGE_SIZE, true);
-
+    
     if (state == STATE::ATTACK)
         lpCurrentWeapon->Render(hdc);
 }
@@ -178,7 +174,6 @@ void Player::Avoid()
     stateFrame = 4;
     stateFrame += (int)dir;
     maxFrame = 8;
-    //collider = { 0,0,0,0 };
 }
 
 void Player::Move(DIR dir)
@@ -204,9 +199,7 @@ void Player::Move(DIR dir)
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
             if (collider.left > 0 && !PixelCollision(collider.left, collider.top, false, RGB(255,0,0)))
-            {
                 pos.x -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
-            }
         }
         break;
     case DIR::UP:
@@ -216,9 +209,7 @@ void Player::Move(DIR dir)
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
             if (collider.top > 0 && !PixelCollision(collider.left, collider.top, true, RGB(255, 0, 0)))
-            {
                 pos.y -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
-            }
         }
         break;
     case DIR::RIGHT:
@@ -227,7 +218,7 @@ void Player::Move(DIR dir)
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if(collider.right < winSize.x && !PixelCollision(collider.right, collider.top, false, RGB(255, 0, 0)))
+            if(collider.right < moveArea.x && !PixelCollision(collider.right, collider.top, false, RGB(255, 0, 0)))
                 pos.x += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         }
         break;
@@ -237,7 +228,7 @@ void Player::Move(DIR dir)
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if(collider.bottom < winSize.y && !PixelCollision(collider.left, collider.bottom, true, RGB(255, 0, 0)))
+            if(collider.bottom < moveArea.y && !PixelCollision(collider.left, collider.bottom, true, RGB(255, 0, 0)))
                 pos.y += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         }
         break;
@@ -292,6 +283,7 @@ void Player::Attack()
             break;
         case WEAPONTYPE::BOW:
             maxFrame = 7;
+            AddAttackFrame({ 1 });
             lpImage = IMAGEMANAGER->FindImage("BowMotion");
             break;
     }
@@ -320,14 +312,14 @@ void Player::SpecialAttack()
 
 void Player::SetCollider()
 {
-    cameraCollider.left = pos.x - lpImage->GetFrameWidth() / 3 - lpCamera->GetCameraPos().x;
-    collider.left = pos.x - lpImage->GetFrameWidth() / 3;
+    cameraCollider.left = pos.x - lpCamera->GetCameraPos().x   - lpImage->GetFrameWidth() / 3;
+    collider.left = pos.x                                      - lpImage->GetFrameWidth() / 3;
     cameraCollider.top = pos.y - lpCamera->GetCameraPos().y;
     collider.top = pos.y;
-    cameraCollider.right = pos.x + lpImage->GetFrameWidth() / 3 - lpCamera->GetCameraPos().x;
-    collider.right = pos.x + lpImage->GetFrameWidth() / 3;
-    cameraCollider.bottom = pos.y + lpImage->GetFrameHeight() / 2 - lpCamera->GetCameraPos().y;
-    collider.bottom = pos.y + lpImage->GetFrameHeight() / 2;
+    cameraCollider.right = pos.x - lpCamera->GetCameraPos().x  + lpImage->GetFrameWidth() / 3;
+    collider.right = pos.x                                     + lpImage->GetFrameWidth() / 3;
+    cameraCollider.bottom = pos.y - lpCamera->GetCameraPos().y + lpImage->GetFrameHeight() / 2;
+    collider.bottom = pos.y                                    + lpImage->GetFrameHeight() / 2;
 }
 
 void Player::NextCombo(int first, int second, int third)
@@ -364,13 +356,11 @@ void Player::ChangeWeapon(Item* weapon)
     if (weapon)
     {
         this->lpCurrentWeapon->Init(weapon->GetItemData(), weapon->GetItemManager());
-        additionalMoveSpeed += weapon->GetSpeed();
         this->damage = this->lpCurrentWeapon->GetDamage();
     }
     else
     {
         this->lpCurrentWeapon->Init();
-        additionalMoveSpeed -= 0;
         this->damage = this->lpCurrentWeapon->GetDamage();
     }
 }
@@ -448,16 +438,15 @@ void Player::CheckItem()
 
 bool Player::PixelCollision(int x, int y, bool isHorizontal, COLORREF checkColor)
 {
-    if (lpPixelImage)
+    if (pixelDC)
     {
         COLORREF color;
         int R, G, B;
-
         if (isHorizontal)
         {
             for (; x <= collider.right; x++)
             {
-                color = GetPixel(lpPixelImage->GetMemDC(), x, y);
+                color = GetPixel(*pixelDC, x, y);
 
                 if (checkColor == color)
                 {
@@ -469,9 +458,7 @@ bool Player::PixelCollision(int x, int y, bool isHorizontal, COLORREF checkColor
         {
             for (; y <= collider.bottom; y++)
             {
-                color = GetPixel(lpPixelImage->GetMemDC(), x, y);
-
-               
+                color = GetPixel(*pixelDC, x, y);
 
                 if (checkColor == color)
                 {
@@ -493,12 +480,18 @@ void Player::ImageLoad()
     IMAGEMANAGER->AddImage("GlovesMotion", L"Image/Player/Weapon/GlovesMotion.png", 20, 4);
     IMAGEMANAGER->AddImage("SpearMotion", L"Image/Player/Weapon/SpearMotion.png", 23, 4);
     IMAGEMANAGER->AddImage("BowMotion", L"Image/Player/Weapon/BowMotion.png", 7, 4);
+
 }
 
 void Player::FrameReset()
 {
     frameTimer = 0;
     imageFrame = 0;
+}
+
+void Player::SetProjectileCamera()
+{
+    lpCurrentWeapon->SetCamera(lpCamera);
 }
 
 Image* Player::GetCurrentWeaponImage()

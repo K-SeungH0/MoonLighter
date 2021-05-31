@@ -19,9 +19,9 @@ public:
 	void Update() override;
 	void Render(HDC hdc) override;
 
-	void CameraRender(HDC hdc, POINT worldPos, Image* lpImage);
+	void CameraRender(HDC hdc, POINT worldPos, Image* lpImage, float size = 1.0f, bool isCenterRenderring = false);
 	void CameraFrameRender(HDC hdc, Image* lpImage, POINT worldPos,
-		int currFrameX, int currFrameY, float size = 1, bool isCenterRenderring = false);
+		int currFrameX, int currFrameY, float size = 1.0f, bool isCenterRenderring = false);
 	
 	inline void SetCameraPos(POINTFLOAT cameraPos) { this->cameraPos = cameraPos; }
 	inline POINTFLOAT GetCameraPos() { return this->cameraPos; }

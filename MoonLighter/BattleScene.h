@@ -9,6 +9,9 @@ class Inventory;
 class BattleSceneUI;
 class ItemManager;
 class Camera;
+class DungeonManager;
+class EnemyManager;
+
 class BattleScene : public GameObject
 {
 private:
@@ -20,6 +23,7 @@ private:
 	Object* outsideColliderBottom;
 	
 	Image* lpBackGround;
+	DungeonManager* lpDungeonManager;
 	TILE_INFO tileMap[DUNGEON_TILE_X * DUNGEON_TILE_Y];
 	Player* lpPlayer;
 	BattleSceneUI* lpUI;

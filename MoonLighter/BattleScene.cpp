@@ -9,6 +9,8 @@
 #include "ItemManager.h"
 #include "Weapon.h"
 #include "Camera.h"
+#include "DungeonManager.h"
+
 HRESULT BattleScene::Init()
 {
     SetClientRect(g_hWnd, WINSIZE_X, WINSIZE_Y);
@@ -23,9 +25,13 @@ HRESULT BattleScene::Init()
     lpCamera = new Camera();
     lpCamera->Init(lpBackGround, lpPlayer->GetpPos(), 350);
     lpPlayer->SetCamera(lpCamera);
+    lpPlayer->SetProjectileCamera();
     lpUI = new BattleSceneUI();
     lpUI->Init();
     
+    lpDungeonManager = new DungeonManager();
+    lpDungeonManager->Init();
+
     int outsideSize = 50;
     RECTFLOAT outsideRc;
     outsideRc.left = 0;

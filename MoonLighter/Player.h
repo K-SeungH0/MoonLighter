@@ -36,13 +36,12 @@ private:
 
 	vector<int> attackFrame;
 
-	Image* lpPixelImage;
+	HDC* pixelDC;
 public:
 	HRESULT Init() override;
 	void Release() override;
 	void Update() override;
 	void Render(HDC hdc) override;
-	void TestRender(HDC hdc, POINTFLOAT pos);
 
 	void Avoid();
 	void Move(DIR dir);
@@ -62,7 +61,8 @@ public:
 	// 동작을 시작할때 실행
 	void FrameReset();
 
-	inline void SetPixelImage(Image* lpPixelImage) { this->lpPixelImage = lpPixelImage; }
+	inline void SetPixelHDC(HDC* pixelDC) { this->pixelDC = pixelDC; }
+	void SetProjectileCamera();
 
 	inline POINTFLOAT GetPos() { return this->pos; }
 	inline POINTFLOAT* GetpPos() { return &this->pos; }

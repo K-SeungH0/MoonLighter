@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Image.h"
 #include "Block.h"
+#include "Projectile.h"
 
 HRESULT Weapon::Init()
 {
@@ -11,7 +12,7 @@ HRESULT Weapon::Init()
 	lpEffectImage = IMAGEMANAGER->FindImage("GlovesEffect");
 
 	this->damage = 1;
-	this->player = GAMEDATA->GetRunTimePlayer();
+	this->lpPlayer = GAMEDATA->GetRunTimePlayer();
 
 	this->itemData.count = 0;
 	this->itemData.isEquipment = false;
@@ -19,6 +20,8 @@ HRESULT Weapon::Init()
 	this->itemData.lpItemImage = nullptr;
 	this->itemData.slotPos = { -1,-1 };
 
+	lpProjectile = new Projectile();
+	lpProjectile->Init();
 	AttackInfoInit();
 
     return S_OK;
@@ -34,7 +37,7 @@ HRESULT Weapon::Init(GameData::ItemData itemData, ItemManager* lpItemManager)
 	this->lpItemManager = lpItemManager;
 
 	ChangeType();
-	this->player = GAMEDATA->GetRunTimePlayer();
+	this->lpPlayer = GAMEDATA->GetRunTimePlayer();
 	AttackInfoInit();
 	return S_OK;
 }
@@ -46,7 +49,8 @@ void Weapon::Release()
 
 void Weapon::Update()
 {
-
+	if(this->weaponType == WEAPONTYPE::BOW)
+	lpProjectile->Update();
 }
 
 void Weapon::Render(HDC hdc)
@@ -55,32 +59,37 @@ void Weapon::Render(HDC hdc)
 		Rectangle(hdc, collider.left, collider.top, collider.right, collider.bottom);
 
 	if(this->weaponType != WEAPONTYPE::NONE)
-		lpImage->FrameRender(hdc, player->GetPos().x, player->GetPos().y, player->GetImageFrame(), player->GetStateFrame(), IMAGE_SIZE, true);
+		lpImage->FrameRender(hdc, lpPlayer->GetPos().x, lpPlayer->GetPos().y, lpPlayer->GetImageFrame(), lpPlayer->GetStateFrame(), IMAGE_SIZE, true);
+
+	if (lpProjectile->GetIsMove())
+		lpProjectile->Render(hdc);
 }
 
 void Weapon::Attack()
 {
-	this->pos = player->GetPos();
-	DIR dir = player->GetDir();
+	this->pos = lpPlayer->GetPos();
+	DIR dir = lpPlayer->GetDir();
 	if (weaponType != WEAPONTYPE::BOW)
 	{
-		AttackInfo attackInfo = attacks.find(make_pair(this->weaponType, player->GetDir()))->second;
+		AttackInfo attackInfo = attacks.find(make_pair(this->weaponType, lpPlayer->GetDir()))->second;
 
 		collider.left = this->pos.x + attackInfo.pos.x - (attackInfo.sizeX / 2);
 		collider.right = this->pos.x + attackInfo.pos.x + (attackInfo.sizeX / 2);
 		collider.top = this->pos.y + attackInfo.pos.y - (attackInfo.sizeY / 2);
 		collider.bottom = this->pos.y + attackInfo.pos.y + (attackInfo.sizeY / 2);
+
+		auto collidedObjects = COLLIDERMANAGER->CheckCollider(this);
+
+		for (auto iter = collidedObjects.begin(); iter != collidedObjects.end(); iter++)
+		{
+			((Block*)*iter)->Hit(lpPlayer, lpEffectImage);
+		}
 	}
 	else
 	{
 		// TODO : Bow 공격 추가
-	}
-
-	auto collidedObjects = COLLIDERMANAGER->CheckCollider(this);
-
-	for (auto iter = collidedObjects.begin(); iter != collidedObjects.end(); iter++)
-	{
-		((Block*)*iter)->Hit(player, lpEffectImage);
+		if(!lpProjectile->GetIsMove())
+			lpProjectile->Shoot(lpPlayer->GetDir(), this->pos);
 	}
 }
 
@@ -139,12 +148,14 @@ void Weapon::ChangeType()
 	case 1040: 
 		this->weaponType = WEAPONTYPE::BOW;
 		lpImage = IMAGEMANAGER->FindImage("Bow1");
+		lpProjectile->SetImage(IMAGEMANAGER->FindImage("Arrow1"));
 		lpEffectImage = IMAGEMANAGER->FindImage("BowEffect");
 		this->damage = 10;
 		break;
 	case 1041:
 		this->weaponType = WEAPONTYPE::BOW;
 		lpImage = IMAGEMANAGER->FindImage("Bow2");
+		lpProjectile->SetImage(IMAGEMANAGER->FindImage("Arrow2"));
 		lpEffectImage = IMAGEMANAGER->FindImage("BowEffect");
 		this->damage = 30;
 		break;
@@ -169,7 +180,9 @@ void Weapon::ImageLoad()
 	IMAGEMANAGER->AddImage("ShortSwordEffect", L"Image/Player/Weapon/ShortSword/ShortSword_Effect.png", 3, 4);
 
 	IMAGEMANAGER->AddImage("Bow1", L"Image/Player/Weapon/Bow/1.png", 7, 4);
+	IMAGEMANAGER->AddImage("Arrow1", L"Image/Player/Weapon/Bow/Arrow_1.png", 1, 4);
 	IMAGEMANAGER->AddImage("Bow2", L"Image/Player/Weapon/Bow/2.png", 7, 4);
+	IMAGEMANAGER->AddImage("Arrow2", L"Image/Player/Weapon/Bow/Arrow_2.png", 1, 4);
 	IMAGEMANAGER->AddImage("BowEffect", L"Image/Player/Weapon/Bow/Bow_Effect.png", 3, 4);
 
 	IMAGEMANAGER->AddImage("Gloves1", L"Image/Player/Weapon/Gloves/1.png",20, 4);
@@ -179,6 +192,12 @@ void Weapon::ImageLoad()
 	IMAGEMANAGER->AddImage("Spear1", L"Image/Player/Weapon/Spear/1.png",23, 4);
 	IMAGEMANAGER->AddImage("Spear2", L"Image/Player/Weapon/Spear/2.png",23, 4);
 	IMAGEMANAGER->AddImage("SpearEffect", L"Image/Player/Weapon/Spear/Spear_Effect.png", 3, 4);
+}
+
+void Weapon::SetCamera(Camera* lpCamera)
+{
+	 Object::SetCamera(lpCamera); 
+	 lpProjectile->SetCamera(this->lpCamera);
 }
 
 void Weapon::AttackInfoInit()

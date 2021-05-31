@@ -67,6 +67,9 @@
     <Filter Include="MainGame\Scene\ShopScene">
       <UniqueIdentifier>{289860c8-b1c5-4264-a8fd-fcda71f7b6b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainGame\Object\Projectile">
+      <UniqueIdentifier>{0b1aed41-4d8a-495c-a552-faac85f126fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -164,6 +167,18 @@
     </ClCompile>
     <ClCompile Include="ShopScene.cpp">
       <Filter>MainGame\Scene\ShopScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Projectile.cpp">
+      <Filter>MainGame\Object\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="LayerManager.cpp">
+      <Filter>2D FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>MainGame\Object\Unit\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyManager.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -274,6 +289,18 @@
     </ClInclude>
     <ClInclude Include="ShopScene.h">
       <Filter>MainGame\Scene\ShopScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.h">
+      <Filter>MainGame\Object\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="LayerManager.h">
+      <Filter>2D FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>MainGame\Object\Unit\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyManager.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

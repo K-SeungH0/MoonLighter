@@ -1,6 +1,7 @@
 #pragma once
 #include "Item.h"
 
+class Projectile;
 class Player;
 enum class DIR;
 
@@ -26,7 +27,8 @@ private:
 	Image* lpEffectImage;
 	int damage;
 	WEAPONTYPE weaponType;
-	Player* player;
+	Player* lpPlayer;
+	Projectile* lpProjectile;
 	map<pair<WEAPONTYPE, DIR>, AttackInfo> attacks;
 	
 	bool imageLoaded = false;
@@ -44,6 +46,7 @@ public:
 
 	void ImageLoad();
 
+	void SetCamera(Camera* lpCamera);
 	inline int GetDamage() { return this->damage; }
 	inline WEAPONTYPE GetType() { return this->weaponType; }
 

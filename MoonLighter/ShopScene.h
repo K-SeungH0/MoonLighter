@@ -12,6 +12,7 @@ private:
 	Image* lpBackGroundPixel;
 	Image* lpDoor;
 	Image* lpInteract;
+	HDC pixelDC;
 
 	Camera* lpCamera;
 	Player* lpPlayer;

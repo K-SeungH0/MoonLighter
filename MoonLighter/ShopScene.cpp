@@ -13,15 +13,16 @@ HRESULT ShopScene::Init()
 	lpMidImage = IMAGEMANAGER->FindImage("Shop_Mid");
 	lpDoor = IMAGEMANAGER->FindImage("Shop_Door");
 	lpInteract = IMAGEMANAGER->FindImage("UI_Interact");
+	pixelDC = lpBackGroundPixel->GetMemDC();
 
 	lpPlayer = GAMEDATA->GetRunTimePlayer();
-	lpPlayer->SetWinSize({ lpBackGround->GetWidth(), lpBackGround->GetHeight() });
-	lpPlayer->SetPixelImage(lpBackGroundPixel);
+	lpPlayer->SetMoveArea({ lpBackGround->GetWidth(), lpBackGround->GetHeight() });
 	lpPlayer->SetPos({ 875,500 });
 
 	lpCamera = new Camera();    
 	lpCamera->Init(lpBackGround, lpPlayer->GetpPos(), 350);
 	lpPlayer->SetCamera(lpCamera);
+	lpPlayer->SetPixelHDC(&pixelDC);
 
 	//FLOATINGFONT->SetCameraPos(lpCamera->GetpCameraPos());
 	doorFrameX = 0;
@@ -33,7 +34,7 @@ HRESULT ShopScene::Init()
 
 void ShopScene::Release()
 {
-	if (lpCamera)
+	if (lpCamera) 
 	{
 		lpCamera->Release();
 		lpCamera = nullptr;

@@ -6,14 +6,6 @@ class Image;
 class Button;
 class Camera;
 
-struct SelectTileInfo
-{
-	Image* lpSelectTile;
-	POINT pos;
-	int frameX;
-	int frameY;
-	RECT rcTile;
-};
 struct ObjectTileInfo
 {
 	Image* lpSelectTile;
@@ -21,11 +13,19 @@ struct ObjectTileInfo
 };
 class TileMapTool : public GameObject
 {
+public:
+	enum class TILESCENE
+	{
+		TOWN,
+		DUNGEON,
+		EXIT,
+		NONE
+	};
 private:
 	Image* lpBackGroundTile;
 	Image* lpTownTileSetImage;
 	Image* lpDunGeonTileSetImage;
-	SelectTileInfo selectTileInfo;
+	TILE_INFO selectTileInfo;
 	Image* lpSelectTile;
 
 	TILE_INFO dunGeonTileSetInfo[DUNGEON_TILE_SET_X * DUNGEON_TILE_SET_Y];
@@ -41,7 +41,9 @@ private:
 	int selectedFrameX;
 	int selectedFrameY;
 
-	RECT rcMain;
+	RECT rcTownMain;
+	RECT rcDungeonMain;
+	
 	RECT rcDungeonTileSet;
 	RECT rcTownTileSet;
 
@@ -53,7 +55,7 @@ private:
 
 	Button* townSelectButton;
 	Button* dungeonSelectButton;
-
+	Button* exitButton;
 	int selectStage;
 	char szText[128];
 
@@ -64,7 +66,8 @@ private:
 
 	int selectPosX;
 	int selectPosY;
-
+	bool overTile;
+	bool overlapColliderTile;
 public:
 	HRESULT Init() override;
 	void Release() override;

@@ -38,7 +38,6 @@ protected:
 	int maxHp;
 	int hp;
 	
-	POINT winSize;
 public:
 	HRESULT Init() override;
 	void Release() override;
@@ -46,8 +45,6 @@ public:
 	void Render(HDC hdc) override;
 	
 	void Hit();
-
-	inline void SetWinSize(POINT winSize) { this->winSize = winSize; }
 
 	inline DIR GetDir() { return this->dir; }
 	inline int GetCurrentHp() { return this->hp; }

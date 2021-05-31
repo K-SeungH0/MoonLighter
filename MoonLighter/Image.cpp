@@ -26,8 +26,6 @@ HRESULT Image::Init(int width, int height)
     this->isTransparent = FALSE;
     this->transColor = FALSE;
 
- 
-
     return S_OK;
 }
 

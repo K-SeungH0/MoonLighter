@@ -71,7 +71,7 @@ void Camera::Render(HDC hdc)
 	//CameraRender(hdc, { (LONG)foucs->GetPos().x, (LONG)foucs->GetPos().y }, foucs->GetImage());
 }
 
-void Camera::CameraRender(HDC hdc, POINT worldPos, Image* lpImage)
+void Camera::CameraRender(HDC hdc, POINT worldPos, Image* lpImage, float size, bool isCenterRenderring)
 {
 	//if (cameraPos.x > worldPos.x || cameraPos.y > worldPos.y ||
 	//	cameraPos.x + WINSIZE_X < worldPos.x - lpImage->GetWidth() ||
@@ -79,7 +79,7 @@ void Camera::CameraRender(HDC hdc, POINT worldPos, Image* lpImage)
 	//	return;
 	
 	//lpImage->CameraRender(hdc, worldPos.x , worldPos.y, cameraPos.x, cameraPos.y);
-	lpImage->Render(hdc, worldPos.x - cameraPos.x, worldPos.y - cameraPos.y);
+	lpImage->Render(hdc, worldPos.x - cameraPos.x, worldPos.y - cameraPos.y, size , isCenterRenderring);
 }
 
 void Camera::CameraFrameRender(HDC hdc, Image* lpImage, POINT worldPos, int currFrameX, int currFrameY, float size, bool isCenterRenderring)

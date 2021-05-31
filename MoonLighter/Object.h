@@ -9,6 +9,7 @@ enum class OBJECTTYPE
 	ITEM,
 	BREAKABLE,
 	UNIT,
+	PROJECTILE,
 	NONE
 };
 class Object : public GameObject
@@ -19,8 +20,8 @@ protected:
 	RECTFLOAT collider;
 	Image* lpImage;
 	OBJECTTYPE objectType;
-	//POINTFLOAT* lpCameraPos;
 	Camera* lpCamera;
+	POINT moveArea;
 
 public:
 	virtual HRESULT Init() = 0;
@@ -29,8 +30,10 @@ public:
 	virtual void Render(HDC hdc) = 0;
 
 	inline void SetPos(POINTFLOAT pos) { this->pos = pos; }
+	inline void SetMoveArea(POINT moveArea) { this->moveArea = moveArea; }
 	inline void SetCamera(Camera* lpCamera) { this->lpCamera = lpCamera; }
 
+	inline RECTFLOAT GetCameraCollider() { return this->cameraCollider; }
 	inline RECTFLOAT GetCollider() { return this->collider; }
 	inline OBJECTTYPE GetObjectType() { return this->objectType; }
 	inline POINTFLOAT GetPos() { return this->pos; }
