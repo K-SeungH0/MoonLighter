@@ -11,8 +11,8 @@ DWORD CALLBACK LoadingThread(LPVOID pvParam)
     {
         SceneManager::currentScene = SceneManager::readyScene;
 
-        SceneManager::loadingScene->Release();
-        SceneManager::loadingScene = nullptr;
+        //SceneManager::loadingScene->Release();
+        //SceneManager::loadingScene = nullptr;
         SceneManager::readyScene = nullptr;
     }
     return 0;
@@ -72,13 +72,13 @@ bool SceneManager::AddLodingScene(string key, GameObject* scene)
     if (iter != mLoadingSceneDatas.end())
         return false;
 
-    mSceneDatas.insert(pair<string, GameObject*>(key, scene));
-    return false;
+    mLoadingSceneDatas.insert(pair<string, GameObject*>(key, scene));
     return false;
 }
 
 HRESULT SceneManager::ChageScene(string sceneName)
 {
+    isDebugMode = false;
     auto iter = mSceneDatas.find(sceneName);
     if (iter == mSceneDatas.end())
         return E_FAIL;
@@ -86,7 +86,7 @@ HRESULT SceneManager::ChageScene(string sceneName)
     if (iter->second == currentScene)
         return S_OK;
 
-    if (currentScene)
+    if(currentScene)
         currentScene->Release();
 
     if (SUCCEEDED(iter->second->Init()))
@@ -100,6 +100,7 @@ HRESULT SceneManager::ChageScene(string sceneName)
 
 HRESULT SceneManager::ChageScene(string sceneName, string lodingSceneName)
 {
+    isDebugMode = false;
     auto iter = mSceneDatas.find(sceneName);
     if (iter == mSceneDatas.end())
         return E_FAIL;
@@ -113,13 +114,11 @@ HRESULT SceneManager::ChageScene(string sceneName, string lodingSceneName)
     if (iterLoading == mLoadingSceneDatas.end())
         return ChageScene(sceneName);
 
-
+    if (currentScene)
+        currentScene->Release();
 
     if (SUCCEEDED(iterLoading->second->Init()))
     {
-        if (currentScene)
-            currentScene->Release();
-
         currentScene = iterLoading->second;
 
         readyScene = iter->second;

@@ -12,6 +12,7 @@
 
 HRESULT MainGame::Init()
 {
+	srand(time(NULL));
 	hdc = GetDC(g_hWnd);
 
 	KeyManager::GetInstance()->Init();
@@ -35,7 +36,8 @@ HRESULT MainGame::Init()
 
 	SceneManager::GetInstance()->AddLodingScene("LodingScene", new LoadingScene());
 
-	SceneManager::GetInstance()->ChageScene("Title");
+	SceneManager::GetInstance()->ChageScene("Title", "LodingScene");
+
 	isInited = true;
 
 	return S_OK;

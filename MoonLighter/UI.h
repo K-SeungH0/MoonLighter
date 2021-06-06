@@ -29,6 +29,8 @@ public:
 	inline void SetCutY(int cutY) { this->cutY = cutY; }
 	inline void SetFrameX(int frameX) { this->frameX = frameX; }
 	inline void SetFrameY(int frameY) { this->frameY = frameY; }
+	inline void SetPos(POINT pos) { this->pos = pos; }
+
 	virtual ~UI() {};
 };
 

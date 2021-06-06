@@ -74,10 +74,10 @@ void TitleScene::Update()
 		switch (menu[selectIndex].type)
 		{
 		case MENU::START:
-			SCENEMANAGER->ChageScene("Shop");
+			SCENEMANAGER->ChageScene("Shop", "LodingScene");
 			break;
 		case MENU::MAPTOOL:
-			SCENEMANAGER->ChageScene("TileMapTool");
+			SCENEMANAGER->ChageScene("TileMapTool", "LodingScene");
 			break;
 		case MENU::EXIT:
 			PostQuitMessage(0);

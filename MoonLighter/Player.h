@@ -16,7 +16,7 @@ private:
 	int comboStack;
 
 	float frameTimer;
-
+	float deadTimer;
 	bool isAction;
 	bool isCombo;
 	bool isEquipMainWeapon;
@@ -25,8 +25,8 @@ private:
 	int additionalMoveSpeed;
 	int additionalArmor;
 
-	int gold;
-
+	//int gold;
+	bool inBattle;
 	Weapon* lpCurrentWeapon;
 
 	Item* lpMainWeapon;
@@ -61,8 +61,8 @@ public:
 	void FrameReset();
 
 	inline void SetPixelHDC(HDC* pixelDC) { this->pixelDC = pixelDC; }
-	void SetProjectileCamera();
-
+ 	void SetProjectileCamera();
+	
 	inline POINTFLOAT GetPos() { return this->pos; }
 	inline POINTFLOAT* GetpPos() { return &this->pos; }
 	inline int GetImageFrame() { return this->imageFrame; }
@@ -73,13 +73,16 @@ public:
 	inline int GetAdditionalHp() { return this->additionalHp; }
 	inline int GetAdditionalMoveSpeed() { return this->additionalMoveSpeed; }
 	inline int GetAdditionalArmor() { return this->additionalArmor; }
-	inline int GetGold() { return this->gold; }
+	//inline int GetGold() { return this->gold; }
 	inline bool GetIsEquipMainWeapon() { return this->isEquipMainWeapon; }
+	inline Camera* GetCamera() { return this->lpCamera; }
+	inline Weapon* GetWeapon() { return this->lpCurrentWeapon; }
 	Image* GetCurrentWeaponImage();
 	Image* GetPotionImage();
 	int GetPotionCount();
 	
 	void ImageLoad();
+	void LoadData();
 	~Player() override {};
 };
 

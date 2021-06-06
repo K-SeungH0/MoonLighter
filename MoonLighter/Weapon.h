@@ -33,7 +33,7 @@ private:
 	
 	bool imageLoaded = false;
 public:
-	HRESULT Init(GameData::ItemData itemData, ItemManager* lpItemManager);
+	HRESULT Init(GameData::ItemData itemData, ItemManager* lpItemManager, Image* lpItemImage);
 	HRESULT Init() override;
 	void Release() override;
 	void Update() override;

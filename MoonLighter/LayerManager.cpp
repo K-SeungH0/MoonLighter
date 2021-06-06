@@ -23,6 +23,7 @@ void LayerManager::Render(HDC hdc)
 
 	for (auto iter = vObjects.begin(); iter != vObjects.end(); iter++)
 	{
+		if(iter->first)
 		lpCamera->CameraFrameRender(hdc, iter->first, {(LONG)iter->second.x, (LONG)iter->second.y	}, iter->first->GetCurrentFrameX(), iter->first->GetCurrentFrameY(), IMAGE_SIZE, true);
     }
 }

@@ -1,6 +1,7 @@
 #include "AstarScene.h"
 #include "CommonFunction.h"
 #include <math.h>
+#include <algorithm>
 #include "Image.h"
 HRESULT AstarTile::Init()
 {
@@ -12,8 +13,8 @@ HRESULT AstarTile::Init(int idX, int idY)
 	this->idX = idX;
 	this->idY = idY;
 
-	center.x = idX * ASTAR_TILE_SIZE + (ASTAR_TILE_SIZE / 2);
-	center.y = idY * ASTAR_TILE_SIZE + (ASTAR_TILE_SIZE / 2);
+	pos.x = idX * ASTAR_TILE_SIZE + (ASTAR_TILE_SIZE / 2);
+	pos.y = idY * ASTAR_TILE_SIZE + (ASTAR_TILE_SIZE / 2);
 
 	rc.left = idX * ASTAR_TILE_SIZE;
 	rc.right = ASTAR_TILE_SIZE + rc.left;
@@ -32,6 +33,34 @@ HRESULT AstarTile::Init(int idX, int idY)
 	type = ASTARTILETYPE::NONE;
 	isInOpenList = false;
 	isClosed = false;
+
+	return S_OK;
+}
+
+HRESULT AstarTile::Init(int idX, int idY, TILE_INFO tile)
+{
+	this->idX = idX;
+	this->idY = idY;
+	this->pos.x = (tile.rcTile.left + tile.rcTile.right) / 2;
+	this->pos.y = (tile.rcTile.top + tile.rcTile.bottom) / 2;
+	this->rc = tile.rcTile;
+
+	costFromStart = 0;
+	costToGoal = 0;
+	totalCost = 0;
+	parentTile = nullptr;
+
+	color = RGB(100, 100, 100);
+	//hBrush = CreateSolidBrush(color);
+
+	if (tile.type == TILETYPE::NONE || tile.type == TILETYPE::SPAWN)
+		type = ASTARTILETYPE::NONE;
+	else
+		type = ASTARTILETYPE::WALL;
+
+	isInOpenList = false;
+	isClosed = false;
+	heapIndex = 0;
 
 	return S_OK;
 }
@@ -70,11 +99,11 @@ void AstarTile::SetColor(COLORREF color)
 
 HRESULT AstarScene::Init()
 {
-	SetClientRect(g_hWnd, ASTARSIZE_X, ASTARSIZE_Y);
+	//SetClientRect(g_hWnd, ASTARSIZE_X, ASTARSIZE_Y);
 
-	for (int i = 0; i < ASTAR_TILE_COUNT; i++)
+	for (int i = 0; i < DUNGEON_TILE_Y; i++)
 	{
-		for (int j = 0; j < ASTAR_TILE_COUNT; j++)
+		for (int j = 0; j < DUNGEON_TILE_X; j++)
 		{
 			map[i][j].Init(j, i);
 		}
@@ -86,9 +115,24 @@ HRESULT AstarScene::Init()
 
 	currTile = startTile;
 
-	endTile = &(map[13][3]);
+	endTile = &(map[6][3]);
 	endTile->SetColor(RGB(0, 0, 255));
 	endTile->SetType(ASTARTILETYPE::END);
+	return S_OK;
+}
+HRESULT AstarScene::Init(TILE_INFO* tile)
+{
+	for (int y = 0; y < DUNGEON_TILE_Y; y++)
+	{
+		for (int x = 0; x < DUNGEON_TILE_X; x++)
+		{
+			map[y][x].Init(x, y, tile[x + y * DUNGEON_TILE_X]);
+		}
+	}
+	openList.clear();
+	closeList.clear();
+	heap.clear();
+	result.clear();
 	return S_OK;
 }
 
@@ -107,7 +151,7 @@ void AstarScene::Update()
 	}
 	if (KeyManager::GetInstance()->IsOnceKeyDown(VK_F2))
 	{
-		SceneManager::GetInstance()->ChageScene("TileMapTool", "LoadingScene");
+		SceneManager::GetInstance()->ChageScene("TileMapTool");
 		return;
 	}
 
@@ -116,8 +160,8 @@ void AstarScene::Update()
 		int selectX = g_ptMouse.x / ASTAR_TILE_SIZE;
 		int selectY = g_ptMouse.y / ASTAR_TILE_SIZE;
 
-		if (selectX < ASTAR_TILE_COUNT && selectX >= 0 &&
-			selectY < ASTAR_TILE_COUNT && selectY >= 0 &&
+		if (selectX < DUNGEON_TILE_X && selectX >= 0 &&
+			selectY < DUNGEON_TILE_Y && selectY >= 0 &&
 			map[selectY][selectX].GetType() != ASTARTILETYPE::START &&
 			map[selectY][selectX].GetType() != ASTARTILETYPE::END)
 		{
@@ -134,6 +178,7 @@ void AstarScene::Update()
 	if (KeyManager::GetInstance()->IsOnceKeyDown('D'))
 	{
 		FindPath();
+		Result();
 	}
 	if (KeyManager::GetInstance()->IsOnceKeyDown('C'))
 	{
@@ -143,23 +188,23 @@ void AstarScene::Update()
 
 void AstarScene::Render(HDC hdc)
 {
-	//for (int i = 0; i < ASTAR_TILE_COUNT; i++)
-	//{
-	//	for (int j = 0; j < ASTAR_TILE_COUNT; j++)
-	//	{
-	//		map[i][j].Render(hdc);
-	//	}
-	//}
+	for (int i = 0; i < DUNGEON_TILE_Y; i++)
+	{
+		for (int j = 0; j < DUNGEON_TILE_X; j++)
+		{
+			map[i][j].Render(hdc);
+		}
+	}
 
-	//for (auto iter = openList.begin(); iter != openList.end(); iter++)
-	//{
-	//	(*iter)->Render(hdc);
-	//}
+	for (auto iter = openList.begin(); iter != openList.end(); iter++)
+	{
+		(*iter)->Render(hdc);
+	}
 	
 	//PatBlt(hdc, 0, 0, WINSIZE_X, WINSIZE_Y, WHITENESS);
-	PatBlt(hdc, 0, 0, WINSIZE_X, WINSIZE_Y, BLACKNESS);
+	//PatBlt(hdc, 0, 0, WINSIZE_X, WINSIZE_Y, BLACKNESS);
 
-	testImage->FrameRender(hdc, WINSIZE_X / 4, WINSIZE_Y / 4, 0, 0, 2);
+	//testImage->FrameRender(hdc, WINSIZE_X / 4, WINSIZE_Y / 4, 0, 0, 2);
 }
 
 
@@ -174,17 +219,16 @@ void AstarScene::FindPath()
 		// 후보들 중 F값이 가장 작은 타일을 다음 currTile로 선정
 		//NextOpenList();
 		currTile = GetMinTotalCostTileWithHeap();
-		currTile->SetColor(RGB(130, 200, 130));
+		//currTile->SetColor(RGB(130, 200, 130));
 
 		if (currTile == endTile)
 			return;
 
 		// 반복
-		//FindPath();
+		FindPath();
 
 		// 출력
 		//PrintPath();
-
 	}
 }
 
@@ -267,42 +311,47 @@ void AstarScene::AddOpenList(AstarTile* currTile)
 	// 강사 추가
 	int currIdX = currTile->GetIdXY().x;
 	int currIdY = currTile->GetIdXY().y;
-	bool diagonal = false;
+
+	// ↗ ↖ ↙ ↘
+	AddList(currIdX + 1, currIdY - 1);
+	AddList(currIdX - 1, currIdY - 1);
+	AddList(currIdX - 1, currIdY + 1);
+	AddList(currIdX + 1, currIdY + 1);
 
 	// ↑ ↓ ← → 
-	diagonal |= AddList(currIdX, currIdY - 1);
-	diagonal |= AddList(currIdX, currIdY + 1);
-	diagonal |= AddList(currIdX - 1, currIdY);
-	diagonal |= AddList(currIdX + 1, currIdY);
+	AddList(currIdX, currIdY - 1);
+	AddList(currIdX, currIdY + 1);
+	AddList(currIdX - 1, currIdY);
+	AddList(currIdX + 1, currIdY);
 
-	if (diagonal)
-	{
-		// ↗ ↖ ↙ ↘
-		AddList(currIdX + 1, currIdY - 1);
-		AddList(currIdX - 1, currIdY - 1);
-		AddList(currIdX - 1, currIdY + 1);
-		AddList(currIdX + 1, currIdY + 1);
-	}
 	currTile->SetIsClosed(true);
 }
 
-bool AstarScene::AddList(int x, int y)
+void AstarScene::AddList(int x, int y)
 {
 	int currIdX = currTile->GetIdXY().x;
 	int currIdY = currTile->GetIdXY().y;
 
-	if (x < 0 || x >= ASTAR_TILE_COUNT ||
-		y < 0 || y >= ASTAR_TILE_COUNT)
-		return false;
+	if (x < 0 || x >= DUNGEON_TILE_X ||
+		y < 0 || y >= DUNGEON_TILE_Y)
+		return;
+	// 대각선 허용시, 벽 사이로 통과 안됨
+
+	if (map[y][currIdX].GetType() == ASTARTILETYPE::WALL && map[currIdY][x].GetType() == ASTARTILETYPE::WALL)
+		return;
+
+	// 코너를 가로질러 가지 않을시, 이동 중에 수직수평 장애물이 있으면 안됨
+	if (map[y][currIdX].GetType() == ASTARTILETYPE::WALL || map[currIdY][x].GetType() == ASTARTILETYPE::WALL)
+		return;
 
 	// 오픈리스트 추가 안될 조건
 	// 1. 타입이 Wall 일때
 	if (map[y][x].GetType() == ASTARTILETYPE::WALL)
-		return false;
+		return;
 
 	// 2. 이미 확인된 타일일 때 (closeList)
 	if (map[y][x].GetIsClosed())
-		return false;
+		return;
 
 	// 3. 이미 오픈리스트에 있을때
 	int F, G, H;
@@ -322,7 +371,7 @@ bool AstarScene::AddList(int x, int y)
 			// parentNode도 갱신
 			map[y][x].SetParentTile(currTile);
 		}
-		return false;
+		return;
 	}
 	else
 	{
@@ -344,7 +393,7 @@ bool AstarScene::AddList(int x, int y)
 		// heap 자료구조에 추가
 		InsertOpenlistWithHeap(&map[y][x]);
 		map[y][x].SetColor(RGB(200, 150, 150));
-		return true;
+		return;
 	}
 }
 
@@ -384,7 +433,10 @@ AstarTile* AstarScene::GetMinTotalCostTileWithHeap()
 	heap.pop_back();
 
 	// 자식과 비교하면서 정렬
-	UpdateLower(heap[0]);
+	if (heap.empty() == false)
+	{
+		UpdateLower(heap[0]);
+	}
 
 	return tile;
 }
@@ -464,9 +516,9 @@ void AstarScene::NextOpenList()
 void AstarScene::PrintPath()
 {
 	AstarTile* targetTile = endTile;
-
 	while (targetTile != startTile)
 	{
+		// end부터 start까지 경로
 		targetTile = targetTile->GetParentTile();
 		targetTile->SetColor(RGB(255, 0, 255));
 	}
@@ -498,4 +550,26 @@ int AstarScene::CalcHeuristic(int x, int y)
 void AstarScene::MarkTileToType()
 {
 	AstarTile* parentTile = endTile;
+}
+
+vector<POINT> AstarScene::Result()
+{
+	result.clear();
+	AstarTile* targetTile = endTile;
+	while (targetTile != startTile)
+	{
+		// end부터 start까지 경로
+		result.push_back(targetTile->GetPos());
+		targetTile = targetTile->GetParentTile();
+		if (!targetTile) break;
+	}
+	int a = 0;
+	reverse(result.begin(), result.end());
+	//result.reserve();
+	return result;
+}
+
+void AstarScene::ResetInfo()
+{
+	result.clear();
 }

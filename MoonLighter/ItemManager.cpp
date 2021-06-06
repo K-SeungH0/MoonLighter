@@ -11,7 +11,7 @@ HRESULT ItemManager::Init()
 HRESULT ItemManager::Init(Inventory* lpInventory)
 {
 	this->lpInventory = lpInventory;
-	this->lpInventory->DataLoad(this);
+	//this->lpInventory->DataLoad();
 
 	return S_OK;
 }

@@ -178,7 +178,7 @@
       <Filter>MainGame\Object\Unit\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="EnemyManager.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>2D FrameWork\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -300,7 +300,7 @@
       <Filter>MainGame\Object\Unit\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="EnemyManager.h">
-      <Filter>소스 파일</Filter>
+      <Filter>2D FrameWork\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

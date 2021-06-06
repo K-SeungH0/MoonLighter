@@ -38,6 +38,7 @@ HRESULT BattleSceneUI::Init()
 
 	hpBarReduceTimer = 0;
 	escapeTimer = 0;
+
 	return S_OK;
 }
 
@@ -102,7 +103,8 @@ void BattleSceneUI::Update()
 
 	if (escapeTimer >= 1.0f)
 	{
-		SCENEMANAGER->ChageScene("Town");
+		SCENEMANAGER->ChageScene("Town", "LodingScene");
+		//GAMEDATA->FileSave();
 	}
 }
 
@@ -130,7 +132,8 @@ void BattleSceneUI::Render(HDC hdc)
 	string hpText= "";
 	hpText = to_string(lpPlayer->GetCurrentHp()) + "/" + to_string(lpPlayer->GetMaxHp() + lpPlayer->GetAdditionalHp());
 	FLOATINGFONT->Render(hdc, { 345 ,35  }, 24, hpText.c_str(), RGB(255, 255, 255));
-	FLOATINGFONT->Render(hdc, { 50 , 115  }, 24, to_string(lpPlayer->GetGold()).c_str(), RGB(255, 255, 255));
+	FLOATINGFONT->Render(hdc, { 50 , 115 }, 24, to_string(GAMEDATA->GetGold()).c_str(), RGB(255, 255, 255));
+	//FLOATINGFONT->Render(hdc, { 50 , 115  }, 24, to_string(lpPlayer->GetGold()).c_str(), RGB(255, 255, 255));
 }
 
 bool BattleSceneUI::GetInvenActive()

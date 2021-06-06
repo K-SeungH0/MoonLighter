@@ -130,6 +130,10 @@ HRESULT TileMapTool::Init()
                     break;
 
             }
+            if (i == DUNGEON_TILE_SET_Y - 1 && j == DUNGEON_TILE_SET_X - 1)
+            {
+                dunGeonTileSetInfo[i * DUNGEON_TILE_SET_X + j].type = TILETYPE::SPAWN;
+            }
         }
     }
 
@@ -189,8 +193,6 @@ HRESULT TileMapTool::Init()
     exitButton->Init("Exit", { TILEMAPTOOLSIZE_X - 600,  TILEMAPTOOLSIZE_Y - 150 });
     exitButton->SetTileMap(this);
     exitButton->SetClick(&TileMapTool::SceneSelect, 2);
-
-
 
     selectStage = 1;
     selectPosX = 0;
@@ -261,8 +263,6 @@ void TileMapTool::Update()
         }
     }
 
-
-
     POINT ptMouse = g_ptMouse;
     ptMouse.x += lpCamera->GetCameraPos().x;
     ptMouse.y += lpCamera->GetCameraPos().y;
@@ -291,7 +291,7 @@ void TileMapTool::Update()
                         {
                             dungeonTileInfo[i].frameX = selectedFrame.x;
                             dungeonTileInfo[i].frameY = selectedFrame.y;
-                            dungeonTileInfo[i].lpImage = lpTownTileSetImage;
+                            //dungeonTileInfo[i].lpImage = lpTownTileSetImage;
                             dungeonTileInfo[i].type = dunGeonTileSetInfo[(selectedFrame.y) * DUNGEON_TILE_SET_X + (selectedFrame.x)].type;
                             break;
                         }
@@ -399,7 +399,7 @@ void TileMapTool::Update()
     }
     if (KEYMANAGER->IsOnceKeyDown(VK_ESCAPE))
     {
-        SCENEMANAGER->ChageScene("Title");
+        SCENEMANAGER->ChageScene("Title", "LodingScene");
     }
 }
 
@@ -415,7 +415,6 @@ void TileMapTool::Render(HDC hdc)
     if (currentScene == TILESCENE::TOWN)
     {
         // 메인 영역 전체
-       
         for (int i = 0; i < TOWN_TILE_Y * TOWN_TILE_X; i++)
         {
             POINT ptMouse = g_ptMouse;
@@ -522,7 +521,7 @@ void TileMapTool::Render(HDC hdc)
         SelectObject(hdc, hOldSelectedBrush);
         lpTownTileSetImage->Render(hdc, TILEMAPTOOLSIZE_X - (lpTownTileSetImage->GetImageInfo()->width * 2) - TILESIZE, 0, IMAGE_SIZE);
     }
-    else
+    else // DunGeon
     {
         // 샘플타일 전체
         Rectangle(hdc, rcDungeonTileSet.left, rcDungeonTileSet.top, rcDungeonTileSet.right, rcDungeonTileSet.bottom);
@@ -537,7 +536,18 @@ void TileMapTool::Render(HDC hdc)
                 DeleteObject(myBrush);
             }
             else
-                Rectangle(hdc, dunGeonTileSetInfo[i].rcTile.left, dunGeonTileSetInfo[i].rcTile.top, dunGeonTileSetInfo[i].rcTile.right, dunGeonTileSetInfo[i].rcTile.bottom);
+            {
+                if (dunGeonTileSetInfo[i].type == TILETYPE::SPAWN)
+                {
+                    HBRUSH myBrush = (HBRUSH)CreateSolidBrush(RGB(0, 128, 128));
+                    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, myBrush);
+                    Rectangle(hdc, dunGeonTileSetInfo[i].rcTile.left, dunGeonTileSetInfo[i].rcTile.top, dunGeonTileSetInfo[i].rcTile.right, dunGeonTileSetInfo[i].rcTile.bottom);
+                    SelectObject(hdc, oldBrush);
+                    DeleteObject(myBrush);
+                }
+                else
+                    Rectangle(hdc, dunGeonTileSetInfo[i].rcTile.left, dunGeonTileSetInfo[i].rcTile.top, dunGeonTileSetInfo[i].rcTile.right, dunGeonTileSetInfo[i].rcTile.bottom);
+            }
         }
         SelectObject(hdc, hOldSelectedBrush);
         lpDunGeonTileSetImage->Render(hdc, TILEMAPTOOLSIZE_X - (lpDunGeonTileSetImage->GetImageInfo()->width * 2),
@@ -553,6 +563,9 @@ void TileMapTool::Render(HDC hdc)
                 Rectangle(hdc, dungeonTileInfo[i].rcTile.left, dungeonTileInfo[i].rcTile.top, dungeonTileInfo[i].rcTile.right, dungeonTileInfo[i].rcTile.bottom);
                 SelectObject(hdc, oldBrush);
                 DeleteObject(myBrush);
+
+                selectPosX = (dungeonTileInfo[i].rcTile.left + dungeonTileInfo[i].rcTile.right) / 2;
+                selectPosY = (dungeonTileInfo[i].rcTile.top + dungeonTileInfo[i].rcTile.bottom) / 2;
             }
             else
             {
@@ -560,6 +573,16 @@ void TileMapTool::Render(HDC hdc)
                 Rectangle(hdc, dungeonTileInfo[i].rcTile.left, dungeonTileInfo[i].rcTile.top, dungeonTileInfo[i].rcTile.right, dungeonTileInfo[i].rcTile.bottom);
             }
             SelectObject(hdc, hOldSelectedBrush);
+
+            if (dungeonTileInfo[i].type == TILETYPE::SPAWN)
+            {
+                HBRUSH myBrush = (HBRUSH)CreateSolidBrush(RGB(0, 128, 128));
+                HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, myBrush);
+                Rectangle(hdc, dungeonTileInfo[i].rcTile.left, dungeonTileInfo[i].rcTile.top, dungeonTileInfo[i].rcTile.right, dungeonTileInfo[i].rcTile.bottom);
+                SelectObject(hdc, oldBrush);
+                DeleteObject(myBrush);
+            }
+            else
             lpDunGeonTileSetImage->FrameRender(hdc,
                 dungeonTileInfo[i].rcTile.left,
                 dungeonTileInfo[i].rcTile.top,
@@ -570,9 +593,18 @@ void TileMapTool::Render(HDC hdc)
 
         // 선택된 타일
 
+        if (dunGeonTileSetInfo[(selectedFrame.y) * DUNGEON_TILE_SET_X + (selectedFrame.x)].type == TILETYPE::SPAWN)
+        {
+            HBRUSH myBrush = (HBRUSH)CreateSolidBrush(RGB(0, 128, 128));
+            HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, myBrush);
+            Rectangle(hdc, g_ptMouse.x - 32, g_ptMouse.y - 32, g_ptMouse.x + 32, g_ptMouse.y + 32);
+            SelectObject(hdc, oldBrush);
+            DeleteObject(myBrush);
+        }
+        else
         lpDunGeonTileSetImage->FrameRender(hdc,
-            g_ptMouse.x,
-            g_ptMouse.y,
+            selectPosX,//g_ptMouse.x,
+            selectPosY,//g_ptMouse.y,
             selectedFrame.x,
             selectedFrame.y,
             IMAGE_SIZE,
@@ -720,7 +752,7 @@ void TileMapTool::SceneSelect(int num)
         currentScene = TILESCENE::DUNGEON;
         break;
     case (int)TILESCENE::EXIT:
-        SCENEMANAGER->ChageScene("Title");
+        SCENEMANAGER->ChageScene("Title", "LodingScene");
         return;
     }
     lpCamera->Init(lpBackGroundTile, nullptr, 1000);

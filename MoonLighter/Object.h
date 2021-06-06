@@ -21,7 +21,7 @@ protected:
 	Image* lpImage;
 	OBJECTTYPE objectType;
 	Camera* lpCamera;
-	POINT moveArea;
+	RECT moveArea;
 
 public:
 	virtual HRESULT Init() = 0;
@@ -30,7 +30,7 @@ public:
 	virtual void Render(HDC hdc) = 0;
 
 	inline void SetPos(POINTFLOAT pos) { this->pos = pos; }
-	inline void SetMoveArea(POINT moveArea) { this->moveArea = moveArea; }
+	inline void SetMoveArea(RECT moveArea) { this->moveArea = moveArea; }
 	inline void SetCamera(Camera* lpCamera) { this->lpCamera = lpCamera; }
 
 	inline RECTFLOAT GetCameraCollider() { return this->cameraCollider; }

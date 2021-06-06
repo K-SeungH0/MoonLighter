@@ -1,8 +1,8 @@
 #pragma once
 #include "GameObject.h"
 #include <vector>
-#define ASTAR_TILE_SIZE 60
-#define ASTAR_TILE_COUNT (ASTARSIZE_Y / ASTAR_TILE_SIZE)
+#define ASTAR_TILE_SIZE 64
+//#define ASTAR_TILE_COUNT (ASTARSIZE_Y / ASTAR_TILE_SIZE)
 
 class Image;
 
@@ -18,7 +18,7 @@ class AstarTile : public GameObject
 {
 private:
 	int idX, idY;
-	POINT center;
+	POINT pos;
 	RECT rc;
 	ASTARTILETYPE type;
 
@@ -42,10 +42,12 @@ private:
 public:
 	HRESULT Init() override;
 	HRESULT Init(int idX, int idY);
+	HRESULT Init(int idX, int idY, TILE_INFO tile);
 	void Release() override;
 	void Update() override;
 	void Render(HDC hdc) override;
 
+	
 	ASTARTILETYPE GetType() { return this->type; }
 	POINT GetIdXY() { return { this->idX, this->idY }; }
 	int GetG() { return this->costFromStart; }
@@ -55,6 +57,8 @@ public:
 	bool GetIsInOpenList() { return this->isInOpenList; }
 	bool GetIsClosed() { return this->isClosed; }
 	int GetHeapIndex() { return this->heapIndex; }
+	POINT GetPos() { return this->pos; }
+
 
 	void SetG(int costFromStart) { this->costFromStart = costFromStart; }
 	void SetH(int costToGoal) { this->costToGoal = costToGoal; }
@@ -71,9 +75,7 @@ public:
 class AstarScene : public GameObject
 {
 private:
-	AstarTile map[ASTAR_TILE_COUNT][ASTAR_TILE_COUNT];
-
-	Image* testImage;
+	AstarTile map[DUNGEON_TILE_Y][DUNGEON_TILE_X];
 
 	AstarTile* startTile;	// 빨간색
 	AstarTile* endTile;		// 파란색
@@ -82,22 +84,24 @@ private:
 	vector<AstarTile*> openList;
 	vector<AstarTile*> closeList;
 	vector<AstarTile*> heap;
+	vector<POINT> result;
 public:
 	HRESULT Init() override;
+	HRESULT Init(TILE_INFO* tile);
 	void Release() override;
 	void Update() override;
 	void Render(HDC hdc) override;
 
 	void FindPath();
+	//vector<> FindPath();
 	void AddOpenList(AstarTile* currTile);
-	bool AddList(int x, int y);
+	void AddList(int x, int y);
 	void InsertOpenlistWithHeap(AstarTile* tile);
 	AstarTile* GetMinTotalCostTile();
 	AstarTile* GetMinTotalCostTileWithHeap();
 	void UpdateUpper(AstarTile* tile);
 	void UpdateLower(AstarTile* tile);
 	void Swap(AstarTile* tile1, AstarTile* tile2);
-
 	void NextOpenList();
 	void PrintPath();
 
@@ -105,6 +109,12 @@ public:
 	int CalcCost(int x, int y);
 	int CalcHeuristic(int x, int y);
 	void MarkTileToType();
+
+	vector<POINT> Result();
+	void ResetInfo();
+
+	inline void SetEndTile(int x, int y) { this->endTile = &(map[y][x]); this->endTile->SetType(ASTARTILETYPE::END); }
+	inline void SetStartTile(int x, int y) { this->startTile = &(map[y][x]); this->startTile->SetType(ASTARTILETYPE::START); this->currTile = startTile; }
 
 	~AstarScene() override {};
 };

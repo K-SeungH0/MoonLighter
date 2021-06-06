@@ -74,7 +74,8 @@ public:
 	inline void SetCamera(Camera* lpCamera) { this->lpCamera = lpCamera; }
 	inline bool GetActive() { return this->isActive; }
 
-	void DataLoad(ItemManager* lpItemManager);
+	void DataSave();
+	void DataLoad();
 	void ImageLoad();
 	~Inventory() override {};
 };

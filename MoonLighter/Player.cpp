@@ -4,7 +4,7 @@
 #include "Inventory.h"
 #include "Camera.h"
 #include "Projectile.h"
-
+#include <math.h>
 HRESULT Player::Init()
 {
     ImageLoad();
@@ -21,18 +21,19 @@ HRESULT Player::Init()
     additionalMoveSpeed = 0;
     additionalArmor = 0;
     
-    gold = 123456789;
-
+    //gold = 123467;// GAMEDATA->GetGold();
+    setHitTime = 1.0f;
     imageFrame = 0;
     stateFrame = 0;
     maxFrame = 0;
 
     frameTimer = 0;
+    deadTimer = 10;
     comboStack = 0;
     pixelDC = nullptr;
-
+    
     pos = { WINSIZE_X / 2 , WINSIZE_Y - 100 };
-    moveArea = { WINSIZE_X , WINSIZE_Y };
+    moveArea = { 0,0, WINSIZE_X , WINSIZE_Y };
 
     isAction = false;
     isCombo = false;
@@ -42,7 +43,7 @@ HRESULT Player::Init()
     ChangeWeapon(nullptr);
 
     lpPotion = nullptr;
-
+    isAlive = true;
 
     objectType = OBJECTTYPE::UNIT;
     COLLIDERMANAGER->AddCollider(this);
@@ -56,70 +57,75 @@ void Player::Release()
 
 void Player::Update()
 {
+    SetCollider();
+
     lpCurrentWeapon->Update();
 
-    if (KEYMANAGER->IsOnceKeyDown('0'))
-        Die();
-    
-    if (KEYMANAGER->IsOnceKeyDown('E'))
+    if (state != STATE::DIE)
     {
-        if (lpPotion && hp < maxHp + additionalHp)
+        if (hitTime >= 0)
+            hitTime -= DELTATIME;
+
+        if (KEYMANAGER->IsOnceKeyDown('E'))
         {
-            hp += lpPotion->GetHp();
-            if (hp >= maxHp + additionalHp)
-                hp = maxHp + additionalHp;
-
-            lpPotion->Use();
-        }
-    }
-
-
-    if (state != STATE::AVOID && KEYMANAGER->IsOnceKeyDown('A'))
-        Attack();
-
-    if (KEYMANAGER->IsOnceKeyDown('D'))
-        this->hp--;
-
-    if (!isAction)
-    {
-        state = STATE::IDLE;
-        stateFrame = 8;
-        stateFrame += (int)dir;
-        maxFrame = 10;
-
-        if (KEYMANAGER->IsOnceKeyDown(VK_LEFT))          FrameReset();
-        else if (KEYMANAGER->IsStayKeyDown(VK_LEFT))     Move(DIR::LEFT);
-
-        else if (KEYMANAGER->IsOnceKeyDown(VK_RIGHT))    FrameReset();
-        else if (KEYMANAGER->IsStayKeyDown(VK_RIGHT))    Move(DIR::RIGHT);
-
-        if (KEYMANAGER->IsOnceKeyDown(VK_UP))            FrameReset();
-        else if (KEYMANAGER->IsStayKeyDown(VK_UP))       Move(DIR::UP);
-
-        else if (KEYMANAGER->IsOnceKeyDown(VK_DOWN))     FrameReset();
-        else if (KEYMANAGER->IsStayKeyDown(VK_DOWN))     Move(DIR::DOWN);
-
-        if (KEYMANAGER->IsOnceKeyDown(VK_SPACE))
-        {
-            FrameReset();
-            Avoid();
-        }
-    }
-    if(state == STATE::AVOID)
-        Move(dir);
-
-    if (state == STATE::ATTACK)
-    {
-        for (int i = 0; i < attackFrame.size(); i++)
-        {
-            if (imageFrame == attackFrame[i])
+            if (lpPotion && hp < maxHp + additionalHp)
             {
-                lpCurrentWeapon->Attack();
-                break;
+                hp += lpPotion->GetHp();
+                if (hp >= maxHp + additionalHp)
+                    hp = maxHp + additionalHp;
+
+                lpPotion->Use();
             }
-            else
-                lpCurrentWeapon->ResetAttackCollider();
         }
+
+
+        if (state != STATE::AVOID && KEYMANAGER->IsOnceKeyDown('A'))
+            Attack();
+
+        if (!isAction)
+        {
+            state = STATE::IDLE;
+            stateFrame = 8;
+            stateFrame += (int)dir;
+            maxFrame = 10;
+
+            if (KEYMANAGER->IsOnceKeyDown(VK_LEFT))          FrameReset();
+            else if (KEYMANAGER->IsStayKeyDown(VK_LEFT))     Move(DIR::LEFT);
+
+            else if (KEYMANAGER->IsOnceKeyDown(VK_RIGHT))    FrameReset();
+            else if (KEYMANAGER->IsStayKeyDown(VK_RIGHT))    Move(DIR::RIGHT);
+
+            if (KEYMANAGER->IsOnceKeyDown(VK_UP))            FrameReset();
+            else if (KEYMANAGER->IsStayKeyDown(VK_UP))       Move(DIR::UP);
+
+            else if (KEYMANAGER->IsOnceKeyDown(VK_DOWN))     FrameReset();
+            else if (KEYMANAGER->IsStayKeyDown(VK_DOWN))     Move(DIR::DOWN);
+
+            if (KEYMANAGER->IsOnceKeyDown(VK_SPACE))
+            {
+                FrameReset();
+                Avoid();
+            }
+        }
+        if (state == STATE::AVOID)
+            Move(dir);
+
+        if (state == STATE::ATTACK)
+        {
+            for (int i = 0; i < attackFrame.size(); i++)
+            {
+                if (imageFrame == attackFrame[i])
+                {
+                    lpCurrentWeapon->Attack();
+                    break;
+                }
+                else
+                    lpCurrentWeapon->ResetAttackCollider();
+            }
+        }
+
+        if (hp <= 0)
+            Die();
     }
 
     frameTimer += DELTATIME;
@@ -128,12 +134,12 @@ void Player::Update()
     {
         frameTimer -= 0.1f;
 
-        // TODO : 죽었을때 상황 추가해야함
         if (state == STATE::DIE)
         {
             if (++imageFrame >= maxFrame)
             {
                 imageFrame = maxFrame - 1;
+
             }
         }
         else if (isAction)
@@ -153,14 +159,34 @@ void Player::Update()
     
     lpImage->SetCurrentFrameX(imageFrame);
     lpImage->SetCurrentFrameY(stateFrame);
+
+    if (lpCurrentWeapon->GetImage())
+    {
+        lpCurrentWeapon->GetImage()->SetCurrentFrameX(imageFrame);
+        lpCurrentWeapon->GetImage()->SetCurrentFrameY(stateFrame);
+    }
+    if (state == STATE::DIE)
+    {
+        deadTimer -= DELTATIME;
+        if (deadTimer <= 0)
+            isAlive = false;
+    }
 }
 
 void Player::Render(HDC hdc)
 {
     Unit::Render(hdc);
 
-    lpCamera->CameraFrameRender(hdc, lpImage, { (LONG)pos.x, (LONG)pos.y }, imageFrame, stateFrame, IMAGE_SIZE, true);
-    
+    if (hitTime > 0)
+    {
+        auto alpha = lpImage->GetBlendFunc();
+        alpha->SourceConstantAlpha = (255 * cosf(500 * (1 - hitTime)));
+        lpImage->AlphaRender(hdc, pos.x, pos.y, imageFrame , stateFrame, IMAGE_SIZE, true);
+    }
+    else
+    {
+        lpCamera->CameraFrameRender(hdc, lpImage, { (LONG)pos.x, (LONG)pos.y }, imageFrame, stateFrame, IMAGE_SIZE, true);
+    }
     if (state == STATE::ATTACK)
         lpCurrentWeapon->Render(hdc);
 }
@@ -198,7 +224,7 @@ void Player::Move(DIR dir)
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if (collider.left > 0 && !PixelCollision(collider.left, collider.top, false, RGB(255,0,0)))
+            if (collider.left > moveArea.left && !PixelCollision(collider.left, collider.top, false, RGB(255,0,0)))
                 pos.x -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
         }
         break;
@@ -208,7 +234,7 @@ void Player::Move(DIR dir)
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if (collider.top > 0 && !PixelCollision(collider.left, collider.top, true, RGB(255, 0, 0)))
+            if (collider.top > moveArea.top && !PixelCollision(collider.left, collider.top, true, RGB(255, 0, 0)))
                 pos.y -= (moveSpeed + additionalMoveSpeed) * DELTATIME;
         }
         break;
@@ -218,7 +244,7 @@ void Player::Move(DIR dir)
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if(collider.right < moveArea.x && !PixelCollision(collider.right, collider.top, false, RGB(255, 0, 0)))
+            if(collider.right < moveArea.right && !PixelCollision(collider.right, collider.top, false, RGB(255, 0, 0)))
                 pos.x += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         }
         break;
@@ -228,7 +254,7 @@ void Player::Move(DIR dir)
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if(collider.bottom < moveArea.y && !PixelCollision(collider.left, collider.bottom, true, RGB(255, 0, 0)))
+            if(collider.bottom < moveArea.bottom && !PixelCollision(collider.left, collider.bottom, true, RGB(255, 0, 0)))
                 pos.y += (moveSpeed + additionalMoveSpeed) * DELTATIME;
         }
         break;
@@ -240,9 +266,15 @@ void Player::Move(DIR dir)
 void Player::Die()
 {
     FrameReset();
+    lpImage = IMAGEMANAGER->FindImage("PlayerState");
+
     isAction = true;
     state = STATE::DIE;
     stateFrame = 12;
+    maxFrame = 8;
+    hitTime = 0;
+    deadTimer = 2.0f;
+    collider = { 0,0,0,0 };
 }
 
 void Player::Attack()
@@ -355,7 +387,7 @@ void Player::ChangeWeapon(Item* weapon)
 {
     if (weapon)
     {
-        this->lpCurrentWeapon->Init(weapon->GetItemData(), weapon->GetItemManager());
+        this->lpCurrentWeapon->Init(weapon->GetItemData(), weapon->GetItemManager(), weapon->GetItemImage());
         this->damage = this->lpCurrentWeapon->GetDamage();
     }
     else
@@ -375,11 +407,17 @@ void Player::EquipFromInventory(SLOTTYPE slotType, Item* equipment)
         lpMainWeapon = equipment;
         if(isEquipMainWeapon)
             ChangeWeapon(lpMainWeapon);
+
+        //if (!lpCurrentWeapon)
+        //    SwapWeapon();
         break;
     case SLOTTYPE::SUBWEAPON:
         lpSubWeapon = equipment;
         if (!isEquipMainWeapon)
             ChangeWeapon(lpSubWeapon);
+        
+        //if (!lpCurrentWeapon)
+        //    SwapWeapon();
         break;
     case SLOTTYPE::HELMET:
         if (equipment)
@@ -483,6 +521,11 @@ void Player::ImageLoad()
 
 }
 
+void Player::LoadData()
+{
+    hp = maxHp + additionalHp;
+}
+
 void Player::FrameReset()
 {
     frameTimer = 0;
@@ -496,13 +539,13 @@ void Player::SetProjectileCamera()
 
 Image* Player::GetCurrentWeaponImage()
 {
-    return this->lpCurrentWeapon->GetItemData().lpItemImage;
+    return this->lpCurrentWeapon->GetItemImage();
 }
 
 Image* Player::GetPotionImage()
 {
     if (lpPotion)
-        return this->lpPotion->GetItemData().lpItemImage;
+        return this->lpPotion->GetItemImage();
     else
         return nullptr;
 }

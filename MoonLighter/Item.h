@@ -10,6 +10,7 @@ class Item : public Object
 {
 protected:
 	GameData::ItemData itemData;
+	Image* lpItemImage;
 	ItemManager* lpItemManager;
 	string description;
 
@@ -32,6 +33,7 @@ public:
 	void ReSetCollider();
 	
 	inline GameData::ItemData GetItemData() { return this->itemData; }
+	inline Image* GetItemImage() { return this->lpItemImage; }
 	inline string GetDescription() { return this->description; }
 	inline ItemManager* GetItemManager() { return this->lpItemManager; }
 	inline int GetArmor() { return this->armor; }
@@ -44,6 +46,7 @@ public:
 	inline void SetDescription(string description) { this->description = description; }
 	inline void SetSaveSlotPos(POINT slotPos) { this->itemData.slotPos = slotPos; }
 	inline void SetSaveCount(int count) { this->itemData.count = count; }
+	inline void SetSaveIsInEquip(bool isInEquip) { this->itemData.isInEquip = isInEquip; }
 	inline void SetOnwer(Slot* lpOwnerSlot) { this->lpOwnerSlot = lpOwnerSlot; }
 
 	~Item() override {};

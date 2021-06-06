@@ -2,6 +2,7 @@
 #include "Singleton.h"
 #include <Windows.h>
 #include <vector>
+#include "MoonLighter.h"
 
 class Object;
 class Image;
@@ -26,4 +27,6 @@ public:
 
 	vector<Object*> CheckCollider(Object* own);
 	bool CheckPixelCollider(Object* own, COLORREF checkColor);
+
+	bool RectInRectFloat(RECTFLOAT rc1, RECTFLOAT rc2);
 };

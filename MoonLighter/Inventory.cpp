@@ -71,11 +71,14 @@ HRESULT Inventory::Init()
     selectTimer = 0;
 
     lpCamera = nullptr;
+
+    DataLoad();
     return S_OK;
 }
 
 void Inventory::Release()
 {
+
     for (int y = 0; y < INVEN_SIZE_Y; y++)
     {
         for (int x = 0; x < INVEN_SIZE_X; x++)
@@ -318,7 +321,55 @@ void Inventory::Render(HDC hdc)
 
 void Inventory::AddItem(Item* item)
 {
-    bool isAddItem = false;
+    if (item->GetItemData().isEquipment && item->GetSlotType() != SLOTTYPE::POTION)
+    {
+        for (int y = 0; y < INVEN_SIZE_Y; y++)
+        {
+            for (int x = 0; x < INVEN_SIZE_X; x++)
+            {
+                if (!invenSlots[y][x].lpItem) continue;
+
+                if (invenSlots[y][x].lpItem->GetItemData().itemCode == item->GetItemData().itemCode)
+                {
+                    return;
+                }
+            }
+        }
+
+        for (int y = 0; y < INVEN_SIZE_Y; y++)
+        {
+            for (int x = 0; x < 2; x++)
+            {
+                if (!equipSlots[y][x].lpItem) continue;
+
+                if (equipSlots[y][x].lpItem->GetItemData().itemCode == item->GetItemData().itemCode)
+                {
+                    return;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int y = 0; y < INVEN_SIZE_Y; y++)
+        {
+            for (int x = 0; x < INVEN_SIZE_X; x++)
+            {
+                if (!invenSlots[y][x].lpItem) continue;
+
+                if (invenSlots[y][x].lpItem->GetItemData().itemCode == item->GetItemData().itemCode)
+                {
+                    invenSlots[y][x].count++;
+
+                    invenSlots[y][x].lpItem->SetSaveCount(invenSlots[y][x].count);
+                    invenSlots[y][x].lpItem->SetSaveIsInEquip(false);
+                    invenSlots[y][x].lpItem->SetSaveSlotPos({ x,y });
+                    return;
+                }
+            }
+        }
+    }
+
     for (int y = 0; y < INVEN_SIZE_Y; y++)
     {
         for (int x = 0; x < INVEN_SIZE_X; x++)
@@ -328,20 +379,25 @@ void Inventory::AddItem(Item* item)
                 invenSlots[y][x].lpItem = new Item();
                 invenSlots[y][x].lpItem->Init(item->GetItemData(), item->GetItemManager());
                 invenSlots[y][x].lpItem->SetOnwer(&invenSlots[y][x]);
-                invenSlots[y][x].count++;
-                isAddItem = true;
-                break;
+                invenSlots[y][x].count = 1;
+
+                invenSlots[y][x].lpItem->SetSaveCount(invenSlots[y][x].count);
+                invenSlots[y][x].lpItem->SetSaveIsInEquip(false);
+                invenSlots[y][x].lpItem->SetSaveSlotPos({ x,y });
+
+                return;
             }
             else if ((invenSlots[y][x].lpItem->GetItemData().itemCode == item->GetItemData().itemCode) 
                 && (item->GetSlotType() != SLOTTYPE::INVEN || item->GetSlotType() != SLOTTYPE::POTION))
             {
                 invenSlots[y][x].count++;
-                isAddItem = true;
-                break;
+
+                invenSlots[y][x].lpItem->SetSaveCount(invenSlots[y][x].count);
+                invenSlots[y][x].lpItem->SetSaveIsInEquip(false);
+                invenSlots[y][x].lpItem->SetSaveSlotPos({ x,y });
+                return;
             }
         }
-        if (isAddItem)
-            break;
     }
 }
 
@@ -485,7 +541,6 @@ void Inventory::ItemPickDown()
                 if (selectItem.lpItem->GetSlotType() == equipSlots[selectSlotY][selectSlotX].slotType ||
                     (selectItem.lpItem->GetSlotType() == SLOTTYPE::MAINWEAPON && equipSlots[selectSlotY][selectSlotX].slotType == SLOTTYPE::SUBWEAPON))
                 {
-                    
                     if (equipSlots[selectSlotY][selectSlotX].lpItem->GetItemData().itemCode == selectItem.lpItem->GetItemData().itemCode)
                     {
                         ItemPickUp();
@@ -497,8 +552,14 @@ void Inventory::ItemPickDown()
 
                     equipSlots[selectSlotY][selectSlotX].lpItem = selectItem.lpItem;
                     equipSlots[selectSlotY][selectSlotX].count = selectItem.count;
+
+                    equipSlots[selectSlotY][selectSlotX].lpItem->SetSaveIsInEquip(true);
+                    equipSlots[selectSlotY][selectSlotX].lpItem->SetSaveSlotPos({ selectSlotX, selectSlotY });
+                    equipSlots[selectSlotY][selectSlotX].lpItem->SetSaveCount(equipSlots[selectSlotY][selectSlotX].count);
+                    
                     selectItem.lpItem = tempItem;
                     selectItem.count = tempCount;
+                    selectItem.lpItem->SetSaveIsInEquip(false);
 
                     GAMEDATA->GetRunTimePlayer()->EquipFromInventory(equipSlots[selectSlotY][selectSlotX].slotType, equipSlots[selectSlotY][selectSlotX].lpItem);
                     isItemPickUp = true;
@@ -512,10 +573,13 @@ void Inventory::ItemPickDown()
                     equipSlots[selectSlotY][selectSlotX].lpItem = selectItem.lpItem;
                     equipSlots[selectSlotY][selectSlotX].count = selectItem.count;
 
+                    equipSlots[selectSlotY][selectSlotX].lpItem->SetSaveIsInEquip(true);
                     equipSlots[selectSlotY][selectSlotX].lpItem->SetSaveCount(equipSlots[selectSlotY][selectSlotX].count);
+                    equipSlots[selectSlotY][selectSlotX].lpItem->SetSaveSlotPos({ selectSlotX, selectSlotY });
 
                     selectItem.lpItem = nullptr;
                     selectItem.count = 0;
+
                     GAMEDATA->GetRunTimePlayer()->EquipFromInventory(equipSlots[selectSlotY][selectSlotX].slotType, equipSlots[selectSlotY][selectSlotX].lpItem);
 
                     isItemPickUp = false;
@@ -526,31 +590,42 @@ void Inventory::ItemPickDown()
     else
     {
         isItemPickUp = false;
-
-        if (invenSlots[selectSlotY][selectSlotX].lpItem != nullptr)
+        
+        if (invenSlots[selectSlotY][selectSlotX].lpItem)
         {
             if (invenSlots[selectSlotY][selectSlotX].lpItem->GetItemData().itemCode == selectItem.lpItem->GetItemData().itemCode)
             {
                 ItemPickUp();
                 return;
             }
-        }
 
-        if (invenSlots[selectSlotY][selectSlotX].lpItem)
-        {
-            Item* tmepItem = selectItem.lpItem;
-            int tempCount = selectItem.count;
-            selectItem.lpItem = invenSlots[selectSlotY][selectSlotX].lpItem;
-            selectItem.count = invenSlots[selectSlotY][selectSlotX].count;
+            Item* tmepItem = invenSlots[selectSlotY][selectSlotX].lpItem;
+            int tempCount = invenSlots[selectSlotY][selectSlotX].count;
 
-            invenSlots[selectSlotY][selectSlotX].lpItem = tmepItem;
-            invenSlots[selectSlotY][selectSlotX].count = tempCount;
+            invenSlots[selectSlotY][selectSlotX].lpItem = selectItem.lpItem;
+            invenSlots[selectSlotY][selectSlotX].count = selectItem.count;
+
+            invenSlots[selectSlotY][selectSlotX].lpItem->SetSaveIsInEquip(false);
+            invenSlots[selectSlotY][selectSlotX].lpItem->SetSaveCount(selectItem.count);
+            invenSlots[selectSlotY][selectSlotX].lpItem->SetSaveSlotPos({ selectSlotX ,selectSlotY });
+
+            selectItem.lpItem = tmepItem;
+            selectItem.count = tempCount;
+
+            selectItem.lpItem->SetSaveCount(selectItem.count);
+            selectItem.lpItem->SetSaveIsInEquip(false);
+            selectItem.lpItem->SetSaveSlotPos({ selectSlotX ,selectSlotY });
+
             isItemPickUp = true;
         }
         else 
         {
             invenSlots[selectSlotY][selectSlotX].lpItem = selectItem.lpItem;
             invenSlots[selectSlotY][selectSlotX].count = selectItem.count;
+
+            invenSlots[selectSlotY][selectSlotX].lpItem->SetSaveIsInEquip(false);
+            invenSlots[selectSlotY][selectSlotX].lpItem->SetSaveCount(selectItem.count);
+            invenSlots[selectSlotY][selectSlotX].lpItem->SetSaveSlotPos({ selectSlotX ,selectSlotY });
 
             selectItem.lpItem = nullptr;
             selectItem.count = 0;
@@ -566,31 +641,79 @@ void Inventory::SwapWeapon()
         lpCurrentWeaponImage = IMAGEMANAGER->FindImage("MainWeapon");
 }
 
-void Inventory::DataLoad(ItemManager* lpItemManager)
+void Inventory::DataSave()
+{
+    vector<GameData::ItemData> items;
+    GameData::ItemData data;
+    for (int y = 0; y < INVEN_SIZE_Y; y++)
+    {
+        for (int x = 0; x < INVEN_SIZE_X; x++)
+        {
+            if (invenSlots[y][x].lpItem != nullptr)
+            {
+                data.count = invenSlots[y][x].count;
+                data.isEquipment = invenSlots[y][x].lpItem->GetItemData().isEquipment;
+                data.isInEquip = invenSlots[y][x].lpItem->GetItemData().isInEquip;
+                data.itemCode = invenSlots[y][x].lpItem->GetItemData().itemCode;
+                data.slotPos = { x,y };
+                items.push_back(data);
+            }
+        }
+    }
+
+    for (int y = 0; y < INVEN_SIZE_Y; y++)
+    {
+        for (int x = 0; x < 2; x++)
+        {
+            if (equipSlots[y][x].lpItem != nullptr)
+            {
+                data.count = equipSlots[y][x].count;
+                data.isEquipment = equipSlots[y][x].lpItem->GetItemData().isEquipment;
+                data.isInEquip = equipSlots[y][x].lpItem->GetItemData().isInEquip;
+                data.itemCode = equipSlots[y][x].lpItem->GetItemData().itemCode;
+                data.slotPos = { x,y };
+                items.push_back(data);
+            }
+        }
+    }
+    
+    GAMEDATA->SaveData(items);
+}
+
+void Inventory::DataLoad()
 {
     auto items = GAMEDATA->GetItems();
 
     for (auto iter = items.begin(); iter != items.end(); iter++)
     {
-        if ((*iter).isEquipment)
+        if ((*iter).isEquipment && (*iter).isInEquip)
         {
             if (equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem == nullptr)
             {
                 equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem = new Item();
-                equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->Init((*iter), lpItemManager);
-            }
-            else
-            {
+                equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->Init((*iter), nullptr);
+                equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].count = (*iter).count;
+                
+                equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->SetSaveCount(equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].count);
+                equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->SetSaveIsInEquip(true);
+                equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->SetSaveSlotPos({ (*iter).slotPos.x, (*iter).slotPos.y });
+                equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->SetOnwer(&equipSlots[(*iter).slotPos.y][(*iter).slotPos.x]);
 
+                GAMEDATA->GetRunTimePlayer()->EquipFromInventory(equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].slotType, equipSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem);
             }
-
         }
         else
         {
             if (invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem == nullptr)
             {
                 invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem = new Item();
-                invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->Init((*iter), lpItemManager);
+                invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->Init((*iter), nullptr);
+                invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].count = (*iter).count;
+
+                invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->SetSaveCount(invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].count);
+                invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->SetSaveIsInEquip(false);
+                invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->SetSaveSlotPos({ (*iter).slotPos.x, (*iter).slotPos.y });
+                invenSlots[(*iter).slotPos.y][(*iter).slotPos.x].lpItem->SetOnwer(&invenSlots[(*iter).slotPos.y][(*iter).slotPos.x]);
             }
             else
             {

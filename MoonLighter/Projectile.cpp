@@ -42,7 +42,7 @@ void Projectile::Move()
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if (collider.left > 0)
+            if (collider.left > moveArea.left)
                 pos.x -= moveSpeed * DELTATIME;
             else
                 this->isMove = false;
@@ -53,7 +53,7 @@ void Projectile::Move()
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if (collider.top > 0 )
+            if (collider.top > moveArea.top )
                 pos.y -= moveSpeed * DELTATIME;
             else
                 this->isMove = false;
@@ -64,7 +64,7 @@ void Projectile::Move()
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if (collider.right < moveArea.x)
+            if (collider.right < moveArea.right)
                 pos.x += moveSpeed  * DELTATIME;    
             else
                 this->isMove = false;
@@ -75,7 +75,7 @@ void Projectile::Move()
 
         if (COLLIDERMANAGER->CheckCollider(this).size() == 0)
         {
-            if (collider.bottom < moveArea.y)
+            if (collider.bottom < moveArea.bottom)
                 pos.y += moveSpeed * DELTATIME;
             else
                 this->isMove = false;

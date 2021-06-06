@@ -90,7 +90,6 @@ inline RECT GetRectToCenter(int posX, int posY, int width, int height)
 	RECT rc{ posX - (width / 2), posY - (height / 2), posX + (width / 2), posY + (height / 2) };
 	return rc;
 }
-
 inline void SetClientRect(HWND hWnd, int width, int height)
 {
 	RECT crt;

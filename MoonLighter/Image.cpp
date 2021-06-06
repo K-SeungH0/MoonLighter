@@ -378,9 +378,9 @@ void Image::CutRender(HDC hdc, int destX, int destY, int currFrameX, int currFra
 
             imageInfo->hMemDC,  // 원본 DC
             imageInfo->frameWidth * imageInfo->currFrameX,  // 복사 X 위치
-            imageInfo->frameHeight * imageInfo->currFrameY, // 복사 Y 위치
+            imageInfo->frameHeight * imageInfo->currFrameY + cutY / 2, // 복사 Y 위치
             imageInfo->frameWidth - cutX,
-            imageInfo->frameHeight - cutY,  // 복사 크기
+            imageInfo->frameHeight - cutY / 2,  // 복사 크기
             transColor  // 제외할 색상
         );
     }
@@ -416,28 +416,35 @@ void Image::CutRender(HDC hdc, int destX, int destY, int currFrameX, int currFra
     }
 }
 
-void Image::AlphaRender(HDC hdc, int destX, int destY, bool isCenterRenderring)
+void Image::AlphaRender(HDC hdc, int destX, int destY,int currFrameX, int currFrameY, float size, bool isCenterRenderring)
 {
+    imageInfo->currFrameX = currFrameX;
+    imageInfo->currFrameY = currFrameY;
+
     int x = destX;
     int y = destY;
     if (isCenterRenderring)
     {
-        x = destX - (imageInfo->width / 2);
-        y = destY - (imageInfo->height / 2);
+        x = destX - (imageInfo->frameWidth / 2) * size;
+        y = destY - (imageInfo->frameHeight / 2) * size;
     }
 
-    // 1. 목적지 DC(hdc)에 그려져 있는 내용을 BlendDC에 복사
-    BitBlt(imageInfo->hBlendDC, 0, 0, imageInfo->width, imageInfo->height,
-        hdc, x, y, SRCCOPY);
+    BitBlt(imageInfo->hBlendDC, 0, 0, imageInfo->width, imageInfo->height, hdc, x, y, SRCCOPY); 
 
-    //GdiTransparentBlt(imageInfo->)
+    GdiTransparentBlt(
+        imageInfo->hBlendDC, 
+        0, 0,   
+        imageInfo->frameWidth * size, 
+        imageInfo->frameHeight * size,
+        imageInfo->hMemDC, 
+        imageInfo->frameWidth * imageInfo->currFrameX,  
+        imageInfo->frameHeight * imageInfo->currFrameY, 
+        imageInfo->frameWidth,
+        imageInfo->frameHeight,  
+        transColor
+    );
 
-    // 2. 출력할 이미지 DC에 내용을 BlendDC에 지정한 색상을 제외하면서 복사
-
-
-    // 3.
-    AlphaBlend(hdc, x, y, imageInfo->width, imageInfo->height,
-        imageInfo->hBlendDC, 0, 0, imageInfo->width, imageInfo->height, blendFunc);
+    AlphaBlend(hdc, x, y, imageInfo->width, imageInfo->height, imageInfo->hBlendDC, 0, 0, imageInfo->width, imageInfo->height, blendFunc);
 }
 
 void Image::Release()

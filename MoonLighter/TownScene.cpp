@@ -3,6 +3,7 @@
 #include "Image.h"
 #include "Camera.h"
 #include "LayerManager.h"
+#include "Weapon.h"
 #include "BattleSceneUI.h"
 
 HRESULT TownScene::Init()
@@ -18,13 +19,13 @@ HRESULT TownScene::Init()
 	lpPixelImage->Init(lpBackGround->GetWidth(), lpBackGround->GetHeight());
 
 	lpPlayer = GAMEDATA->GetRunTimePlayer();
-	lpPlayer->SetMoveArea({ lpBackGround->GetWidth(), lpBackGround->GetHeight()});
+	lpPlayer->SetMoveArea({ 0,0, lpBackGround->GetWidth(), lpBackGround->GetHeight() });
 	lpPlayer->SetPos({ 1940, 550 });
 
 	lpCamera = new Camera();
 	lpCamera->Init(lpBackGround, lpPlayer->GetpPos(), 350);
 	lpPlayer->SetCamera(lpCamera);
-
+	
 	lpLayerManager = new LayerManager();
 	lpLayerManager->Init();
 	lpLayerManager->SetCamera(lpCamera);
@@ -55,6 +56,7 @@ void TownScene::Release()
 
 	SAFE_RELEASE(lpPixelImage);
 	SAFE_RELEASE(lpLayerManager);
+	vObjectsPixel.clear();
 	COLLIDERMANAGER->RemovePixelCollider();
 }
 
@@ -93,13 +95,19 @@ void TownScene::Update()
 	if (isEnterDunGeon)
 	{
 		if (KEYMANAGER->IsOnceKeyDown('J'))
+		{
 			SCENEMANAGER->ChageScene("Battle");
+			//GAMEDATA->FileSave();
+		}
 	}
 
 	if (isEnterShop)
 	{
 		if (KEYMANAGER->IsOnceKeyDown('J'))
-			SCENEMANAGER->ChageScene("Shop");
+		{
+			SCENEMANAGER->ChageScene("Shop", "LodingScene");
+			//GAMEDATA->FileSave();
+		}
 	}
 }
 
@@ -108,21 +116,19 @@ void TownScene::Render(HDC hdc)
 	lpCamera->CameraRender(hdc, { 0, 0 }, lpBackGround);
 
 	lpLayerManager->AddObject(make_pair(lpPlayer->GetImage(), lpPlayer->GetPos()));
+	if(lpPlayer->GetState() == STATE::ATTACK)	lpLayerManager->AddObject(make_pair(lpPlayer->GetWeapon()->GetImage(), lpPlayer->GetPos()));
+	
 	lpLayerManager->Render(hdc);
+	
 	lpLayerManager->RemoveObject(make_pair(lpPlayer->GetImage(), lpPlayer->GetPos()));
-
-	//for (auto iter = vObjects.begin(); iter != vObjects.end(); iter++)
-	//{
-	//	lpCamera->CameraFrameRender(hdc, iter->first, { (LONG)iter->second.x, (LONG)iter->second.y }, iter->first->GetCurrentFrameX(), iter->first->GetCurrentFrameY(), IMAGE_SIZE);
-	//}
-	//lpPlayer->Render(hdc);
-
+	if (lpPlayer->GetState() == STATE::ATTACK)	lpLayerManager->RemoveObject(make_pair(lpPlayer->GetWeapon()->GetImage(), lpPlayer->GetPos()));
 
 	if (isDebugMode)
 	{
 		for (auto iter = vObjectsPixel.begin(); iter != vObjectsPixel.end(); iter++)
 		{
 			Rectangle(hdc, lpPlayer->GetCameraCollider().left, lpPlayer->GetCameraCollider().top, lpPlayer->GetCameraCollider().right, lpPlayer->GetCameraCollider().bottom);
+
 			lpCamera->CameraRender(hdc, { (LONG)iter->second.x, (LONG)iter->second.y }, iter->first, IMAGE_SIZE);
 		}
 	}

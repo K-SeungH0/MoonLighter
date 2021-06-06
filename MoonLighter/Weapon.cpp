@@ -3,23 +3,26 @@
 #include "Image.h"
 #include "Block.h"
 #include "Projectile.h"
+#include "Camera.h"
+
 
 HRESULT Weapon::Init()
 {
 	if (!imageLoaded)
 		ImageLoad();
+
 	weaponType = WEAPONTYPE::NONE;		
 	lpEffectImage = IMAGEMANAGER->FindImage("GlovesEffect");
 
-	this->damage = 1;
+	this->damage = 10;
 	this->lpPlayer = GAMEDATA->GetRunTimePlayer();
 
 	this->itemData.count = 0;
 	this->itemData.isEquipment = false;
 	this->itemData.itemCode = 0;
-	this->itemData.lpItemImage = nullptr;
 	this->itemData.slotPos = { -1,-1 };
 
+	this->lpItemImage = nullptr;
 	lpProjectile = new Projectile();
 	lpProjectile->Init();
 	AttackInfoInit();
@@ -27,7 +30,7 @@ HRESULT Weapon::Init()
     return S_OK;
 }
 
-HRESULT Weapon::Init(GameData::ItemData itemData, ItemManager* lpItemManager)
+HRESULT Weapon::Init(GameData::ItemData itemData, ItemManager* lpItemManager, Image* lpItemImage)
 {
 	//Item::Init(itemData, lpItemManager);
 	if(!imageLoaded)
@@ -35,7 +38,7 @@ HRESULT Weapon::Init(GameData::ItemData itemData, ItemManager* lpItemManager)
 
 	this->itemData = itemData;
 	this->lpItemManager = lpItemManager;
-
+	this->lpItemImage = lpItemImage;
 	ChangeType();
 	this->lpPlayer = GAMEDATA->GetRunTimePlayer();
 	AttackInfoInit();
@@ -59,7 +62,7 @@ void Weapon::Render(HDC hdc)
 		Rectangle(hdc, collider.left, collider.top, collider.right, collider.bottom);
 
 	if(this->weaponType != WEAPONTYPE::NONE)
-		lpImage->FrameRender(hdc, lpPlayer->GetPos().x, lpPlayer->GetPos().y, lpPlayer->GetImageFrame(), lpPlayer->GetStateFrame(), IMAGE_SIZE, true);
+		lpPlayer->GetCamera()->CameraFrameRender(hdc, lpImage, { (LONG)lpPlayer->GetPos().x,(LONG)lpPlayer->GetPos().y }, lpPlayer->GetImageFrame(), lpPlayer->GetStateFrame(), IMAGE_SIZE, true);
 
 	if (lpProjectile->GetIsMove())
 		lpProjectile->Render(hdc);
@@ -82,7 +85,15 @@ void Weapon::Attack()
 
 		for (auto iter = collidedObjects.begin(); iter != collidedObjects.end(); iter++)
 		{
-			((Block*)*iter)->Hit(lpPlayer, lpEffectImage);
+			switch ((*iter)->GetObjectType())
+			{
+				case OBJECTTYPE::UNIT:
+					((Unit*)*iter)->Hit(lpPlayer, lpEffectImage);
+					break;
+				case OBJECTTYPE::BREAKABLE:
+					((Block*)*iter)->Hit(lpPlayer, lpEffectImage);
+					break;
+			}
 		}
 	}
 	else

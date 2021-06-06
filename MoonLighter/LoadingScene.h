@@ -6,6 +6,11 @@ class LoadingScene : public GameObject
 {
 private:
 	Image* lpBackGroundImage;
+	Image* lpIcon;
+	int frameX;
+	float frameTimer;
+	
+	string text;
 public:
 	HRESULT Init() override;
 	void Release() override;

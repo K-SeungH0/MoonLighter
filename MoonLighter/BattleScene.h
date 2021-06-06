@@ -17,11 +17,6 @@ class BattleScene : public GameObject
 private:
 	Camera* lpCamera;
 
-	Object* outsideColliderTop;
-	Object* outsideColliderLeft;
-	Object* outsideColliderRight;
-	Object* outsideColliderBottom;
-	
 	Image* lpBackGround;
 	DungeonManager* lpDungeonManager;
 	TILE_INFO tileMap[DUNGEON_TILE_X * DUNGEON_TILE_Y];
@@ -33,6 +28,8 @@ private:
 	ItemManager* lpItemManager;
 
 	Object* testItem;
+	
+	EnemyManager* lpEnemyManager;
 
 	char text[128];
 public:
@@ -43,5 +40,7 @@ public:
 
 	void Load();
 	void ImageLoad();
+
+	void TestItem();
 };
 

@@ -90,8 +90,9 @@ public:
 		int currFrameX, int currFrameY, float size = 1, bool isCenterRenderring = false);
 	void CutRender(HDC hdc, int destX, int destY,
 		int currFrameX, int currFrameY, int cutX = 0, int cutY = 0, float size = 1, bool isCenterRenderring = false);
-	void AlphaRender(HDC hdc, int destX, int destY,
-		bool isCenterRenderring = false);
+	void AlphaRender(HDC hdc, int destX, int destY, int currFrameX, int currFrameY, float size, bool isCenterRenderring);
+	//void AlphaRender(HDC hdc, int destX, int destY, float size = 1.0f,
+	//	bool isCenterRenderring = false);
 
 
 	void Release();

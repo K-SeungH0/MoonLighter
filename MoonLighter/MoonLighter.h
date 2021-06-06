@@ -10,6 +10,14 @@
 #include <vector>
 using namespace std;
 
+struct RECTFLOAT
+{
+	float left;
+	float top;
+	float right;
+	float bottom;
+};
+
 #include "KeyManager.h"
 #include "ImageManager.h"
 #include "TimerManager.h"
@@ -71,16 +79,10 @@ enum class TILETYPE
 	BREAKABLE,
 	WALL,
 	HOLE,
+	SPAWN,
 	NONE
 };
 
-struct RECTFLOAT
-{
-	float left;
-	float top;
-	float right;
-	float bottom;
-};
 typedef struct tagTile
 {
 	Image* lpImage;

@@ -16,7 +16,7 @@ HRESULT ShopScene::Init()
 	pixelDC = lpBackGroundPixel->GetMemDC();
 
 	lpPlayer = GAMEDATA->GetRunTimePlayer();
-	lpPlayer->SetMoveArea({ lpBackGround->GetWidth(), lpBackGround->GetHeight() });
+	lpPlayer->SetMoveArea({ 0,0,lpBackGround->GetWidth(), lpBackGround->GetHeight() });
 	lpPlayer->SetPos({ 875,500 });
 
 	lpCamera = new Camera();    
@@ -48,22 +48,32 @@ void ShopScene::Release()
 
 void ShopScene::Update()
 {
-	lpPlayer->Update();
-	lpCamera->Update();
+	if (KEYMANAGER->IsOnceKeyDown('I'))
+		lpUI->ToggleInven();
 
-	if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().top, false, RGB(0, 255, 255))) isExit = true;
-	else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().top, true, RGB(0, 255, 255))) isExit = true;
-	else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().right, lpPlayer->GetCollider().top, false, RGB(0, 255, 255))) isExit = true;
-	else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().bottom, true, RGB(0, 255, 255))) isExit = true;
-	else isExit = false;
-
-	lpUI->Update();
-	if (isExit)
+	if (!lpUI->GetInvenActive())
 	{
-		if (KEYMANAGER->IsOnceKeyDown('J'))
-			SCENEMANAGER->ChageScene("Town");
+		lpPlayer->Update();
+		lpCamera->Update();
+
+		if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().top, false, RGB(0, 255, 255))) isExit = true;
+		else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().top, true, RGB(0, 255, 255))) isExit = true;
+		else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().right, lpPlayer->GetCollider().top, false, RGB(0, 255, 255))) isExit = true;
+		else if (lpPlayer->PixelCollision(lpPlayer->GetCollider().left, lpPlayer->GetCollider().bottom, true, RGB(0, 255, 255))) isExit = true;
+		else isExit = false;
+
 	}
 
+	lpUI->Update();
+
+	if (isExit && !lpUI->GetInvenActive())
+	{
+		if (KEYMANAGER->IsOnceKeyDown('J'))
+		{
+			SCENEMANAGER->ChageScene("Town", "LodingScene");
+			//GAMEDATA->FileSave();
+		}
+	}
 }
 
 void ShopScene::Render(HDC hdc)

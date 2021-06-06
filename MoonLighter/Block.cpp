@@ -6,7 +6,7 @@ HRESULT Block::Init()
 	return S_OK;
 }
 
-HRESULT Block::Init(TILE_INFO tile)
+HRESULT Block::Init(TILE_INFO tile, TILETYPE* from)
 {
 	this->pos.x = tile.rcTile.left;
 	this->pos.y = tile.rcTile.top;
@@ -22,25 +22,9 @@ HRESULT Block::Init(TILE_INFO tile)
 	this->frameX = tile.frameX;
 	this->frameY = tile.frameY;
 
+	this->fromTileType = from;
+
 	this->lpImage = IMAGEMANAGER->FindImage("DunGeon_TileSet");
-	
-	COLLIDERMANAGER->AddCollider(this);
-	return S_OK;
-}
-
-HRESULT Block::Init(RECTFLOAT rc)
-{
-	// 배틀씬에서 외부 벽 초기화
-	this->tileType = TILETYPE::WALL;
-	this->lpImage = nullptr;
-	this->frameX = 0;
-	this->frameY = 0;
-
-	this->collider.left = rc.left;
-	this->collider.right = rc.right;
-	this->collider.top = rc.top;
-	this->collider.bottom = rc.bottom;
-
 	COLLIDERMANAGER->AddCollider(this);
 	return S_OK;
 }
@@ -110,6 +94,7 @@ void Block::Broken()
 {
 	frameX = 0;
 	frameY = 0;
+	*fromTileType = TILETYPE::NONE;
 	tileType = TILETYPE::NONE;
 	collider = { 0,0,0,0 };
 }

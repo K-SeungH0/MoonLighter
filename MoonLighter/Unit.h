@@ -39,21 +39,25 @@ protected:
 	int maxHp;
 	int hp;
 	
+	float hitTime;
+	float setHitTime;
+
+	bool isAlive;
 public:
 	HRESULT Init() override;
 	void Release() override;
 	void Update() override;
 	void Render(HDC hdc) override;
-	
-	void Hit();
 
+	void Hit(Unit* attacker, Image* hitEffect);
+	
 	inline DIR GetDir() { return this->dir; }
 	inline int GetCurrentHp() { return this->hp; }
 	inline int GetMaxHp() { return this->maxHp; }
 	inline int GetArmor() { return this->armor; }
 	inline int GetMoveSpeed() { return this->moveSpeed; }
 	inline int GetDamage() { return this->damage; }
-
+	inline bool GetIsAilve() { return this->isAlive; }
 	~Unit() override {};
 };
 

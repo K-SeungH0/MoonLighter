@@ -1,15 +1,8 @@
 #include "CollisionManager.h"
-//#include "Object.h"
 #include "Unit.h"
 #include "Image.h"
-bool RectInRectFloat(RECTFLOAT rc1, RECTFLOAT rc2)
-{
-	if (rc1.right < rc2.left || rc1.left > rc2.right
-		|| rc1.top > rc2.bottom || rc1.bottom < rc2.top)
-		return false;
 
-	return true;
-}
+
 
 HRESULT CollisionManager::Init()
 {
@@ -129,4 +122,13 @@ bool CollisionManager::CheckPixelCollider(Object* own, COLORREF checkColor)
         
     }
 	return false;
+}
+
+bool CollisionManager::RectInRectFloat(RECTFLOAT rc1, RECTFLOAT rc2)
+{
+    if (rc1.right < rc2.left || rc1.left > rc2.right
+        || rc1.top > rc2.bottom || rc1.bottom < rc2.top)
+        return false;
+
+    return true;
 }
