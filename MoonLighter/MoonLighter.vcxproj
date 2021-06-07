@@ -155,6 +155,7 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="LayerManager.cpp" />
+    <ClCompile Include="NPC.cpp" />
     <ClCompile Include="Projectile.cpp" />
     <ClCompile Include="ShopScene.cpp" />
     <ClCompile Include="TownScene.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="LayerManager.h" />
+    <ClInclude Include="NPC.h" />
     <ClInclude Include="Projectile.h" />
     <ClInclude Include="ShopScene.h" />
     <ClInclude Include="TownScene.h" />

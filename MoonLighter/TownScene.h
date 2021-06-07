@@ -23,7 +23,6 @@ private:
 
 
 	vector<pair<Image*, POINTFLOAT>> vObjects;
-	//vector<Object*> vObjects;
 	vector<pair<Image*, POINTFLOAT>> vObjectsPixel;
 	TILE_INFO tileMap[TOWN_TILE_X * TOWN_TILE_Y];
 

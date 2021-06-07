@@ -268,4 +268,12 @@ void TownScene::ImageLoad()
 	IMAGEMANAGER->AddImage("Town_BlackSmithHouse_Pixel", L"Image/Object/Town/Town_BlackSmithHouse_Pixel.png");
 	IMAGEMANAGER->AddImage("Town_WitchHouse", L"Image/Object/Town/Town_WitchHouse.png");
 	IMAGEMANAGER->AddImage("Town_WitchHouse_Pixel", L"Image/Object/Town/Town_WitchHouse_Pixel.png");
+	
+	IMAGEMANAGER->AddImage("BlackSmith_Idle_1", L"Image/NPC/BlackSmith_Idle_1.png");
+	IMAGEMANAGER->AddImage("BlackSmith_Idle_1", L"Image/NPC/BlackSmith_Idle_1.png");
+
+
+	IMAGEMANAGER->AddImage("Witch_Idle_1", L"Image/NPC/Witch_Idle_1.png");
+	IMAGEMANAGER->AddImage("Witch_Idle_2", L"Image/NPC/Witch_Idle_2.png");
+	IMAGEMANAGER->AddImage("Witch_Idle_3", L"Image/NPC/Witch_Idle_3.png");
 }

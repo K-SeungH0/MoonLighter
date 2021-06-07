@@ -10,6 +10,7 @@ enum class OBJECTTYPE
 	BREAKABLE,
 	UNIT,
 	PROJECTILE,
+	NPC,
 	NONE
 };
 class Object : public GameObject
