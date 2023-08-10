@@ -1,5 +1,6 @@
 # MoonLighter
-![Ingame](https://github.com/K-SeungH0/MoonLighter/assets/79676354/569eb2b3-a511-4c18-bada-2a5910fa09d3)  
+![Ingame](https://github.com/K-SeungH0/MoonLighter/assets/79676354/5d9053da-54f2-4574-ae7d-c51c8db9fce3)
+  
 
 개인 포토폴리오  
 개발 툴 : Visual Studio 2019  
